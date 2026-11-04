@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NextGen Cloud Analytics Platform">
+  <title>Cloud Analytics Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+  <header class="app-header">
+    <nav class="navbar" role="navigation" aria-label="Main Navigation">
+      <div class="logo">⚡ CloudSphere</div>
+      <ul class="nav-links">
+        <li><a href="#metrics">Metrics</a></li>
+        <li><a href="#deployments">Deployments</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content" class="container">
+    <section class="hero-banner">
+      <h1>Real-Time Cluster Analytics</h1>
+      <p>Continuous monitoring across microservices and cloud workloads.</p>
+    </section>
+
+    <!-- SPA Root Mount Point -->
+    <div id="root" role="region" aria-label="Application Dashboard Root"></div>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 CloudSphere Systems. All rights reserved.</p>
+  </footer>
+
+  <script type="module" src="app.jsx"></script>
+</body>
+</html>

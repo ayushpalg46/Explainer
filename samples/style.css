@@ -1,0 +1,58 @@
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #10b981;
+  --bg-dark: #090d16;
+  --card-bg: rgba(18, 24, 38, 0.85);
+  --border-color: #23304a;
+  --text-main: #f8fafc;
+  --font-base: system-ui, sans-serif;
+  --spacing-unit: 8px;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-base);
+  margin: 0;
+  padding: 0;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(var(--spacing-unit) * 2);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: calc(var(--spacing-unit) * 3);
+  padding: calc(var(--spacing-unit) * 3);
+}
+
+.hero-banner {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: calc(var(--spacing-unit) * 2);
+  }
+}

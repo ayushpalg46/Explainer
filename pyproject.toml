@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "explainer-engine"
+version = "1.0.0"
+description = "Deep Codebase Architecture, Compatibility & Per-File Analysis Engine"
+authors = [{ name = "Ayush Pal", email = "ayushpalg46@users.noreply.github.com" }]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "rich>=13.0.0",
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "pygments>=2.15.0",
+    "httpx>=0.25.0",
+]
+
+[project.scripts]
+explainer = "explainer.cli:main"
