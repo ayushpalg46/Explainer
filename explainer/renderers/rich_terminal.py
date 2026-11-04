@@ -24,6 +24,13 @@ class RichTerminalRenderer:
         ))
 
         # Architecture & Tech Stack Summary
+        if analysis.beginner_codebase_story:
+            c.print(Panel(
+                f"[bold yellow]🏰 The Big Castle Story (Explain Like I'm 4 Years Old):[/bold yellow]\n\n{analysis.beginner_codebase_story}",
+                title="Beginner Codebase Big Picture",
+                border_style="cyan"
+            ))
+
         arch_content = (
             f"[bold yellow]🏛 Architecture Style:[/bold yellow] {analysis.architecture_style}\n\n"
             f"{analysis.architecture_summary}\n\n"
@@ -97,10 +104,12 @@ class RichTerminalRenderer:
 
     def _render_file_deep_dive(self, fa: FileAnalysis):
         c = self.console
+        story_part = f"\n[bold yellow]🧸 Beginner Story (Like I'm 4):[/bold yellow] {fa.beginner_story}\n" if fa.beginner_story else ""
         c.print(Panel(
             f"[bold green]📄 {fa.relative_path}[/bold green] ([dim]{fa.language}, {fa.line_count} lines, {fa.file_size_bytes} bytes[/dim])\n"
             f"[bold]Role:[/bold] {fa.role_in_codebase}\n"
             f"[bold]Summary:[/bold] {fa.summary}\n"
+            f"{story_part}"
             f"{f'[bold yellow]Concepts:[/bold yellow] ' + ', '.join(fa.concepts_detected) if fa.concepts_detected else ''}\n"
             f"{f'[bold cyan]Design & Styling:[/bold cyan] ' + fa.design_and_style_notes if fa.design_and_style_notes else ''}\n"
             f"{f'[bold magenta]Motion & Interactions:[/bold magenta] ' + fa.animations_and_interactions if fa.animations_and_interactions else ''}",
@@ -122,11 +131,13 @@ class RichTerminalRenderer:
             elem_table.add_column("Name", style="bold cyan")
             elem_table.add_column("Kind", style="yellow")
             elem_table.add_column("Line", justify="right", style="dim")
-            elem_table.add_column("What & How", style="white")
+            elem_table.add_column("What It Is & 4-Year-Old Analogy", style="white")
             elem_table.add_column("Why & Best Practice", style="green")
 
             for el in fa.elements[:15]:  # Display top 15 in terminal to keep readable
-                what_how = f"[bold]What:[/bold] {el.what_it_is}\n[bold]How:[/bold] {el.how_it_is_used}\n[bold]Where:[/bold] {el.where_it_is_used}"
+                analogy_txt = f"\n[bold yellow]🧸 Like I'm 4:[/bold yellow] {el.simple_analogy}" if el.simple_analogy else ""
+                screen_txt = f"\n[bold cyan]🖥️ Screen:[/bold cyan] {el.what_happens_on_screen}" if el.what_happens_on_screen else ""
+                what_how = f"[bold]What:[/bold] {el.what_it_is}{analogy_txt}{screen_txt}\n[bold]How:[/bold] {el.how_it_is_used}"
                 why_bp = f"[bold]Why:[/bold] {el.why_it_works}\n[bold]Best Practice:[/bold] {el.best_practices_and_pitfalls or 'Follow framework standards.'}"
                 elem_table.add_row(
                     el.name,

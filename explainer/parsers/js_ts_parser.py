@@ -18,25 +18,30 @@ class JsTsParser(BaseParser):
         analysis = self.create_base_analysis(file_path, content, relative_path)
         lines = content.splitlines()
 
-        # Extract Imports:
-        # 1. ES6 import ... from '...'
-        import_matches = re.finditer(r'import\s+(?:(?:(?:[a-zA-Z0-9_{}\s*,*]+)\s+from\s+)?["\']([^"\']+)["\'])', content)
+        # Extract Imports
+        import_matches = list(re.finditer(r'import\s+((?:[a-zA-Z0-9_{}\s*,*]+)\s+from\s+)?["\']([^"\']+)["\']', content))
         for m in import_matches:
-            analysis.raw_imports.append(m.group(1))
+            target = m.group(2)
+            imported_symbols = m.group(1).replace("from", "").strip() if m.group(1) else target
+            analysis.raw_imports.append(target)
+            line_no = content[:m.start()].count('\n') + 1
 
-        # 2. CommonJS require('...')
-        require_matches = re.finditer(r'require\s*\(\s*["\']([^"\']+)["\']\s*\)', content)
-        for m in require_matches:
-            if m.group(1) not in analysis.raw_imports:
-                analysis.raw_imports.append(m.group(1))
+            analysis.elements.append(ElementExplanation(
+                name=f"import from '{target}'",
+                kind="import",
+                line_number=line_no,
+                snippet=m.group(0),
+                what_it_is=f"Brings tools or components (`{imported_symbols}`) from the external file or library `{target}`.",
+                how_it_is_used=f"Written at line {line_no} to import dependencies for this file.",
+                where_it_is_used=f"Line {line_no} of `{relative_path}`.",
+                why_it_works="The JavaScript module loader links the exported functions from the target module into this file's scope.",
+                best_practices_and_pitfalls="Import only what you need and keep imports organized at the top of the file.",
+                simple_analogy="Think of this like borrowing a toy or tool from your friend's room so you can build something cool here!",
+                what_happens_on_screen="Doesn't show a picture directly, but makes the borrowed functions and buttons available to use.",
+                what_if_removed=f"The file crashes with an error saying: 'I cannot find {imported_symbols}!'."
+            ))
 
-        # 3. Dynamic import('...')
-        dyn_import_matches = re.finditer(r'import\s*\(\s*["\']([^"\']+)["\']\s*\)', content)
-        for m in dyn_import_matches:
-            if m.group(1) not in analysis.raw_imports:
-                analysis.raw_imports.append(m.group(1))
-
-        # Extract Exports:
+        # Extract Exports
         export_matches = re.finditer(r'export\s+(?:default\s+)?(?:const|let|var|function\*?|class|type|interface)?\s*([a-zA-Z0-9_$]+)?', content)
         for m in export_matches:
             exp_name = m.group(1)
@@ -77,14 +82,16 @@ class JsTsParser(BaseParser):
                     how_it_is_used=f"Invoked {len(matches)} time(s) to manage state or lifecycle.",
                     where_it_is_used=f"First invoked around line {line_no}.",
                     why_it_works=kb.get("why_it_works", "Manages state or effects via React's internal Fiber node tracking."),
-                    best_practices_and_pitfalls=kb.get("best_practices", "Follow the Rules of Hooks: call only at the top level.")
+                    best_practices_and_pitfalls=kb.get("best_practices", "Follow the Rules of Hooks: call only at the top level."),
+                    simple_analogy=kb.get("simple_analogy", "Think of this like an erasable whiteboard scoreboard that redraws the screen whenever the score changes!"),
+                    what_happens_on_screen=kb.get("what_happens_on_screen", "The number or item on screen instantly updates before your eyes."),
+                    what_if_removed=kb.get("what_if_removed", "The computer forgets what you clicked and the screen never updates.")
                 ))
 
         if hooks_found:
             detected_concepts.append(f"React State & Hooks Architecture ({', '.join(hooks_found.keys())})")
 
         # React Components Detection
-        # Functional components e.g. function MyComponent() or const MyComponent = () =>
         component_matches = re.finditer(r'(?:function\s+([A-Z][a-zA-Z0-9_]*)|(?:const|let)\s+([A-Z][a-zA-Z0-9_]*)\s*=\s*(?:\([^)]*\)|[a-zA-Z0-9_]+)\s*=>)', content)
         components = []
         for m in component_matches:
@@ -96,12 +103,15 @@ class JsTsParser(BaseParser):
                     name=f"Component: <{cname} />",
                     kind="component",
                     line_number=line_no,
-                    snippet=f"function {cname}(...) {{ ... return <...> }}",
-                    what_it_is=f"Declarative React UI component `<{cname} />` encapsulating presentation and interactive behavior.",
-                    how_it_is_used="Receives props, maintains local state, and returns a JSX Virtual DOM subtree.",
+                    snippet=f"function {cname}(...) {{ return <...> }}",
+                    what_it_is=f"Declarative React UI component `<{cname} />` building a section of the user interface.",
+                    how_it_is_used="Receives props (settings), manages local state, and returns JSX elements to draw on screen.",
                     where_it_is_used=f"Defined at line {line_no}.",
-                    why_it_works="React instantiates a fiber node for this component, executing render and reconciliation algorithms whenever inputs change.",
-                    best_practices_and_pitfalls="Keep components focused on a single UI responsibility. Extract pure business logic into custom hooks or utility helpers."
+                    why_it_works="React instantiates a fiber node for this component and reconciles its Virtual DOM against the real screen.",
+                    best_practices_and_pitfalls="Keep components small and focused on one job.",
+                    simple_analogy=f"Think of <{cname} /> like a specialized Lego workshop or toy factory! Whenever the app calls its name, it stamps out a brand new, interactive Lego block with buttons and text.",
+                    what_happens_on_screen=f"Draws the `<{cname} />` component and all of its buttons, text, and pictures on the page.",
+                    what_if_removed=f"The entire `{cname}` section will disappear from the screen."
                 ))
 
         if components:
@@ -112,17 +122,19 @@ class JsTsParser(BaseParser):
         has_fetch = bool(re.search(r'\bfetch\s*\(|\baxios\.', content))
         if has_async or has_fetch:
             detected_concepts.append("Asynchronous Data Pipelines (Promises / async-await)")
-            kb = JS_REACT_KNOWLEDGE.get("async_await", {})
             analysis.elements.append(ElementExplanation(
                 name="Async / Await Flow",
                 kind="concept",
                 line_number=None,
                 snippet="async () => { const res = await fetch(...); }",
-                what_it_is=kb.get("what_it_is", "Non-blocking asynchronous control flow pattern."),
+                what_it_is="Non-blocking asynchronous control flow pattern.",
                 how_it_is_used="Pauses execution non-blockingly while network or async tasks resolve.",
                 where_it_is_used="Found in data retrieval, effect handlers, or API endpoints.",
-                why_it_works=kb.get("why_it_works", "Operates over JavaScript Promises yielded back to the browser's event loop."),
-                best_practices_and_pitfalls=kb.get("best_practices", "Always handle rejections using try/catch blocks.")
+                why_it_works="Operates over JavaScript Promises yielded back to the browser's event loop.",
+                best_practices_and_pitfalls="Always handle rejections using try/catch blocks.",
+                simple_analogy="Think of this like ordering food at a restaurant! You place your order, sit down and chat with friends, and when the chef rings the bell ('await'), your food is ready!",
+                what_happens_on_screen="Allows the app to fetch data from the internet smoothly without freezing the buttons or screen.",
+                what_if_removed="The screen would freeze like ice while waiting for internet data."
             ))
 
         analysis.concepts_detected = detected_concepts
@@ -138,20 +150,19 @@ class JsTsParser(BaseParser):
         else:
             analysis.role_in_codebase = "JavaScript/TypeScript Logic & Module Utility"
 
-        analysis.summary = (
-            f"{self.language} module containing {len(analysis.raw_imports)} external/internal import references "
-            f"and exporting {len(analysis.raw_exports)} symbol(s) ({', '.join(analysis.raw_exports[:3]) if analysis.raw_exports else 'internal module'}). "
-            f"{f'Declares {len(components)} UI component(s): {', '.join(components[:3])}. ' if components else ''}"
-            f"{f'Utilizes {len(hooks_found)} React hook type(s): {', '.join(hooks_found.keys())}. ' if hooks_found else ''}"
-            f"{'Features asynchronous promise and fetch workflows. ' if has_async or has_fetch else ''}"
+        # Beginner Friendly Story
+        analysis.beginner_story = (
+            f"Imagine this file `{relative_path}` is a lively workshop in a toy factory! "
+            f"{'It builds interactive React Lego blocks with buttons and cards. ' if components else 'It provides smart tools and helper calculations. '}"
+            f"Whenever a user touches a button or clicks their mouse on the screen, the functions inside this file wake up, "
+            f"calculate new numbers, and update the screen so the user sees instant magic!"
         )
 
-        if "Three.js 3D Engine" in detected_frameworks or "GSAP Animation Library" in detected_frameworks:
-            analysis.animations_and_interactions = (
-                f"Interactive animation integration detected: "
-                f"{'Three.js 3D render loop & viewport controls. ' if 'Three.js 3D Engine' in detected_frameworks else ''}"
-                f"{'GSAP timeline sequences & scroll triggers. ' if 'GSAP Animation Library' in detected_frameworks else ''}"
-            )
+        analysis.summary = (
+            f"{self.language} module containing {len(analysis.raw_imports)} imports, {len(components)} component(s), "
+            f"and {len(analysis.raw_exports)} exported symbols. "
+            f"{'Built with ' + ', '.join(detected_frameworks) + '. ' if detected_frameworks else ''}"
+            f"{'Uses stateful hooks: ' + ', '.join(hooks_found.keys()) + '. ' if hooks_found else ''}"
+        )
 
         return analysis
-

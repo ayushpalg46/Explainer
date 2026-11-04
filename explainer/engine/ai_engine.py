@@ -14,13 +14,24 @@ class AIExplainerEngine:
     Augments deterministic AST & Knowledge facts with real local AI model analysis
     (Ollama, LM Studio, or OpenAI-compatible local endpoints).
     Features native auto-detection for installed models (e.g. Qwen2.5-Coder and Qwen3.5).
-    Performs true two-tier AI generation:
-      1. High-level System Architecture & Technical Debt Review
-      2. Per-file Deep Neural Code Analysis (Mechanics, Design Patterns, Interconnections)
+    Instructs the AI model as a World-Class Senior Developer & System Architect
+    explaining code to a complete beginner / 4-year-old child with zero prior knowledge.
+    Walks through what is actually written on the codefile line-by-line, tag-by-tag,
+    and class-by-class using fun real-world analogies.
     """
 
     DEFAULT_CODER_MODEL = "hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
     DEFAULT_GENERAL_MODEL = "qwen35-uncensored:latest"
+
+    SYSTEM_PROMPT = (
+        "You are an elite Senior Developer and Master System Architect. Your world-renowned "
+        "talent is explaining software code to complete beginners and bright 4-year-old children "
+        "who have zero prior programming knowledge. You NEVER use unexplained jargon or hand-waving "
+        "abstractions. You explain what is actually WRITTEN on the code file, word-for-word, "
+        "tag-for-tag, line-by-line, using fun, vivid real-world analogies (like toys, Lego blocks, "
+        "recipe books, drawing easels, and helpful robots). Your explanations are deep, ultra-clear, "
+        "patient, and comprehensive. You never give short or vague summaries."
+    )
 
     def __init__(
         self,
@@ -105,12 +116,12 @@ class AIExplainerEngine:
         base_analysis.engine_used = f"Local AI Model ({self.model_name} via {self.provider})"
         base_analysis.ai_model_name = self.model_name
 
-        # Step 2: System-level AI Architectural Synthesis
+        # Step 2: System-level AI Architectural Synthesis (Beginner / Lego Factory Analogy)
         ai_narrative = self._query_architecture(base_analysis)
         if ai_narrative:
             base_analysis.ai_architecture_critique = ai_narrative
 
-        # Step 3: Per-File Deep Neural Analysis
+        # Step 3: Per-File Deep Neural Analysis (Line-by-line / block-by-block beginner walkthrough)
         file_items = list(base_analysis.files.items())
         total_files = len(file_items)
 
@@ -126,24 +137,30 @@ class AIExplainerEngine:
         return base_analysis
 
     def _query_architecture(self, base_analysis: CodebaseAnalysis) -> Optional[str]:
-        """Queries the local AI model for deep codebase architectural synthesis."""
+        """Queries the local AI model for codebase architectural synthesis explained to a beginner."""
         prompt = (
-            f"You are a principal software architect. Review this codebase structural profile and produce "
-            f"a comprehensive, highly insightful architectural assessment:\n\n"
-            f"Project: {base_analysis.project_name}\n"
-            f"Total Files: {base_analysis.total_files}, Total Lines: {base_analysis.total_lines:,}\n"
-            f"Detected Tech Stack: {base_analysis.tech_stack.compatibility_analysis}\n"
-            f"Languages: {json.dumps(base_analysis.tech_stack.languages)}\n"
-            f"Frameworks & Tooling: {', '.join(base_analysis.tech_stack.frameworks or ['None identified'])}\n"
-            f"Cross-File Interconnections: {len(base_analysis.interconnections)} inter-module relationships.\n\n"
-            f"In your response, explain:\n"
-            f"1. **Architectural Paradigm**: Identify and justify the overall architecture pattern (e.g. Full-Stack Polyglot, Monolith, Component-Driven).\n"
-            f"2. **Data & Execution Flow**: How runtime requests, styling, and data travel across these layers.\n"
-            f"3. **Production Strengths & Recommendations**: Critical evaluation of scalability, testability, and edge cases.\n"
-            f"Format clearly in GitHub Markdown with bullet points (under 250 words)."
+            f"{self.SYSTEM_PROMPT}\n\n"
+            f"You are explaining the big architecture of this entire software project '{base_analysis.project_name}' "
+            f"to a beginner student / 4-year-old child:\n\n"
+            f"Project Facts:\n"
+            f"- Total Files: {base_analysis.total_files}\n"
+            f"- Total Lines of Code: {base_analysis.total_lines:,}\n"
+            f"- Languages Used: {json.dumps(base_analysis.tech_stack.languages)}\n"
+            f"- Frameworks: {', '.join(base_analysis.tech_stack.frameworks or ['None detected'])}\n"
+            f"- Inter-File Connections: {len(base_analysis.interconnections)} cross-file links\n\n"
+            f"Explain the system architecture using the Lego Castle / Toy Factory analogy. "
+            f"Structure your response with these exact sections:\n\n"
+            f"### 🏰 1. The Big Castle Story (What is this whole project?)\n"
+            f"Explain what this project actually is and what it does in fun, plain English.\n\n"
+            f"### 🏭 2. The Toy Workshops (How Folders & Files Divide the Work)\n"
+            f"Explain how the different files and languages work together like different rooms in a toy workshop.\n\n"
+            f"### 🚂 3. The Information Highway (How a User Click Travels)\n"
+            f"Trace what happens when a user touches the screen or clicks a button, and how data travels through the code.\n\n"
+            f"### 🛡️ 4. How to Make It Even Stronger (Architectural Recommendations)\n"
+            f"Give 2-3 friendly recommendations on how to keep the project clean, fast, and organized.\n"
         )
 
-        return self._send_prompt(prompt, max_tokens=400, temperature=0.2)
+        return self._send_prompt(prompt, max_tokens=400, temperature=0.3)
 
     def _query_file_analysis(
         self,
@@ -151,8 +168,7 @@ class AIExplainerEngine:
         codebase: CodebaseAnalysis,
         root_path: str
     ) -> Optional[str]:
-        """Queries the local AI model for a deep, file-specific technical explanation."""
-        # Read snippet of file content from disk safely
+        """Queries the local AI model for a deep, line-by-line file explanation for beginners."""
         content_snippet = ""
         try:
             full_path = Path(fa.file_path)
@@ -161,39 +177,40 @@ class AIExplainerEngine:
             if full_path.exists():
                 raw = full_path.read_text(encoding="utf-8", errors="replace")
                 lines = raw.splitlines()
-                # Feed first 120 lines or 4500 chars to avoid exceeding model context
-                if len(lines) > 120:
-                    content_snippet = "\n".join(lines[:120]) + f"\n... [Truncated: {len(lines) - 120} more lines]"
+                # Feed first 100 lines or 3500 chars to provide full file visibility
+                if len(lines) > 100:
+                    content_snippet = "\n".join(lines[:100]) + f"\n... [Truncated: {len(lines) - 100} more lines]"
                 else:
-                    content_snippet = raw[:4500]
+                    content_snippet = raw[:3500]
         except Exception:
             content_snippet = "(File content unavailable)"
 
-        # Collect inbound & outbound relationship names
         outbound_desc = [f"{c.relation_type} -> {c.target_file}" for c in fa.outbound_connections] or ["None"]
-        inbound_desc = [f"used by {c.source_file} ({c.relation_type})" for c in fa.inbound_connections] or ["None"]
-        element_sample = [f"{e.kind}: {e.name}" for e in fa.elements[:8]]
 
         prompt = (
-            f"You are a staff software engineer and technical educator. Perform a deep, authoritative code analysis "
-            f"for this specific file in the '{codebase.project_name}' project:\n\n"
-            f"File: `{fa.relative_path}`\n"
-            f"Language: {fa.language} | Lines: {fa.line_count}\n"
-            f"Role Identified: {fa.role_in_codebase}\n"
-            f"Dependencies: Outbound: [{', '.join(outbound_desc)}] | Inbound: [{', '.join(inbound_desc)}]\n"
-            f"Key Symbols Detected: [{', '.join(element_sample)}]\n\n"
-            f"Source Code:\n```\n{content_snippet}\n```\n\n"
-            f"Provide a structured Markdown breakdown:\n"
-            f"- **Core Purpose & Engineering Rationale**: Why this file exists and how it contributes to the application.\n"
-            f"- **Mechanics & Implementation Highlights**: Key logic flow, syntax techniques, state handling, or algorithms used.\n"
-            f"- **Interconnection Rationale**: How and why it integrates with its dependencies ({', '.join(outbound_desc)}).\n"
-            f"- **Production Considerations**: Edge cases, performance nuances, or best practices.\n"
-            f"Keep it concise, highly technical, and directly tied to the code above."
+            f"{self.SYSTEM_PROMPT}\n\n"
+            f"You are teaching an absolute beginner (or a 4-year-old child) who knows NOTHING about code. "
+            f"Explain what is written inside this file: `{fa.relative_path}` ({fa.language}) from '{codebase.project_name}'.\n\n"
+            f"CODE IN THIS FILE:\n"
+            f"```\n{content_snippet}\n```\n\n"
+            f"Write a vivid, beginner-friendly explanation structured into these 4 sections:\n\n"
+            f"### 🧸 1. The Big Picture Story (Explain Like I'm 4 Years Old)\n"
+            f"Give a fun real-world story or analogy (like Lego blocks, toy kitchen, or recipe book) explaining what this file does.\n\n"
+            f"### 🔍 2. What Is Written in This File? (Line-by-Line & Tag Walkthrough)\n"
+            f"Walk through the key lines, tags, classes, or functions written above:\n"
+            f"- **What is written?** (Quote the line, e.g. `<div id=\"root\">`, `def calculate_metrics`)\n"
+            f"- **Explain Like I'm 4**: Explain in simple words with a fun analogy.\n"
+            f"- **What happens on screen / in computer?**\n"
+            f"- **What if we deleted it?**\n\n"
+            f"### 🔗 3. How This File Talks to Other Files (Friendship Connection)\n"
+            f"Explain how it shares or borrows tools from other files ({', '.join(outbound_desc)}).\n\n"
+            f"### 💡 4. Secret Rules to Remember\n"
+            f"Give 2 simple golden rules for beginners.\n"
         )
 
-        return self._send_prompt(prompt, max_tokens=450, temperature=0.2)
+        return self._send_prompt(prompt, max_tokens=650, temperature=0.3)
 
-    def _send_prompt(self, prompt: str, max_tokens: int = 350, temperature: float = 0.2) -> Optional[str]:
+    def _send_prompt(self, prompt: str, max_tokens: int = 650, temperature: float = 0.3) -> Optional[str]:
         """Sends a prompt to the local AI endpoint with robust timeout and error reporting."""
         try:
             if self.provider == "ollama":
@@ -222,13 +239,13 @@ class AIExplainerEngine:
                 payload = {
                     "model": self.model_name,
                     "messages": [
-                        {"role": "system", "content": "You are an expert software engineer and codebase explainer."},
+                        {"role": "system", "content": self.SYSTEM_PROMPT},
                         {"role": "user", "content": prompt}
                     ],
                     "temperature": temperature,
                     "max_tokens": max_tokens
                 }
-                res = requests.post(url, json=payload, timeout=120)
+                res = requests.post(url, json=payload, timeout=180)
                 if res.status_code == 200:
                     data = res.json()
                     choices = data.get("choices", [])
@@ -238,7 +255,7 @@ class AIExplainerEngine:
                     return f"*AI Generation Notice*: Local AI server returned HTTP {res.status_code}: {res.text[:100]}"
 
         except requests.exceptions.Timeout:
-            return "*AI Generation Notice*: Local model request timed out (>120s)."
+            return "*AI Generation Notice*: Local model request timed out (>180s)."
         except requests.exceptions.ConnectionError:
             return "*AI Generation Notice*: Could not connect to local AI server at " + self.endpoint_url
         except Exception as e:

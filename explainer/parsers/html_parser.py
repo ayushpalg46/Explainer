@@ -33,7 +33,6 @@ class HtmlParser(BaseParser):
         try:
             extractor.feed(content)
         except Exception:
-            # Fallback regex tag matching if malformed html
             for m in re.finditer(r'<([a-zA-Z0-9\-]+)([^>]*)>', content):
                 line = content[:m.start()].count('\n') + 1
                 tag_name = m.group(1).lower()
@@ -61,28 +60,23 @@ class HtmlParser(BaseParser):
             line = item["line"]
             tag_counts[tag] = tag_counts.get(tag, 0) + 1
 
-            # Detect CSS links
             if tag == "link" and attrs.get("rel") == "stylesheet" and "href" in attrs:
                 linked_css.append(attrs["href"])
                 analysis.raw_imports.append(attrs["href"])
 
-            # Detect script links
             if tag == "script" and "src" in attrs:
                 linked_scripts.append(attrs["src"])
                 analysis.raw_imports.append(attrs["src"])
 
-            # Detect React mount root
             if attrs.get("id") in ("root", "app", "__next"):
                 has_react_root = True
                 detected_frameworks.append("React / Modern SPA Mount Point")
 
-            # Detect Canvas & SVG
             if tag == "canvas":
                 has_canvas = True
             if tag == "svg":
                 has_svg = True
 
-            # Detect Tailwind or utility classes
             cls = attrs.get("class", "")
             if any(tw in cls for tw in ["flex", "grid", "p-", "m-", "text-", "bg-", "dark:"]):
                 if "Tailwind CSS Utilities" not in detected_frameworks:
@@ -99,40 +93,75 @@ class HtmlParser(BaseParser):
         if has_svg:
             detected_concepts.append("Vector Iconography / Graphics (SVG)")
 
-        # Generate ElementExplanations for unique tags
-        for tag, count in tag_counts.items():
+        # Generate Beginner-Friendly Element Explanations for Tags
+        seen_tags = set()
+        for item in extractor.tags:
+            tag = item["tag"]
+            attrs = item["attrs"]
+            line = item["line"]
+            
+            # Format attributes string
+            attr_parts = [f'{k}="{v}"' for k, v in attrs.items()]
+            snippet_str = f"<{tag} {' '.join(attr_parts)}>" if attr_parts else f"<{tag}>"
+
+            # Create specific explanations for important tags or first occurrence
+            is_special = tag in ("link", "script") or attrs.get("id") or "class" in attrs
+            if tag in seen_tags and not is_special:
+                continue
+            seen_tags.add(tag)
+
             kb = HTML_TAG_KNOWLEDGE.get(tag, {
                 "what_it_is": f"Standard HTML5 element `<{tag}>` providing document structure or markup styling.",
+                "simple_analogy": f"Think of `<{tag}>` like a Lego brick that holds a piece of your webpage in place.",
+                "what_happens_on_screen": "Displays or organizes content on the page.",
+                "what_if_removed": f"The `<{tag}>` section will disappear from the screen.",
                 "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.",
                 "best_practices": "Ensure proper closing tags and valid semantic hierarchy."
             })
-            
-            # Find representative line
-            rep_line = next((t["line"] for t in extractor.tags if t["tag"] == tag), None)
-            
-            # Where is it used context
-            where_desc = f"Used {count} time(s) across the document. "
-            if tag == "link":
-                where_desc += f"Imports stylesheets/resources: {', '.join(linked_css[:3]) if linked_css else 'metadata'}. "
-            elif tag == "script":
-                where_desc += f"Loads scripts: {', '.join(linked_scripts[:3]) if linked_scripts else 'inline code'}. "
-            elif tag == "div" and has_react_root:
-                where_desc += "Contains the primary React/SPA root mount point (`#root`). "
+
+            # What is written & how it's used
+            how_desc = f"Written on line {line} as `{snippet_str}`. "
+            if attrs:
+                attr_explain = []
+                for k, v in attrs.items():
+                    if k == "id":
+                        attr_explain.append(f"`id='{v}'` (a unique name-tag so code can find this exact box)")
+                    elif k == "class":
+                        attr_explain.append(f"`class='{v}'` (styling labels that tell CSS how to color and size it)")
+                    elif k == "src":
+                        attr_explain.append(f"`src='{v}'` (the file path telling the browser where to fetch this script/image)")
+                    elif k == "href":
+                        attr_explain.append(f"`href='{v}'` (the link path telling the browser where this connects)")
+                    elif k == "rel":
+                        attr_explain.append(f"`rel='{v}'` (tells the browser the relationship of the linked file)")
+                    elif k == "type":
+                        attr_explain.append(f"`type='{v}'` (specifies the behavior mode)")
+                if attr_explain:
+                    how_desc += "Contains attributes: " + ", ".join(attr_explain) + ". "
 
             explanation = ElementExplanation(
                 name=f"<{tag}>",
                 kind="tag",
-                line_number=rep_line,
-                snippet=f"<{tag} ...> (count: {count})",
+                line_number=line,
+                snippet=snippet_str,
                 what_it_is=kb["what_it_is"],
-                how_it_is_used=f"Defined in the markup to structure content. Count in file: {count}.",
-                where_it_is_used=where_desc,
+                how_it_is_used=how_desc,
+                where_it_is_used=f"Line {line} of `{relative_path}`. Total `<{tag}>` tags in file: {tag_counts.get(tag, 1)}.",
                 why_it_works=kb["why_it_works"],
-                best_practices_and_pitfalls=kb["best_practices"]
+                best_practices_and_pitfalls=kb.get("best_practices", "Follow standard HTML conventions."),
+                simple_analogy=kb.get("simple_analogy", f"Think of `<{tag}>` like a Lego block building the page."),
+                what_happens_on_screen=kb.get("what_happens_on_screen", "Draws or positions this element on screen."),
+                what_if_removed=kb.get("what_if_removed", "This element will vanish from the page.")
             )
             analysis.elements.append(explanation)
 
-        # Summary & role
+        # Beginner Friendly Story for the whole file
+        analysis.beginner_story = (
+            f"Imagine you are building a toy house out of Lego blocks! This HTML file `{relative_path}` is the blueprint "
+            f"and skeleton of the house. It sets up the roof and secret rules in `<head>`, the big living room where all the toys perform in `<body>`, "
+            f"{'and builds an empty stage `<div id=\"root\">` waiting for your React code to jump in and build the whole interactive world!' if has_react_root else 'and organizes the buttons, text, and pictures on the page.'}"
+        )
+
         analysis.summary = (
             f"HTML document containing {len(extractor.tags)} elements across {len(tag_counts)} distinct tag types. "
             f"Serves as the visual entrypoint or template. "
@@ -143,7 +172,6 @@ class HtmlParser(BaseParser):
         analysis.concepts_detected = detected_concepts
         analysis.frameworks_detected = detected_frameworks
         
-        # Design & Animation notes
         analysis.design_and_style_notes = (
             f"Links {len(linked_css)} external stylesheet(s). "
             f"{'Utilizes Tailwind utility classes in markup. ' if 'Tailwind CSS Utilities' in detected_frameworks else 'Custom or standard semantic styling. '}"

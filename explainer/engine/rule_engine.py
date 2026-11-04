@@ -25,6 +25,15 @@ class RuleExplainerEngine:
         folder_roles = self._compute_folder_roles(files)
         arch_style, arch_summary = self._synthesize_architecture(files, tech_stack, interconnections)
 
+        beginner_codebase_story = (
+            f"Imagine this entire project `{project_name}` is a giant, bustling Lego castle or toy workshop! "
+            f"There are {len(files)} different Lego pieces working together across {len(tech_stack.languages)} languages. "
+            f"Some files build the colorful walls and buttons that you see on screen (frontend), "
+            f"some files are the secret clockwork gears under the floor doing the heavy lifting (backend), "
+            f"and {len(interconnections)} plastic snap-connectors hold them tightly together "
+            f"so when you tap a button on the wall, the gears turn and the doors open smoothly!"
+        )
+
         return CodebaseAnalysis(
             root_path=str(root_p),
             project_name=project_name,
@@ -33,6 +42,7 @@ class RuleExplainerEngine:
             tech_stack=tech_stack,
             architecture_style=arch_style,
             architecture_summary=arch_summary,
+            beginner_codebase_story=beginner_codebase_story,
             folder_roles=folder_roles,
             files=files,
             interconnections=interconnections,

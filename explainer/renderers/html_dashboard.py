@@ -45,6 +45,7 @@ class HtmlDashboardRenderer:
                 "animations_and_interactions": fa.animations_and_interactions or "",
                 "ai_insights": fa.ai_insights or "",
                 "ai_model_used": fa.ai_model_used or "",
+                "beginner_story": fa.beginner_story or "",
                 "elements": [
                     {
                         "name": el.name,
@@ -55,7 +56,10 @@ class HtmlDashboardRenderer:
                         "how_it_is_used": el.how_it_is_used,
                         "where_it_is_used": el.where_it_is_used,
                         "why_it_works": el.why_it_works,
-                        "best_practices": el.best_practices_and_pitfalls or ""
+                        "best_practices": el.best_practices_and_pitfalls or "",
+                        "simple_analogy": el.simple_analogy or "",
+                        "what_happens_on_screen": el.what_happens_on_screen or "",
+                        "what_if_removed": el.what_if_removed or ""
                     }
                     for el in fa.elements
                 ],
@@ -73,6 +77,19 @@ class HtmlDashboardRenderer:
         files_data_json = json.dumps(files_payload)
         tech_stack_json = json.dumps(analysis.tech_stack.model_dump())
         folder_roles_json = json.dumps(analysis.folder_roles)
+
+        beginner_codebase_html = ""
+        if analysis.beginner_codebase_story:
+            safe_story = (analysis.beginner_codebase_story
+                          .replace("&", "&amp;")
+                          .replace("<", "&lt;")
+                          .replace(">", "&gt;"))
+            beginner_codebase_html = f"""
+            <div class="card" style="border: 1px solid #38bdf8; background: #0c1a30; margin-bottom:20px; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);">
+              <h2 style="color:#7dd3fc; font-size:1.15rem; margin-bottom:8px;">🏰 The Big Castle Story (Explain Like I'm 4 Years Old)</h2>
+              <div style="color:#e0f2fe; line-height:1.65; font-size:0.95rem;">{safe_story}</div>
+            </div>
+            """
 
         ai_arch_html = ""
         if analysis.ai_architecture_critique:
@@ -218,6 +235,8 @@ class HtmlDashboardRenderer:
         </div>
       </div>
 
+      {beginner_codebase_html}
+
       <div class="card">
         <h2>🏛 Architecture Profile: {analysis.architecture_style}</h2>
         <p style="line-height:1.6; color:#d1d5db; margin-bottom:16px;">{analysis.architecture_summary}</p>
@@ -348,14 +367,24 @@ class HtmlDashboardRenderer:
 
       let elementsRows = "";
       f.elements.forEach(el => {{
+        let analogyHtml = el.simple_analogy ? `<div style="background:#1e293b; border-left:3px solid #f59e0b; padding:6px 10px; margin:6px 0; border-radius:4px; font-size:0.85rem; color:#fef3c7;"><strong>🧸 Like I'm 4:</strong> ${{escapeHtml(el.simple_analogy)}}</div>` : '';
+        let screenHtml = el.what_happens_on_screen ? `<div style="margin-top:4px; font-size:0.85rem; color:#7dd3fc;"><strong>🖥️ On Screen:</strong> ${{escapeHtml(el.what_happens_on_screen)}}</div>` : '';
+        let removedHtml = el.what_if_removed ? `<div style="margin-top:4px; font-size:0.85rem; color:#f87171;"><strong>⚠️ If Removed:</strong> ${{escapeHtml(el.what_if_removed)}}</div>` : '';
+
         elementsRows += `
           <tr>
-            <td><strong style="color:var(--accent);">${{escapeHtml(el.name)}}</strong></td>
+            <td>
+              <strong style="color:var(--accent);">${{escapeHtml(el.name)}}</strong>
+              ${{el.snippet ? '<pre style="background:#0b1120; padding:4px 8px; border-radius:4px; font-size:0.75rem; margin-top:4px; color:#cbd5e1; overflow-x:auto;">' + escapeHtml(el.snippet) + '</pre>' : ''}}
+            </td>
             <td><span class="kind-badge">${{el.kind}}</span></td>
             <td>${{el.line_number || '-'}}</td>
             <td>
               <strong>What:</strong> ${{el.what_it_is}}<br>
+              ${{analogyHtml}}
               <strong style="margin-top:4px; display:inline-block;">How:</strong> ${{el.how_it_is_used}}
+              ${{screenHtml}}
+              ${{removedHtml}}
             </td>
             <td>${{el.where_it_is_used}}</td>
             <td>
@@ -368,6 +397,19 @@ class HtmlDashboardRenderer:
 
       let inConn = f.inbound.map(c => `<li>⬅️ Referenced by <code>${{c.source}}</code> (${{c.type}})</li>`).join("");
       let outConn = f.outbound.map(c => `<li>➡️ References <code>${{c.target}}</code> (${{c.type}})</li>`).join("");
+
+      let beginnerStoryHtml = "";
+      if (f.beginner_story) {{
+        beginnerStoryHtml = `
+          <div class="card" style="border: 1px solid #38bdf8; background: #0c1a30; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15); margin-bottom: 16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span style="font-size:1.2rem;">🧸</span>
+              <h2 style="color:#7dd3fc; font-size:1.1rem;">The Big Picture Story (Explain Like I'm 4 Years Old)</h2>
+            </div>
+            <p style="color:#e0f2fe; line-height:1.6; font-size:0.95rem;">${{escapeHtml(f.beginner_story)}}</p>
+          </div>
+        `;
+      }}
 
       let aiCardHtml = "";
       if (f.ai_insights) {{
@@ -385,6 +427,7 @@ class HtmlDashboardRenderer:
       }}
 
       container.innerHTML = `
+        ${{beginnerStoryHtml}}
         ${{aiCardHtml}}
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">

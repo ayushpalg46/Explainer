@@ -14,6 +14,9 @@ class ElementExplanation(BaseModel):
     where_it_is_used: str
     why_it_works: str
     best_practices_and_pitfalls: Optional[str] = None
+    simple_analogy: Optional[str] = None  # Friendly 4-year-old / beginner analogy
+    what_happens_on_screen: Optional[str] = None  # What the user actually sees or experiences
+    what_if_removed: Optional[str] = None  # What breaks if this code is deleted
 
 
 class FileInterconnection(BaseModel):
@@ -46,6 +49,7 @@ class FileAnalysis(BaseModel):
     raw_exports: List[str] = Field(default_factory=list)
     ai_insights: Optional[str] = None
     ai_model_used: Optional[str] = None
+    beginner_story: Optional[str] = None  # Friendly 4-year-old story explaining this file
 
 
 class TechStackInfo(BaseModel):
@@ -75,4 +79,5 @@ class CodebaseAnalysis(BaseModel):
     engine_used: str = "Rule/AST Deep Knowledge Engine"
     ai_model_name: Optional[str] = None
     ai_architecture_critique: Optional[str] = None
+    beginner_codebase_story: Optional[str] = None  # Lego / Toy factory analogy for the whole project
 
