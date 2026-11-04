@@ -189,26 +189,32 @@ class AIExplainerEngine:
 
         prompt = (
             f"{self.SYSTEM_PROMPT}\n\n"
-            f"You are teaching an absolute beginner (or a 4-year-old child) who knows NOTHING about code. "
-            f"Explain what is written inside this file: `{fa.relative_path}` ({fa.language}) from '{codebase.project_name}'.\n\n"
+            f"You are teaching an absolute beginner (or a 4-year-old child) who knows NOTHING about programming. "
+            f"You must explain what is actually WRITTEN on this code file: `{fa.relative_path}` ({fa.language}) from the project '{codebase.project_name}'.\n\n"
             f"CODE IN THIS FILE:\n"
             f"```\n{content_snippet}\n```\n\n"
-            f"Write a vivid, beginner-friendly explanation structured into these 4 sections:\n\n"
+            f"Cross-File Links: {', '.join(outbound_desc)}\n\n"
+            f"Produce your deep beginner explanation using this EXACT structure:\n\n"
             f"### 🧸 1. The Big Picture Story (Explain Like I'm 4 Years Old)\n"
-            f"Give a fun real-world story or analogy (like Lego blocks, toy kitchen, or recipe book) explaining what this file does.\n\n"
-            f"### 🔍 2. What Is Written in This File? (Line-by-Line & Tag Walkthrough)\n"
-            f"Walk through the key lines, tags, classes, or functions written above:\n"
-            f"- **What is written?** (Quote the line, e.g. `<div id=\"root\">`, `def calculate_metrics`)\n"
-            f"- **Explain Like I'm 4**: Explain in simple words with a fun analogy.\n"
-            f"- **What happens on screen / in computer?**\n"
-            f"- **What if we deleted it?**\n\n"
-            f"### 🔗 3. How This File Talks to Other Files (Friendship Connection)\n"
-            f"Explain how it shares or borrows tools from other files ({', '.join(outbound_desc)}).\n\n"
-            f"### 💡 4. Secret Rules to Remember\n"
-            f"Give 2 simple golden rules for beginners.\n"
+            f"Tell a fun real-world analogy (like Lego blocks, toy kitchen, or drawing easel) explaining what this file is and why it exists.\n\n"
+            f"### 🔍 2. Line-by-Line & Word-by-Word Breakdown\n"
+            f"Pick the major lines/tags/blocks in this code file and explain each one thoroughly:\n\n"
+            f"#### 📌 Line X: `exact code snippet`\n"
+            f"- **🔤 Word-by-Word & Symbol Breakdown**: Explain what each word, tag, or symbol in this line means in plain English.\n"
+            f"- **🧸 4-Year-Old Analogy**: A super simple real-world comparison.\n"
+            f"- **🎯 Why did the programmer write this?**: Plain explanation of why the author put this line here.\n"
+            f"- **🖥️ What happens on screen / inside the computer?**: What the user sees or what the computer does.\n"
+            f"- **🔗 Interconnection with other files**: How this line connects to other files.\n"
+            f"- **💥 What breaks if deleted?**: Exactly what error or glitch happens if removed.\n"
+            f"- **⚙️ Under the Hood (Why it works)**: The technical reason.\n"
+            f"- **💡 Best Practice**: One pro tip for beginners.\n\n"
+            f"### 🔗 3. How This File Talks to Other Files (Cross-File Friendship)\n"
+            f"Explain how this file connects with the rest of the project.\n\n"
+            f"### 💡 4. Secret Superpower Rules to Remember\n"
+            f"Give 2 memorable golden rules for beginners.\n"
         )
 
-        return self._send_prompt(prompt, max_tokens=650, temperature=0.3)
+        return self._send_prompt(prompt, max_tokens=850, temperature=0.3)
 
     def _send_prompt(self, prompt: str, max_tokens: int = 650, temperature: float = 0.3) -> Optional[str]:
         """Sends a prompt to the local AI endpoint with robust timeout and error reporting."""

@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Optional
 from .base import BaseParser
 from ..models import FileAnalysis, ElementExplanation
 from ..knowledge.catalog import JS_REACT_KNOWLEDGE
@@ -26,6 +26,13 @@ class JsTsParser(BaseParser):
             analysis.raw_imports.append(target)
             line_no = content[:m.start()].count('\n') + 1
 
+            words_dict = {
+                "import": "Command instructing the JavaScript engine to borrow external code.",
+                imported_symbols: f"The specific function, component, or object being imported.",
+                "from": "Keyword specifying which file or package to load from.",
+                f"'{target}'": f"Path or package name of the dependency."
+            }
+
             analysis.elements.append(ElementExplanation(
                 name=f"import from '{target}'",
                 kind="import",
@@ -38,7 +45,9 @@ class JsTsParser(BaseParser):
                 best_practices_and_pitfalls="Import only what you need and keep imports organized at the top of the file.",
                 simple_analogy="Think of this like borrowing a toy or tool from your friend's room so you can build something cool here!",
                 what_happens_on_screen="Doesn't show a picture directly, but makes the borrowed functions and buttons available to use.",
-                what_if_removed=f"The file crashes with an error saying: 'I cannot find {imported_symbols}!'."
+                what_if_removed=f"The file crashes with an error saying: 'I cannot find {imported_symbols}!'",
+                words_breakdown=words_dict,
+                interconnection_note=f"Directly links to and imports code from '{target}'."
             ))
 
         # Extract Exports
@@ -73,6 +82,15 @@ class JsTsParser(BaseParser):
                 hooks_found[hook_name] = len(matches)
                 line_no = content[:matches[0].start()].count('\n') + 1
                 kb = JS_REACT_KNOWLEDGE.get(hook_name, {})
+
+                words_dict = {
+                    hook_name: f"React standard hook for managing state or lifecycle.",
+                    "()": "Function execution parenthesis."
+                }
+                if hook_name == "useState":
+                    words_dict["[state, setState]"] = "Array destructuring: first is the current value, second is the updater function."
+                    words_dict["setState(newValue)"] = "Calling this erases the old value and automatically redraws the screen."
+
                 analysis.elements.append(ElementExplanation(
                     name=f"Hook: {hook_name}()",
                     kind="hook",
@@ -81,11 +99,12 @@ class JsTsParser(BaseParser):
                     what_it_is=kb.get("what_it_is", f"React standard hook `{hook_name}`."),
                     how_it_is_used=f"Invoked {len(matches)} time(s) to manage state or lifecycle.",
                     where_it_is_used=f"First invoked around line {line_no}.",
-                    why_it_works=kb.get("why_it_works", "Manages state or effects via React's internal Fiber node tracking."),
+                    why_it_works="Manages state or effects via React's internal Fiber node tracking.",
                     best_practices_and_pitfalls=kb.get("best_practices", "Follow the Rules of Hooks: call only at the top level."),
                     simple_analogy=kb.get("simple_analogy", "Think of this like an erasable whiteboard scoreboard that redraws the screen whenever the score changes!"),
                     what_happens_on_screen=kb.get("what_happens_on_screen", "The number or item on screen instantly updates before your eyes."),
-                    what_if_removed=kb.get("what_if_removed", "The computer forgets what you clicked and the screen never updates.")
+                    what_if_removed=kb.get("what_if_removed", "The computer forgets what you clicked and the screen never updates."),
+                    words_breakdown=words_dict
                 ))
 
         if hooks_found:
@@ -99,11 +118,19 @@ class JsTsParser(BaseParser):
             if cname:
                 components.append(cname)
                 line_no = content[:m.start()].count('\n') + 1
+
+                words_dict = {
+                    "function / const": "Declares the component function.",
+                    cname: "Name of the component (must start with capital letter in React).",
+                    "props": "Settings, data, or callback functions passed in from parent components.",
+                    "return (...)": "Returns the JSX Lego bricks to display on the screen."
+                }
+
                 analysis.elements.append(ElementExplanation(
                     name=f"Component: <{cname} />",
                     kind="component",
                     line_number=line_no,
-                    snippet=f"function {cname}(...) {{ return <...> }}",
+                    snippet=f"function {cname}(props) {{ return <...> }}",
                     what_it_is=f"Declarative React UI component `<{cname} />` building a section of the user interface.",
                     how_it_is_used="Receives props (settings), manages local state, and returns JSX elements to draw on screen.",
                     where_it_is_used=f"Defined at line {line_no}.",
@@ -111,17 +138,51 @@ class JsTsParser(BaseParser):
                     best_practices_and_pitfalls="Keep components small and focused on one job.",
                     simple_analogy=f"Think of <{cname} /> like a specialized Lego workshop or toy factory! Whenever the app calls its name, it stamps out a brand new, interactive Lego block with buttons and text.",
                     what_happens_on_screen=f"Draws the `<{cname} />` component and all of its buttons, text, and pictures on the page.",
-                    what_if_removed=f"The entire `{cname}` section will disappear from the screen."
+                    what_if_removed=f"The entire `{cname}` section will disappear from the screen.",
+                    words_breakdown=words_dict,
+                    interconnection_note=f"Can be imported and rendered as `<{cname} />` by other components or HTML entrypoints."
                 ))
 
         if components:
             detected_concepts.append(f"Modular React Component Hierarchy ({', '.join(components[:4])})")
+
+        # Standard Functions Detection (if not already captured as component)
+        fn_matches = re.finditer(r'(?:function\s+([a-z][a-zA-Z0-9_]*)|(?:const|let)\s+([a-z][a-zA-Z0-9_]*)\s*=\s*(?:\([^)]*\)|[a-zA-Z0-9_]+)\s*=>)', content)
+        for m in fn_matches:
+            fname = m.group(1) or m.group(2)
+            if fname and fname not in [e.name for e in analysis.elements]:
+                line_no = content[:m.start()].count('\n') + 1
+                words_dict = {
+                    "function": "Keyword defining an executable procedure.",
+                    fname: "The name used to invoke this function.",
+                    "()": "Parameter arguments passed into this function.",
+                    "{ ... }": "Code block executed when the function is called."
+                }
+                analysis.elements.append(ElementExplanation(
+                    name=f"function {fname}()",
+                    kind="function",
+                    line_number=line_no,
+                    snippet=f"function {fname}(...) {{ ... }}",
+                    what_it_is=f"JavaScript function `{fname}` that executes calculations or event handling.",
+                    how_it_is_used=f"Defined at line {line_no}.",
+                    where_it_is_used=f"Line {line_no} of `{relative_path}`.",
+                    why_it_works="Creates a callable function in memory executed within its execution context.",
+                    simple_analogy=f"Think of `{fname}` like teaching a robot a recipe! Whenever you call `{fname}()`, it performs these steps.",
+                    what_happens_on_screen="Calculates values or triggers changes on the screen.",
+                    what_if_removed=f"Any button or code calling `{fname}` will crash.",
+                    words_breakdown=words_dict
+                ))
 
         # Async / Await and Fetch detection
         has_async = bool(re.search(r'\basync\s+function|\basync\s*\([^)]*\)\s*=>|\bawait\s+', content))
         has_fetch = bool(re.search(r'\bfetch\s*\(|\baxios\.', content))
         if has_async or has_fetch:
             detected_concepts.append("Asynchronous Data Pipelines (Promises / async-await)")
+            words_dict = {
+                "async": "Marks the function as asynchronous, returning a Promise.",
+                "await": "Pauses execution non-blockingly until the asynchronous task finishes.",
+                "fetch(...)": "Native browser API for downloading data across the network."
+            }
             analysis.elements.append(ElementExplanation(
                 name="Async / Await Flow",
                 kind="concept",
@@ -134,7 +195,8 @@ class JsTsParser(BaseParser):
                 best_practices_and_pitfalls="Always handle rejections using try/catch blocks.",
                 simple_analogy="Think of this like ordering food at a restaurant! You place your order, sit down and chat with friends, and when the chef rings the bell ('await'), your food is ready!",
                 what_happens_on_screen="Allows the app to fetch data from the internet smoothly without freezing the buttons or screen.",
-                what_if_removed="The screen would freeze like ice while waiting for internet data."
+                what_if_removed="The screen would freeze like ice while waiting for internet data.",
+                words_breakdown=words_dict
             ))
 
         analysis.concepts_detected = detected_concepts

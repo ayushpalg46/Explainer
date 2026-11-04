@@ -3,7 +3,12 @@
 > **Scope**: 10 files | 293 lines of code | 5 cross-file interconnections
 ---
 
-## 1. System Architecture & Tech Stack
+## 🏰 1. The Big Castle Story (Explain Like I'm 4 Years Old)
+> Imagine this entire project `samples` is a giant, bustling Lego castle or toy workshop! There are 10 different Lego pieces working together across 10 languages. Some files build the colorful walls and buttons that you see on screen (frontend), some files are the secret clockwork gears under the floor doing the heavy lifting (backend), and 5 plastic snap-connectors hold them tightly together so when you tap a button on the wall, the gears turn and the doors open smoothly!
+
+---
+
+## 2. System Architecture & Tech Stack
 ### Architectural Style: **Single Page Application (SPA) / Frontend Component Architecture**
 The project implements a modern client-side Single Page Application architecture. Components are organized hierarchically, allowing rapid declarative DOM updates via the Virtual DOM and encapsulated CSS styling.
 
@@ -13,20 +18,20 @@ The project implements a modern client-side Single Page Application architecture
 | Category | Detected Technologies & Tooling |
 | :--- | :--- |
 | **Languages** | `Dockerfile` (1 files), `Java` (1 files), `JavaScript (JSX/React)` (1 files), `Shell Script` (1 files), `Rust` (1 files), `Go` (1 files), `HTML` (1 files), `Python` (1 files), `CSS` (1 files), `TypeScript` (1 files) |
-| **Frameworks** | `CLI / Tooling Automation (python)`, `Docker Engine Containerization`, `Go Standard net/http`, `Pydantic Data Validation`, `React / Modern SPA Mount Point`, `React.js`, `Tailwind CSS Utilities` |
+| **Frameworks** | `CLI / Tooling Automation (echo, python, export)`, `Docker Engine Containerization`, `Go Standard net/http`, `Pydantic Data Validation`, `React / Modern SPA Mount Point`, `React.js`, `Tailwind CSS Utilities` |
 | **Build Tools** | `Docker Container Engine` |
 | **Runtimes** | `OCI Containerized Sandbox` |
 
 ---
 
-## 2. Directory Subsystem Roles
+## 3. Directory Subsystem Roles
 | Directory / Subsystem | Purpose & Architectural Role |
 | :--- | :--- |
 | `root/` | Repository Scaffolding, Package Manifests & Environment Configs |
 
 ---
 
-## 3. Cross-File Interconnection Graph & Mechanics
+## 4. Cross-File Interconnection Graph & Mechanics
 ```mermaid
 graph LR
     Dockerfile["Dockerfile"] -->|docker_builds| server_py["server.py"]
@@ -65,8 +70,8 @@ graph LR
 
 ---
 
-## 4. File-by-File Detailed Explanation Catalog
-Each file below has its own dedicated, comprehensive analysis document:
+## 5. File-by-File Detailed Explanation Catalog
+Each file below has its own dedicated, beginner-friendly analysis document:
 
 | File | Language | Lines | Role | Individual Explanation Link |
 | :--- | :--- | :---: | :--- | :---: |
@@ -77,8 +82,8 @@ Each file below has its own dedicated, comprehensive analysis document:
 | **`engine.rs`** | `Rust` | 35 | Rust Systems Service / High-Performance Core Engine | [📄 View Explanation](files/engine.rs.md) |
 | **`handler.go`** | `Go` | 34 | Go Cloud Microservice / High-Performance Backend Routine | [📄 View Explanation](files/handler.go.md) |
 | **`index.html`** | `HTML` | 38 | Application Presentation & DOM Root Entrypoint | [📄 View Explanation](files/index.html.md) |
-| **`server.py`** | `Python` | 23 | Domain Model / Object-Oriented Core Service | [📄 View Explanation](files/server.py.md) |
-| **`style.css`** | `CSS` | 58 | Application Styling, Design System Tokens & Responsive Theme Layer | [📄 View Explanation](files/style.css.md) |
+| **`server.py`** | `Python` | 23 | Python Source File | [📄 View Explanation](files/server.py.md) |
+| **`style.css`** | `CSS` | 58 | Visual Design Tokens, Layout Styling & Responsive Theming | [📄 View Explanation](files/style.css.md) |
 | **`utils.ts`** | `TypeScript` | 16 | JavaScript/TypeScript Logic & Module Utility | [📄 View Explanation](files/utils.ts.md) |
 
 > You can also view the complete consolidated dossier in [FULL_REPORT.md](FULL_REPORT.md) or launch the interactive GUI in [dashboard.html](dashboard.html).

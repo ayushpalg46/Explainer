@@ -93,19 +93,17 @@ class HtmlParser(BaseParser):
         if has_svg:
             detected_concepts.append("Vector Iconography / Graphics (SVG)")
 
-        # Generate Beginner-Friendly Element Explanations for Tags
+        # Generate Detailed, Word-by-Word Line Explanations
         seen_tags = set()
         for item in extractor.tags:
             tag = item["tag"]
             attrs = item["attrs"]
             line = item["line"]
             
-            # Format attributes string
             attr_parts = [f'{k}="{v}"' for k, v in attrs.items()]
             snippet_str = f"<{tag} {' '.join(attr_parts)}>" if attr_parts else f"<{tag}>"
 
-            # Create specific explanations for important tags or first occurrence
-            is_special = tag in ("link", "script") or attrs.get("id") or "class" in attrs
+            is_special = tag in ("link", "script") or attrs.get("id") or "class" in attrs or "onclick" in attrs
             if tag in seen_tags and not is_special:
                 continue
             seen_tags.add(tag)
@@ -119,25 +117,34 @@ class HtmlParser(BaseParser):
                 "best_practices": "Ensure proper closing tags and valid semantic hierarchy."
             })
 
-            # What is written & how it's used
-            how_desc = f"Written on line {line} as `{snippet_str}`. "
+            # Word-by-word breakdown
+            words_dict: Dict[str, str] = {
+                tag: kb["what_it_is"]
+            }
+            conn_note: Optional[str] = None
+
             if attrs:
-                attr_explain = []
                 for k, v in attrs.items():
                     if k == "id":
-                        attr_explain.append(f"`id='{v}'` (a unique name-tag so code can find this exact box)")
+                        words_dict[f'id="{v}"'] = f"A unique name-tag. There is only one '{v}' element in the document, allowing code to find this exact box."
+                        if v in ("root", "app", "__next"):
+                            conn_note = f"Mount point anchor where client-side JavaScript (e.g. React/app.js) attaches and renders the interactive UI."
                     elif k == "class":
-                        attr_explain.append(f"`class='{v}'` (styling labels that tell CSS how to color and size it)")
+                        words_dict[f'class="{v}"'] = f"A style costume label. Connects this element to CSS styling rules (like colors, paddings, and borders) defined in stylesheets."
                     elif k == "src":
-                        attr_explain.append(f"`src='{v}'` (the file path telling the browser where to fetch this script/image)")
+                        words_dict[f'src="{v}"'] = f"The source path. Tells the browser where to fetch this script file or image from disk."
+                        conn_note = f"Directly loads and executes the external JavaScript bundle '{v}'."
                     elif k == "href":
-                        attr_explain.append(f"`href='{v}'` (the link path telling the browser where this connects)")
+                        words_dict[f'href="{v}"'] = f"Hyperlink reference. Points the browser to the address of the linked file '{v}'."
+                        if attrs.get("rel") == "stylesheet":
+                            conn_note = f"Loads external stylesheet '{v}', applying all design tokens, fonts, and colors to this page."
                     elif k == "rel":
-                        attr_explain.append(f"`rel='{v}'` (tells the browser the relationship of the linked file)")
-                    elif k == "type":
-                        attr_explain.append(f"`type='{v}'` (specifies the behavior mode)")
-                if attr_explain:
-                    how_desc += "Contains attributes: " + ", ".join(attr_explain) + ". "
+                        words_dict[f'rel="{v}"'] = f"Specifies the relationship between this HTML page and the linked file."
+                    elif k == "onclick":
+                        words_dict[f'onclick="{v}"'] = f"An 'ear' listening for clicks. The moment a user clicks, it shouts: 'Run the {v} recipe now!'"
+                        conn_note = f"Directly calls the interactive function '{v}' defined in the connected JavaScript code."
+                    else:
+                        words_dict[f'{k}="{v}"'] = f"Configures the attribute '{k}' with value '{v}'."
 
             explanation = ElementExplanation(
                 name=f"<{tag}>",
@@ -145,20 +152,21 @@ class HtmlParser(BaseParser):
                 line_number=line,
                 snippet=snippet_str,
                 what_it_is=kb["what_it_is"],
-                how_it_is_used=how_desc,
+                how_it_is_used=f"Written on line {line} as `{snippet_str}`.",
                 where_it_is_used=f"Line {line} of `{relative_path}`. Total `<{tag}>` tags in file: {tag_counts.get(tag, 1)}.",
                 why_it_works=kb["why_it_works"],
                 best_practices_and_pitfalls=kb.get("best_practices", "Follow standard HTML conventions."),
                 simple_analogy=kb.get("simple_analogy", f"Think of `<{tag}>` like a Lego block building the page."),
                 what_happens_on_screen=kb.get("what_happens_on_screen", "Draws or positions this element on screen."),
-                what_if_removed=kb.get("what_if_removed", "This element will vanish from the page.")
+                what_if_removed=kb.get("what_if_removed", "This element will vanish from the page."),
+                words_breakdown=words_dict,
+                interconnection_note=conn_note
             )
             analysis.elements.append(explanation)
 
-        # Beginner Friendly Story for the whole file
         analysis.beginner_story = (
-            f"Imagine you are building a toy house out of Lego blocks! This HTML file `{relative_path}` is the blueprint "
-            f"and skeleton of the house. It sets up the roof and secret rules in `<head>`, the big living room where all the toys perform in `<body>`, "
+            f"Imagine this HTML file `{relative_path}` is a real physical toy box sitting on a stage! "
+            f"It sets up the roof and secret rules in `<head>`, the big living room where all the toys perform in `<body>`, "
             f"{'and builds an empty stage `<div id=\"root\">` waiting for your React code to jump in and build the whole interactive world!' if has_react_root else 'and organizes the buttons, text, and pictures on the page.'}"
         )
 

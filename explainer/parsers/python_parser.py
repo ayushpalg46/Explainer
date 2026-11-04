@@ -53,12 +53,10 @@ class PythonParser(BaseParser):
                     has_async = True
                 fn_decorators = [self._get_node_name(d) for d in node.decorator_list]
                 decorators.extend(fn_decorators)
-                # Extract args
                 arg_names = [a.arg for a in node.args.args]
                 functions.append((node.name, node.lineno, is_async, fn_decorators, ast.get_docstring(node), arg_names))
 
             elif isinstance(node, ast.If):
-                # Check for if __name__ == '__main__':
                 if (isinstance(node.test, ast.Compare) and 
                     isinstance(node.test.left, ast.Name) and node.test.left.id == "__name__"):
                     has_main_guard = True
@@ -91,6 +89,10 @@ class PythonParser(BaseParser):
 
         # Explain Imports
         for imp_name, lineno in imports_found:
+            words_dict = {
+                "import": "Command instructing Python to borrow external code or standard modules.",
+                imp_name: f"Name of the module or file being imported into this script."
+            }
             analysis.elements.append(ElementExplanation(
                 name=f"import {imp_name}",
                 kind="import",
@@ -103,12 +105,19 @@ class PythonParser(BaseParser):
                 best_practices_and_pitfalls="Import standard libraries first, then third-party libraries, then local files.",
                 simple_analogy=f"Think of this like borrowing a special tool `{imp_name}` from a friend's toolbox so you can use it here!",
                 what_happens_on_screen="Allows the rest of the file to use functions and classes from that module.",
-                what_if_removed=f"The program crashes with an error: 'NameError: name is not defined' when trying to call `{imp_name}`."
+                what_if_removed=f"The program crashes with an error: 'NameError: name is not defined' when trying to call `{imp_name}`.",
+                words_breakdown=words_dict,
+                interconnection_note=f"Directly connects to and borrows functions from `{imp_name}`."
             ))
 
         # Explain Classes
         for cname, lineno, bases, doc in classes:
             base_str = f" inherits from `{', '.join(bases)}`" if bases else " base class"
+            words_dict = {
+                "class": "Keyword used to create a custom object blueprint.",
+                cname: "Name of the class.",
+                f"({', '.join(bases)})" if bases else "()": f"Inheritance list (inherits powers from {', '.join(bases)})." if bases else "Base class with standard Python object features."
+            }
             analysis.elements.append(ElementExplanation(
                 name=f"class {cname}",
                 kind="class",
@@ -121,7 +130,8 @@ class PythonParser(BaseParser):
                 best_practices_and_pitfalls="Keep each class focused on one single responsibility.",
                 simple_analogy=f"Think of `class {cname}` like a cookie cutter! The class is the cookie cutter blueprint, and every object you make with it is a real cookie with its own sprinkles!",
                 what_happens_on_screen="Organizes complicated information into neat, reusable objects.",
-                what_if_removed=f"The program won't know how to create `{cname}` objects and will crash."
+                what_if_removed=f"The program won't know how to create `{cname}` objects and will crash.",
+                words_breakdown=words_dict
             ))
 
         # Explain Functions
@@ -129,6 +139,11 @@ class PythonParser(BaseParser):
             prefix = "async def" if is_async else "def"
             dec_str = f" decorated by `@{', '.join(decs)}`" if decs else ""
             arg_str = ", ".join(args)
+            words_dict = {
+                prefix: "Short for 'define'. Teaches Python a brand new instruction recipe.",
+                fname: "The name used to call and execute this recipe.",
+                f"({arg_str})": f"Inputs/parameters: accepts {arg_str} to perform calculations." if arg_str else "Accepts no input parameters."
+            }
             analysis.elements.append(ElementExplanation(
                 name=f"{prefix} {fname}({arg_str})",
                 kind="function",
@@ -141,11 +156,18 @@ class PythonParser(BaseParser):
                 best_practices_and_pitfalls="Give functions descriptive action names and keep them short and easy to test.",
                 simple_analogy=f"Think of `{fname}` like teaching a robot helper a brand new recipe! Whenever you call `{fname}`, the robot follows these exact steps and gives you back the result!",
                 what_happens_on_screen="Executes calculations, transforms data, or triggers actions behind the scenes.",
-                what_if_removed=f"Any code that calls `{fname}` will crash with an error saying the function does not exist."
+                what_if_removed=f"Any code that calls `{fname}` will crash with an error saying the function does not exist.",
+                words_breakdown=words_dict
             ))
 
         # Explain Main Guard
         if has_main_guard:
+            words_dict = {
+                "if": "Condition checker: only runs the block below if the check is true.",
+                "__name__": "Built-in Python variable holding the current module's execution identity.",
+                "==": "Equality comparison checking if both sides match.",
+                "'__main__'": "Special string value assigned only when the file is run directly as the main script."
+            }
             analysis.elements.append(ElementExplanation(
                 name="if __name__ == '__main__':",
                 kind="concept",
@@ -158,7 +180,9 @@ class PythonParser(BaseParser):
                 best_practices_and_pitfalls="Always wrap script execution in a `main()` function under this guard.",
                 simple_analogy="Think of this like a sign on a toy racecar: 'Only start the engine if someone presses the main START button, not when it is sitting inside the toy box!'",
                 what_happens_on_screen="Starts the script when run from the command line, but stays quiet if another file imports it.",
-                what_if_removed="If another file imports this file, the whole program would accidentally run prematurely!"
+                what_if_removed="If another file imports this file, the whole program would accidentally run prematurely!",
+                words_breakdown=words_dict,
+                interconnection_note="Distinguishes between direct execution and being imported by other files in the codebase."
             ))
 
         analysis.concepts_detected = detected_concepts
@@ -199,6 +223,11 @@ class PythonParser(BaseParser):
             fname = m.group(2)
             args = m.group(3)
             line_no = content[:m.start()].count('\n') + 1
+            words_dict = {
+                prefix: "Short for 'define'. Teaches Python a reusable instruction recipe.",
+                fname: "The name used to call this function recipe.",
+                f"({args})": f"Parameters accepted by this function: {args}."
+            }
             analysis.elements.append(ElementExplanation(
                 name=f"{prefix} {fname}({args})",
                 kind="function",
@@ -210,7 +239,8 @@ class PythonParser(BaseParser):
                 why_it_works="Executes instructions and returns evaluated values.",
                 simple_analogy=f"Think of `{fname}` like a helpful robot recipe that runs whenever you call its name!",
                 what_happens_on_screen="Executes logic behind the scenes and returns answers.",
-                what_if_removed="The program cannot run this calculation and will crash with an error."
+                what_if_removed="The program cannot run this calculation and will crash with an error.",
+                words_breakdown=words_dict
             ))
 
         # Regex for classes
@@ -218,6 +248,10 @@ class PythonParser(BaseParser):
             cname = m.group(1)
             bases = m.group(2) or ""
             line_no = content[:m.start()].count('\n') + 1
+            words_dict = {
+                "class": "Blueprint keyword for stamping out custom objects.",
+                cname: "The class name."
+            }
             analysis.elements.append(ElementExplanation(
                 name=f"class {cname}",
                 kind="class",
@@ -229,13 +263,18 @@ class PythonParser(BaseParser):
                 why_it_works="Instantiates object instances with state and methods.",
                 simple_analogy=f"Think of `class {cname}` like a cookie cutter blueprint making custom objects!",
                 what_happens_on_screen="Organizes application data cleanly.",
-                what_if_removed=f"The program won't know how to create `{cname}` objects."
+                what_if_removed=f"The program won't know how to create `{cname}` objects.",
+                words_breakdown=words_dict
             ))
 
         # Regex for imports
         for m in re.finditer(r'^(?:from\s+([a-zA-Z0-9_.]+)\s+import\s+([a-zA-Z0-9_.,\s*]+)|import\s+([a-zA-Z0-9_.,\s]+))', content, re.MULTILINE):
             imp = m.group(1) or m.group(3)
             line_no = content[:m.start()].count('\n') + 1
+            words_dict = {
+                "import": "Command instructing Python to borrow external code.",
+                imp.strip(): "Name of the module being imported."
+            }
             analysis.elements.append(ElementExplanation(
                 name=f"import {imp.strip()}",
                 kind="import",
@@ -247,7 +286,8 @@ class PythonParser(BaseParser):
                 why_it_works="Loads external module into Python scope.",
                 simple_analogy="Think of this like borrowing a tool from another room!",
                 what_happens_on_screen="Enables external functions to be used here.",
-                what_if_removed="Code calling these functions will crash with an error."
+                what_if_removed="Code calling these functions will crash with an error.",
+                words_breakdown=words_dict
             ))
 
         analysis.beginner_story = (

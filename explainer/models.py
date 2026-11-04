@@ -17,6 +17,8 @@ class ElementExplanation(BaseModel):
     simple_analogy: Optional[str] = None  # Friendly 4-year-old / beginner analogy
     what_happens_on_screen: Optional[str] = None  # What the user actually sees or experiences
     what_if_removed: Optional[str] = None  # What breaks if this code is deleted
+    words_breakdown: Dict[str, str] = Field(default_factory=dict)  # Word-by-word explanation of keywords & attributes
+    interconnection_note: Optional[str] = None  # Direct link to another file connected to this line
 
 
 class FileInterconnection(BaseModel):

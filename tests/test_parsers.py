@@ -8,6 +8,7 @@ from explainer.parsers.java_parser import JavaParser
 from explainer.parsers.go_parser import GoParser
 from explainer.parsers.docker_parser import DockerParser
 from explainer.parsers.shell_parser import ShellParser
+from explainer.parsers.generic_parser import GenericParser
 
 
 class TestFileParsers(unittest.TestCase):
@@ -36,6 +37,12 @@ class TestFileParsers(unittest.TestCase):
         self.assertIn("<html>", tag_names)
         self.assertIn("<canvas>", tag_names)
         self.assertTrue(any("SPA" in c for c in analysis.concepts_detected))
+        self.assertTrue(len(analysis.elements) > 0)
+        first_el = analysis.elements[0]
+        self.assertTrue(first_el.simple_analogy)
+        self.assertTrue(first_el.words_breakdown)
+        self.assertTrue(first_el.what_happens_on_screen)
+        self.assertTrue(first_el.what_if_removed)
 
     def test_css_parser(self):
         content = """
@@ -52,6 +59,10 @@ class TestFileParsers(unittest.TestCase):
         self.assertTrue(any("Flexbox" in c for c in analysis.concepts_detected))
         self.assertTrue(any("CSS Grid" in c for c in analysis.concepts_detected))
         self.assertTrue(any("pulse" in c for c in analysis.concepts_detected))
+        self.assertTrue(len(analysis.elements) > 0)
+        el = analysis.elements[1]
+        self.assertTrue(el.words_breakdown)
+        self.assertTrue(el.simple_analogy)
 
     def test_js_ts_jsx_parser(self):
         content = """
@@ -72,6 +83,9 @@ class TestFileParsers(unittest.TestCase):
         self.assertIn("./components/Button", analysis.raw_imports)
         self.assertTrue(any("useState" in e.name for e in analysis.elements))
         self.assertTrue(any("Counter" in e.name for e in analysis.elements))
+        btn_el = [e for e in analysis.elements if "useState" in e.name][0]
+        self.assertTrue(btn_el.words_breakdown)
+        self.assertTrue(btn_el.simple_analogy)
 
     def test_python_parser(self):
         content = """
@@ -94,6 +108,9 @@ class TestFileParsers(unittest.TestCase):
         names = [e.name for e in analysis.elements]
         self.assertTrue(any("Config" in n for n in names))
         self.assertTrue(any("start_server" in n for n in names))
+        cfg_el = [e for e in analysis.elements if "Config" in e.name][0]
+        self.assertTrue(cfg_el.words_breakdown)
+        self.assertTrue(cfg_el.simple_analogy)
 
     def test_rust_parser(self):
         content = """
@@ -110,6 +127,9 @@ class TestFileParsers(unittest.TestCase):
 
         self.assertEqual(analysis.language, "Rust")
         self.assertTrue(any("Cache" in e.name for e in analysis.elements))
+        cache_el = [e for e in analysis.elements if "Cache" in e.name][0]
+        self.assertTrue(cache_el.words_breakdown)
+        self.assertTrue(cache_el.simple_analogy)
 
     def test_java_parser(self):
         content = """
@@ -127,6 +147,9 @@ class TestFileParsers(unittest.TestCase):
         self.assertEqual(analysis.language, "Java")
         self.assertTrue(any("Spring Boot" in f for f in analysis.frameworks_detected))
         self.assertTrue(any("PaymentService" in e.name for e in analysis.elements))
+        ps_el = [e for e in analysis.elements if "PaymentService" in e.name][0]
+        self.assertTrue(ps_el.words_breakdown)
+        self.assertTrue(ps_el.simple_analogy)
 
     def test_go_parser(self):
         content = """
@@ -146,6 +169,9 @@ class TestFileParsers(unittest.TestCase):
 
         self.assertEqual(analysis.language, "Go")
         self.assertTrue(any("Server" in e.name for e in analysis.elements))
+        srv_el = [e for e in analysis.elements if "Server" in e.name][0]
+        self.assertTrue(srv_el.words_breakdown)
+        self.assertTrue(srv_el.simple_analogy)
 
     def test_docker_parser(self):
         content = """
@@ -163,6 +189,10 @@ class TestFileParsers(unittest.TestCase):
         self.assertEqual(analysis.language, "Dockerfile")
         self.assertIn("package.json", analysis.raw_imports)
         self.assertTrue(any("FROM" in e.name for e in analysis.elements))
+        from_el = [e for e in analysis.elements if "FROM" in e.name][0]
+        self.assertTrue(from_el.words_breakdown)
+        self.assertTrue(from_el.simple_analogy)
+        self.assertTrue(from_el.what_if_removed)
 
     def test_shell_parser(self):
         content = """#!/usr/bin/env bash
@@ -175,6 +205,25 @@ class TestFileParsers(unittest.TestCase):
 
         self.assertEqual(analysis.language, "Shell Script")
         self.assertIn("./config.sh", analysis.raw_imports)
+        self.assertTrue(len(analysis.elements) > 0)
+        sh_el = analysis.elements[0]
+        self.assertTrue(sh_el.words_breakdown)
+        self.assertTrue(sh_el.simple_analogy)
+
+    def test_generic_manifest_parser(self):
+        pkg_content = """{
+            "name": "my-web-app",
+            "version": "1.0.0",
+            "scripts": { "dev": "vite", "build": "vite build" },
+            "dependencies": { "react": "^18.2.0" }
+        }"""
+        parser = GenericParser()
+        analysis = parser.parse("package.json", pkg_content, "package.json")
+        self.assertIn("react", analysis.raw_imports)
+        self.assertTrue(any("vite" in e.how_it_is_used for e in analysis.elements))
+        el = analysis.elements[0]
+        self.assertTrue(el.words_breakdown)
+        self.assertTrue(el.simple_analogy)
 
 
 if __name__ == "__main__":

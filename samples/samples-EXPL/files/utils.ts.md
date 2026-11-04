@@ -4,11 +4,14 @@
 
 ---
 
-## 1. Architectural Purpose & Summary
+## 1. Architectural Purpose & Beginner Story
 **Role in Codebase**: `JavaScript/TypeScript Logic & Module Utility`
 
-### Executive Summary
-TypeScript module containing 0 external/internal import references and exporting 3 symbol(s) (ClusterMetric, formatLatency, calculateUptime). 
+### 🧸 The Big Picture Story (Explain Like I'm 4 Years Old)
+> Imagine this file `utils.ts` is a lively workshop in a toy factory! It provides smart tools and helper calculations. Whenever a user touches a button or clicks their mouse on the screen, the functions inside this file wake up, calculate new numbers, and update the screen so the user sees instant magic!
+
+### Executive Technical Summary
+TypeScript module containing 0 imports, 0 component(s), and 3 exported symbols. 
 
 ### Key Architectural Concepts
 - **Static TypeScript Type Contracts**
@@ -21,9 +24,44 @@ TypeScript module containing 0 external/internal import references and exporting
 
 ---
 
-## 3. Elements, Tags, Components & Symbols (0 items)
+## 3. Line-by-Line & Word-by-Word Breakdown (2 Items Explained)
 
-*No parsed symbols or tags in this file.*
+### 📌 Line 8: `function formatLatency()`
+```text
+function formatLatency(...) { ... }
+```
+* **What is written?**: JavaScript function `formatLatency` that executes calculations or event handling.
+* **What does every word & symbol mean?**:
+  * `function`: Keyword defining an executable procedure.
+  * `formatLatency`: The name used to invoke this function.
+  * `()`: Parameter arguments passed into this function.
+  * `{ ... }`: Code block executed when the function is called.
+* **🧸 4-Year-Old Analogy**: Think of `formatLatency` like teaching a robot a recipe! Whenever you call `formatLatency()`, it performs these steps.
+* **🎯 Why did the programmer write this?**: Defined at line 8.
+* **🖥️ What happens on screen / inside computer?**: Calculates values or triggers changes on the screen.
+* **💥 What breaks if deleted?**: Any button or code calling `formatLatency` will crash.
+* **⚙️ Under the Hood (Why It Works)**: Creates a callable function in memory executed within its execution context.
+
+---
+
+### 📌 Line 14: `function calculateUptime()`
+```text
+function calculateUptime(...) { ... }
+```
+* **What is written?**: JavaScript function `calculateUptime` that executes calculations or event handling.
+* **What does every word & symbol mean?**:
+  * `function`: Keyword defining an executable procedure.
+  * `calculateUptime`: The name used to invoke this function.
+  * `()`: Parameter arguments passed into this function.
+  * `{ ... }`: Code block executed when the function is called.
+* **🧸 4-Year-Old Analogy**: Think of `calculateUptime` like teaching a robot a recipe! Whenever you call `calculateUptime()`, it performs these steps.
+* **🎯 Why did the programmer write this?**: Defined at line 14.
+* **🖥️ What happens on screen / inside computer?**: Calculates values or triggers changes on the screen.
+* **💥 What breaks if deleted?**: Any button or code calling `calculateUptime` will crash.
+* **⚙️ Under the Hood (Why It Works)**: Creates a callable function in memory executed within its execution context.
+
+---
+
 
 ---
 > [⬅ Back to Main Index](../INDEX.md)

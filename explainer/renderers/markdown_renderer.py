@@ -199,25 +199,41 @@ class MarkdownRenderer:
         out.append("---\n\n")
 
         # 3. Elements Breakdown (Detailed & Line-by-Line)
-        out.append(f"## 3. What Is Written in This File? ({len(fa.elements)} Items Explained)\n\n")
+        out.append(f"## 3. Line-by-Line & Word-by-Word Breakdown ({len(fa.elements)} Items Explained)\n\n")
         if fa.elements:
             for el in fa.elements:
                 line_str = f"Line {el.line_number}" if el.line_number else "Global / Declarative"
-                out.append(f"### 🔹 `{el.name}` ({el.kind.upper()} | {line_str})\n")
+                out.append(f"### 📌 {line_str}: `{el.name}`\n")
                 if el.snippet:
                     out.append(f"```text\n{el.snippet}\n```\n")
+                
+                out.append(f"* **What is written?**: {el.what_it_is}\n")
+                
+                if el.words_breakdown:
+                    out.append("* **What does every word & symbol mean?**:\n")
+                    for w, meaning in el.words_breakdown.items():
+                        out.append(f"  * `{w}`: {meaning}\n")
+                
                 if el.simple_analogy:
-                    out.append(f"> 🧸 **Explain Like I'm 4**: {el.simple_analogy}\n\n")
-                out.append(f"- **What It Is**: {el.what_it_is}\n")
-                out.append(f"- **How It Is Used**: {el.how_it_is_used}\n")
+                    out.append(f"* **🧸 4-Year-Old Analogy**: {el.simple_analogy}\n")
+                
+                out.append(f"* **🎯 Why did the programmer write this?**: {el.how_it_is_used}\n")
+                
                 if el.what_happens_on_screen:
-                    out.append(f"- 🖥️ **What Happens on Screen / Computer**: {el.what_happens_on_screen}\n")
+                    out.append(f"* **🖥️ What happens on screen / inside computer?**: {el.what_happens_on_screen}\n")
+                
+                if el.interconnection_note:
+                    out.append(f"* **🔗 Interconnection with other files**: {el.interconnection_note}\n")
+                
                 if el.what_if_removed:
-                    out.append(f"- ⚠️ **What If Removed?**: {el.what_if_removed}\n")
-                out.append(f"- ⚙️ **Why It Works**: {el.why_it_works}\n")
+                    out.append(f"* **💥 What breaks if deleted?**: {el.what_if_removed}\n")
+                
+                out.append(f"* **⚙️ Under the Hood (Why It Works)**: {el.why_it_works}\n")
+                
                 if el.best_practices_and_pitfalls:
-                    out.append(f"- 💡 **Best Practice**: {el.best_practices_and_pitfalls}\n")
-                out.append("\n")
+                    out.append(f"* **💡 Best Practice**: {el.best_practices_and_pitfalls}\n")
+                
+                out.append("\n---\n\n")
         else:
             out.append("*No parsed symbols or tags in this file.*\n")
 
