@@ -79,6 +79,7 @@ class CodebaseAnalysis(BaseModel):
     files: Dict[str, FileAnalysis] = Field(default_factory=dict)
     interconnections: List[FileInterconnection] = Field(default_factory=list)
     engine_used: str = "Rule/AST Deep Knowledge Engine"
+    ai_provider: Optional[str] = "ollama"
     ai_model_name: Optional[str] = None
     ai_architecture_critique: Optional[str] = None
     beginner_codebase_story: Optional[str] = None  # Lego / Toy factory analogy for the whole project

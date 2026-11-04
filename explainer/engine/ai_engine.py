@@ -7,6 +7,7 @@ import requests
 from typing import Dict, List, Optional, Tuple, Callable
 from ..models import CodebaseAnalysis, FileAnalysis, TechStackInfo, FileInterconnection
 from .rule_engine import RuleExplainerEngine
+from .cloud_providers import CloudAIProvider
 
 
 class AIExplainerEngine:
@@ -40,11 +41,17 @@ class AIExplainerEngine:
         provider: str = "ollama"  # 'ollama' or 'openai_compatible'
     ):
         self.endpoint_url = endpoint_url
-        self.provider = provider
+        self.provider = provider.lower() if provider else "ollama"
         self.rule_engine = RuleExplainerEngine()
+        self.cloud_provider = None
 
-        # If model_name is not provided or generic, auto-resolve to best available local model
-        if not model_name or model_name == "llama3":
+        if self.provider in ("groq", "gemini", "openai", "openrouter"):
+            self.cloud_provider = CloudAIProvider(
+                provider=self.provider,
+                model=model_name
+            )
+            self.model_name = self.cloud_provider.model
+        elif not model_name or model_name == "llama3":
             installed = self.list_installed_models()
             if installed:
                 coder_candidates = [m for m in installed if "coder" in m.lower()]
@@ -107,7 +114,11 @@ class AIExplainerEngine:
         base_analysis = self.rule_engine.analyze_codebase(
             root_path, files, tech_stack, interconnections
         )
-        base_analysis.engine_used = f"Local AI Model ({self.model_name} via {self.provider})"
+        if self.provider in ("groq", "gemini", "openai", "openrouter"):
+            base_analysis.engine_used = f"Cloud AI ({self.provider.upper()}: {self.model_name})"
+        else:
+            base_analysis.engine_used = f"Local AI Model ({self.model_name} via {self.provider})"
+        base_analysis.ai_provider = self.provider
         base_analysis.ai_model_name = self.model_name
 
         # Step 2: System-level AI Architectural Synthesis (Beginner / Lego Factory Analogy)
@@ -227,7 +238,16 @@ class AIExplainerEngine:
     ) -> Optional[str]:
         """Sends a prompt to the local AI endpoint with robust timeout and optional token streaming."""
         try:
-            if self.provider == "ollama":
+            if self.provider in ("groq", "gemini", "openai", "openrouter"):
+                return self.cloud_provider.stream_prompt(
+                    prompt=prompt,
+                    system_prompt=self.SYSTEM_PROMPT,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    stream_callback=stream_callback
+                )
+
+            elif self.provider == "ollama":
                 payload = {
                     "model": self.model_name,
                     "prompt": prompt,

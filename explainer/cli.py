@@ -19,9 +19,13 @@ from .renderers.rich_terminal import RichTerminalRenderer
 from .renderers.markdown_renderer import MarkdownRenderer
 from .diff.git_diff_explainer import GitDiffExplainer, DiffAnalysis
 from .models import CodebaseAnalysis, TechStackInfo
+from .scanner.remote_resolver import RemoteResolver
+from .engine.cloud_providers import CloudAIProvider
 
 console = Console()
 _flush_token = lambda t: (sys.stdout.write(t), sys.stdout.flush())
+
+AI_PROVIDER_CHOICES = ["ollama", "groq", "gemini", "openai", "openrouter", "openai_compatible"]
 
 
 def resolve_file_key(arg: str, file_keys: List[str], files_dict: Dict) -> Optional[str]:
@@ -32,7 +36,7 @@ def resolve_file_key(arg: str, file_keys: List[str], files_dict: Dict) -> Option
 
 
 class ExplGroup(click.Group):
-    """Custom Click Group that dynamically routes file arguments directly to `explain_file`."""
+    """Custom Click Group that dynamically routes remote URLs or file paths directly."""
     def resolve_command(self, ctx, args):
         if not args:
             return super().resolve_command(ctx, args)
@@ -40,6 +44,9 @@ class ExplGroup(click.Group):
         cmd = self.get_command(ctx, cmd_name)
         if cmd is not None:
             return cmd_name, cmd, args[1:]
+        # If the argument is a remote Git or web URL, route to remote
+        if RemoteResolver.is_remote_url(cmd_name):
+            return "remote", self.get_command(ctx, "remote"), args
         # If the argument is an existing file, route to explain_file
         if Path(cmd_name).is_file():
             return "explain_file", self.get_command(ctx, "explain_file"), args
@@ -54,18 +61,22 @@ def main(ctx):
         interactive_wizard()
 
 
-def select_mode_interactive() -> Tuple[str, Optional[str]]:
-    """Prompt user to choose between Without-AI and AI mode, returning (mode, ai_model)."""
+def select_mode_interactive() -> Tuple[str, str, Optional[str]]:
+    """Prompt user to choose between Without-AI, Local AI (GPU), and Cloud AI mode.
+    Returns (mode, ai_provider, ai_model).
+    """
     while True:
         console.print("\n[bold yellow]Choose Explanation Mode:[/bold yellow]")
         console.print("  [cyan][1][/cyan] [bold]Without-AI Explanation[/bold] (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [bold green][Default][/bold green]")
-        console.print("  [cyan][2][/cyan] [bold]AI Explanation[/bold] (Local Ollama / Qwen Model with Live Streaming)")
-        mode_choice = Prompt.ask("Select mode", choices=["1", "2"], default="1")
+        console.print("  [cyan][2][/cyan] [bold]Local AI Explanation[/bold] (Local Ollama on GPU - 100% Offline & Private)")
+        console.print("  [cyan][3][/cyan] [bold]Cloud AI Explanation[/bold] (Free Ultra-Fast Groq / Google Gemini / OpenAI - 300+ tok/sec Live Streaming)")
+        mode_choice = Prompt.ask("Select mode", choices=["1", "2", "3"], default="1")
 
         if mode_choice == "1":
-            return "static", None
+            return "static", "ollama", None
+
         elif mode_choice == "2":
-            console.print("\n[bold yellow]Select Local AI Model:[/bold yellow]")
+            console.print("\n[bold yellow]Select Local AI Model (Ollama on GPU):[/bold yellow]")
             detected_models = AIExplainerEngine.list_installed_models()
 
             if detected_models:
@@ -97,10 +108,10 @@ def select_mode_interactive() -> Tuple[str, Optional[str]]:
                     continue
                 elif m_select == manual_idx:
                     ai_model = Prompt.ask("Enter model identifier")
-                    return "ai", ai_model
+                    return "ai", "ollama", ai_model
                 else:
                     ai_model = detected_models[int(m_select) - 1]
-                    return "ai", ai_model
+                    return "ai", "ollama", ai_model
             else:
                 console.print("[yellow]No local Ollama models detected automatically.[/yellow]")
                 console.print("  [cyan][1][/cyan] Enter Ollama model name manually")
@@ -115,7 +126,50 @@ def select_mode_interactive() -> Tuple[str, Optional[str]]:
                         "Enter Ollama model name",
                         default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
                     )
-                    return "ai", ai_model
+                    return "ai", "ollama", ai_model
+
+        elif mode_choice == "3":
+            console.print("\n[bold yellow]Select Cloud AI Provider:[/bold yellow]")
+            console.print("  [cyan][1][/cyan] [bold]Groq Cloud[/bold] (⚡ 300+ tok/s - llama-3.3-70b-versatile) [bold green][Free][/bold green]")
+            console.print("  [cyan][2][/cyan] [bold]Google Gemini[/bold] (gemini-2.0-flash / gemini-1.5-pro) [bold green][Free Tier][/bold green]")
+            console.print("  [cyan][3][/cyan] [bold]OpenAI[/bold] (gpt-4o-mini / gpt-4o)")
+            console.print("  [cyan][4][/cyan] [bold]OpenRouter[/bold] (meta-llama/llama-3.3-70b-instruct)")
+            console.print("  [cyan][5][/cyan] [bold yellow]↩ GO BACK[/bold yellow] (Return to Main Menu)")
+            cloud_choice = Prompt.ask("Choose cloud provider", choices=["1", "2", "3", "4", "5"], default="1")
+
+            if cloud_choice == "5":
+                continue
+
+            provider_map = {
+                "1": ("groq", "llama-3.3-70b-versatile"),
+                "2": ("gemini", "gemini-2.0-flash"),
+                "3": ("openai", "gpt-4o-mini"),
+                "4": ("openrouter", "meta-llama/llama-3.3-70b-instruct"),
+            }
+            provider, default_model = provider_map[cloud_choice]
+
+            # Check if API key exists
+            api_key = CloudAIProvider.get_saved_api_key(provider)
+            if not api_key:
+                prov_info = CloudAIProvider.SUPPORTED_PROVIDERS.get(provider, {})
+                env_var = prov_info.get("env_var", f"{provider.upper()}_API_KEY")
+                doc_url = prov_info.get("doc", "")
+                console.print(f"\n[yellow]No API key found in environment ({env_var}) or config file.[/yellow]")
+                if doc_url:
+                    console.print(f"[dim]{doc_url}[/dim]")
+                api_key = Prompt.ask(f"Enter {provider.capitalize()} API key", password=True)
+                if not api_key:
+                    console.print("[red]API key is required for Cloud AI. Returning to menu...[/red]")
+                    continue
+                save_key = Prompt.ask("Save key locally in ~/.explainer/cloud_config.json for future use?", choices=["y", "n"], default="y")
+                if save_key.lower() == "y":
+                    CloudAIProvider.save_api_key(provider, api_key)
+                    console.print("[green]✓ Key saved successfully.[/green]")
+                else:
+                    os.environ[env_var] = api_key
+
+            custom_model = Prompt.ask(f"Model to use (Press Enter for default: [bold cyan]{default_model}[/bold cyan])", default=default_model)
+            return "ai", provider, custom_model
 
 
 def interactive_wizard():
@@ -130,8 +184,7 @@ def interactive_wizard():
     console.print(f"[bold]📁 Current Codebase:[/bold] [underline white]{current_cwd}[/underline white]")
 
     # Select Mode
-    mode, ai_model = select_mode_interactive()
-    ai_provider = "ollama"
+    mode, ai_provider, ai_model = select_mode_interactive()
     ai_endpoint = "http://localhost:11434/api/generate"
 
     codebase_folder_name = current_cwd.name or "Codebase"
@@ -208,7 +261,7 @@ def run_cli_file_inspector(codebase_analysis):
                 run_single_file_cli(
                     filepath=fa.file_path,
                     mode="ai",
-                    ai_provider="ollama",
+                    ai_provider=codebase_analysis.ai_provider or "ollama",
                     ai_model=codebase_analysis.ai_model_name,
                     stream=True
                 )
@@ -275,8 +328,11 @@ def run_core_analysis(
             model_name=ai_model,
             provider=ai_provider
         )
-        engine.ensure_ollama_running()
-        console.print(f"\n[bold magenta]🧠 Connected to Local AI Model: [bold white]{engine.model_name}[/bold white] via {ai_provider}[/bold magenta]")
+        if ai_provider == "ollama":
+            engine.ensure_ollama_running()
+            console.print(f"\n[bold magenta]🧠 Connected to Local AI Model: [bold white]{engine.model_name}[/bold white] via {ai_provider}[/bold magenta]")
+        else:
+            console.print(f"\n[bold magenta]⚡ Connected to Cloud AI Provider: [bold white]{ai_provider.upper()} ({engine.model_name})[/bold white][/bold magenta]")
         console.print("[dim]Streaming neural architecture synthesis and per-file breakdowns word-by-word...[/dim]\n")
 
         def on_ai_file_progress(curr: int, total: int, fpath: str):
@@ -315,7 +371,12 @@ def run_single_file_cli(
     stream: bool = True
 ):
     """Direct single-file explainer with live streaming and line-by-line breakdown."""
-    file_path = Path(filepath).resolve()
+    if RemoteResolver.is_remote_url(filepath):
+        local_path, _, _ = RemoteResolver.resolve(filepath)
+        file_path = local_path.resolve()
+    else:
+        file_path = Path(filepath).resolve()
+
     if not file_path.exists() or not file_path.is_file():
         console.print(f"[bold red]❌ Error: File '{filepath}' does not exist or is not a valid file.[/bold red]")
         sys.exit(1)
@@ -328,7 +389,7 @@ def run_single_file_cli(
     # Prompt for mode if not provided via flags
     if not mode:
         console.print(f"\n[bold cyan]📄 Direct File Explainer:[/bold cyan] [bold white]{file_path.name}[/bold white] [dim]({fa.language} • {fa.line_count} LOC)[/dim]")
-        mode, ai_model = select_mode_interactive()
+        mode, ai_provider, ai_model = select_mode_interactive()
 
     terminal_renderer = RichTerminalRenderer()
 
@@ -338,9 +399,11 @@ def run_single_file_cli(
             model_name=ai_model,
             provider=ai_provider
         )
-        engine.ensure_ollama_running()
-
-        console.print(f"\n[bold magenta]🧠 Querying Local AI Model: [bold white]{engine.model_name}[/bold white][/bold magenta]")
+        if ai_provider == "ollama":
+            engine.ensure_ollama_running()
+            console.print(f"\n[bold magenta]🧠 Querying Local AI Model: [bold white]{engine.model_name}[/bold white][/bold magenta]")
+        else:
+            console.print(f"\n[bold magenta]⚡ Querying Cloud AI ({ai_provider.upper()}): [bold white]{engine.model_name}[/bold white][/bold magenta]")
         console.print("[dim]Streaming live token-by-token line walkthrough...[/dim]\n")
 
         # Create dummy codebase wrapper for prompt context
@@ -399,7 +462,7 @@ def run_git_diff_cli(
     console.print(f"\n[bold cyan]🔍 Git Diff Detected:[/bold cyan] [bold white]{len(diff_files)} file(s) changed[/bold white], [bold green]+{total_added} added lines[/bold green] [dim]({ref_label})[/dim]")
 
     if not mode:
-        mode, ai_model = select_mode_interactive()
+        mode, ai_provider, ai_model = select_mode_interactive()
 
     ai_engine = None
     if mode == "ai":
@@ -408,8 +471,11 @@ def run_git_diff_cli(
             model_name=ai_model,
             provider=ai_provider
         )
-        ai_engine.ensure_ollama_running()
-        console.print(f"\n[bold magenta]🧠 Streaming Git Diff AI Walkthrough with: [bold white]{ai_engine.model_name}[/bold white][/bold magenta]\n")
+        if ai_provider == "ollama":
+            ai_engine.ensure_ollama_running()
+            console.print(f"\n[bold magenta]🧠 Streaming Git Diff AI Walkthrough with: [bold white]{ai_engine.model_name}[/bold white][/bold magenta]\n")
+        else:
+            console.print(f"\n[bold magenta]⚡ Streaming Git Diff Cloud AI Walkthrough ({ai_provider.upper()}): [bold white]{ai_engine.model_name}[/bold white][/bold magenta]\n")
 
     analysis = explainer.analyze_diff(
         files=diff_files,
@@ -424,10 +490,54 @@ def run_git_diff_cli(
     terminal_renderer.render_diff(analysis)
 
 
+def run_remote_cli(
+    url: str,
+    mode: Optional[str] = None,
+    ai_provider: str = "ollama",
+    ai_endpoint: str = "http://localhost:11434/api/generate",
+    ai_model: Optional[str] = None,
+    stream: bool = True,
+    fmt: str = "all",
+    output_dir: Optional[str] = None
+):
+    """Resolves a remote URL (Git repo or raw file) and explains it."""
+    console.print(f"\n[bold cyan]🌐 Fetching remote source:[/bold cyan] [underline white]{url}[/underline white]")
+    try:
+        with console.status("[bold green]Resolving remote Git repo / file...[/bold green]"):
+            local_path, is_single_file, label = RemoteResolver.resolve(url)
+    except Exception as e:
+        console.print(f"[bold red]❌ Failed to resolve remote URL:[/bold red] {e}")
+        sys.exit(1)
+
+    console.print(f"[bold green]✓ Downloaded/Cloned successfully:[/bold green] [white]{label}[/white]")
+    console.print(f"[dim]Cached at: {local_path}[/dim]\n")
+
+    if is_single_file:
+        run_single_file_cli(
+            filepath=str(local_path),
+            mode=mode,
+            ai_provider=ai_provider,
+            ai_endpoint=ai_endpoint,
+            ai_model=ai_model,
+            stream=stream
+        )
+    else:
+        run_cli_scan(
+            path=str(local_path),
+            mode=mode or "static",
+            fmt=fmt,
+            ai_provider=ai_provider,
+            ai_endpoint=ai_endpoint,
+            ai_model=ai_model,
+            inspect=None,
+            output_dir=output_dir
+        )
+
+
 @main.command(name="explain_file")
-@click.argument("filepath", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default=None, help="Explanation mode: 'static' (Without-AI) or 'ai' (Local LLM).")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.argument("filepath", type=click.Path())
+@click.option("--mode", type=click.Choice(["static", "ai"]), default=None, help="Explanation mode: 'static' (Without-AI) or 'ai' (LLM).")
+@click.option("--ai-provider", type=click.Choice(AI_PROVIDER_CHOICES), default="ollama", help="AI provider (local Ollama or cloud).")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
 @click.option("--ai-model", default=None, help="AI model identifier.")
 @click.option("--stream/--no-stream", default=True, help="Enable live token streaming for AI mode.")
@@ -440,7 +550,7 @@ def explain_file_cmd(filepath, mode, ai_provider, ai_endpoint, ai_model, stream)
 @click.argument("ref", required=False, default=None)
 @click.option("--mode", type=click.Choice(["static", "ai"]), default=None, help="Explanation mode: 'static' or 'ai'.")
 @click.option("--staged", is_flag=True, help="Explain staged git changes.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-provider", type=click.Choice(AI_PROVIDER_CHOICES), default="ollama", help="AI provider (local Ollama or cloud).")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
 @click.option("--ai-model", default=None, help="AI model identifier.")
 @click.option("--stream/--no-stream", default=True, help="Enable live token streaming for AI mode.")
@@ -449,11 +559,28 @@ def diff_cmd(ref, mode, staged, ai_provider, ai_endpoint, ai_model, stream):
     run_git_diff_cli(ref, mode, staged, ai_provider, ai_endpoint, ai_model, stream)
 
 
+@main.command(name="remote")
+@click.argument("url")
+@click.option("--mode", type=click.Choice(["static", "ai"]), default=None, help="Explanation mode: 'static' or 'ai'.")
+@click.option("--ai-provider", type=click.Choice(AI_PROVIDER_CHOICES), default="ollama", help="AI provider (local Ollama or cloud).")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--stream/--no-stream", default=True, help="Enable live token streaming for AI mode.")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
+@click.option("--output-dir", default=None, help="Directory to save generated markdown files.")
+def remote_cmd(url, mode, ai_provider, ai_endpoint, ai_model, stream, fmt, output_dir):
+    """Explain a remote Git repository or single file from a URL."""
+    run_remote_cli(url, mode, ai_provider, ai_endpoint, ai_model, stream, fmt, output_dir)
+
+
+main.add_command(remote_cmd, name="explain_remote")
+
+
 @main.command(name="analyze")
 @click.argument("path", default=".", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
+@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (LLM).")
 @click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-provider", type=click.Choice(AI_PROVIDER_CHOICES), default="ollama", help="AI provider (local Ollama or cloud).")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
 @click.option("--ai-model", default=None, help="AI model identifier.")
 @click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")

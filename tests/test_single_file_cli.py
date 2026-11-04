@@ -39,6 +39,14 @@ class TestSingleFileCLI(unittest.TestCase):
         result = self.runner.invoke(main, ["non_existent_file.xyz", "--mode", "static"])
         self.assertNotEqual(result.exit_code, 0)
 
+    @unittest.mock.patch("explainer.cli.RemoteResolver.resolve")
+    def test_direct_remote_url_routing(self, mock_resolve):
+        mock_resolve.return_value = (Path("samples/server.py"), True, "test_repo:server.py")
+        result = self.runner.invoke(main, ["https://github.com/user/repo/blob/main/server.py", "--mode", "static"])
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Fetching remote source:", result.output)
+        self.assertIn("File Overview: server.py", result.output)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,9 +5,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://python.org)
-[![Tests: 27 Passed](https://img.shields.io/badge/Tests-27%20Passed-success.svg)](tests/)
+[![Tests: 38 Passed](https://img.shields.io/badge/Tests-38%20Passed-success.svg)](tests/)](tests/)
 [![Interface: Pure CLI](https://img.shields.io/badge/Interface-100%25%20Terminal-blueviolet.svg)](#-how-to-use-it)
-[![AI Streaming: Enabled](https://img.shields.io/badge/Ollama-Live%20Streaming-ff69b4.svg)](#-local-ai--hardware-recommendations)
+[![AI Streaming: Local & Cloud](https://img.shields.io/badge/AI%20Streaming-Ollama%20%2B%20Groq%20%2B%20Gemini-ff69b4.svg)](#-local-ai--cloud-ai-engines)](#-local-ai--cloud-ai-engines)
 
 ---
 
@@ -18,37 +18,37 @@
 It operates under the persona of a **World-Class Senior Developer & Master System Architect** who translates complex software concepts into fun, vivid real-world analogies (toys, Lego blocks, kitchen blenders, doorbell buttons, and helpful robot assistants).
 
 ```
-                 ┌────────────────────────────────────────┐
-                 │          User Runs `expl` Command      │
-                 └───────────────────┬────────────────────┘
-                                     │
-           ┌─────────────────────────┼─────────────────────────┐
-           ▼                         ▼                         ▼
-   `expl` (Interactive)      `expl <file_path>`          `expl diff`
-   • Whole Workspace Scan    • Instant Single File      • Git Working Tree
-   • Cross-File Graph        • Bypasses Workspace Scan  • Changed/Added Lines
-   • Dossier (-EXPL/)        • Terminal Breakdown       • Line-by-Line Impact
-           │                         │                         │
-           └─────────────────────────┼─────────────────────────┘
-                                     │
-                      ┌──────────────┴──────────────┐
-                      ▼                             ▼
-           [1] Without-AI Mode            [2] Local AI Mode
-           • Deterministic AST            • Ollama GPU Inference
-           • 100% Offline & Instant       • Qwen2.5-Coder-7B
-           • Zero Hardware Budget         • Live Token Streaming
-                      │                             │
-                      └──────────────┬──────────────┘
-                                     ▼
-                ┌────────────────────────────────────────┐
-                │  Exact Pedagogical Standard Output     │
-                │  • 🧸 4-Year-Old Big Picture Story    │
-                │  • 🔍 Line-by-Line Breakdown (Blue)    │
-                │  • • Word-by-Word Meanings             │
-                │  • • Screen & Memory Outcomes          │
-                │  • • Cross-File Interconnections       │
-                │  • • What Breaks If Deleted / Buggy    │
-                └────────────────────────────────────────┘
+                 ┌─────────────────────────────────────────────────────────┐
+                 │                User Runs `expl` Command                 │
+                 └────────────────────────────┬────────────────────────────┘
+                                              │
+            ┌─────────────────────┬───────────┴───────────┬─────────────────────┐
+            ▼                     ▼                       ▼                     ▼
+    `expl` (Interactive)   `expl <file>`           `expl <remote_url>`     `expl diff`
+    • Whole Workspace      • Single Local File     • Remote GitHub Repo    • Git Working Tree
+    • Cross-File Graph     • Bypasses Workspace    • Direct Blob / Raw URL • Changed Lines
+    • Dossier (-EXPL/)     • Terminal Breakdown    • Auto-Cloned & Cached  • Line-by-Line Impact
+            │                     │                       │                     │
+            └─────────────────────┴───────────┬───────────┴─────────────────────┘
+                                              │
+                        ┌─────────────────────┼─────────────────────┐
+                        ▼                     ▼                     ▼
+             [1] Without-AI Mode      [2] Local AI Mode     [3] Cloud AI Mode
+             • Deterministic AST      • Ollama GPU Inference • Groq / Gemini / OpenAI
+             • 100% Offline & Instant • Qwen2.5-Coder-7B     • 300+ tok/s Ultra-Fast
+             • Zero Hardware Budget   • Live Token Streaming • Real-Time SSE Streaming
+                        │                     │                     │
+                        └─────────────────────┼─────────────────────┘
+                                              ▼
+                 ┌─────────────────────────────────────────────────────────┐
+                 │           Exact Pedagogical Standard Output             │
+                 │           • 🧸 4-Year-Old Big Picture Story            │
+                 │           • 🔍 Line-by-Line Breakdown (Blue)            │
+                 │           • • Word-by-Word Meanings                     │
+                 │           • • Screen & Memory Outcomes                  │
+                 │           • • Cross-File Interconnections               │
+                 │           • • What Breaks If Deleted / Buggy            │
+                 └─────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -60,17 +60,22 @@ It operates under the persona of a **World-Class Senior Developer & Master Syste
    - Generates an isolated `<Codebase>-EXPL` dossier containing individual markdown breakdowns for each file and a master `INDEX.md`.
    - Opens an interactive terminal inspector where you can browse any file's breakdown directly in your CLI.
 
-2. **📄 Direct Single-File Explainer (`expl <file_path>`)**:
-   - Pass any file path directly (e.g. `expl server.py`, `expl schema.sql`, `expl nginx.conf`).
+2. **🌐 Remote Git & Web Explaining (`expl <remote_url>`)**:
+   - Explain any remote GitHub repository directly: `expl https://github.com/user/repo` (shallow cloned and cached in `~/.cache/explainer/remote/`).
+   - Explain single remote files directly from GitHub blob links or raw files: `expl https://github.com/user/repo/blob/main/src/app.py`.
+   - No need to manually git-clone before inspecting code!
+
+3. **📄 Direct Single-File Explainer (`expl <file_path>`)**:
+   - Pass any local or remote file path directly (e.g. `expl server.py`, `expl schema.sql`, `expl nginx.conf`).
    - Bypasses workspace scan and immediately outputs the Big Picture Story and the full Line-by-Line & Word-by-Word breakdown into your terminal.
 
-3. **🔍 Git Diff Line-by-Line Explainer (`expl diff [ref]`)**:
+4. **🔍 Git Diff Line-by-Line Explainer (`expl diff [ref]`)**:
    - Inspects modified and added lines in your Git working tree or commits (e.g. `expl diff`, `expl diff HEAD~1`, `expl diff --staged`).
    - Walks through every added or modified line with 4-year-old analogies, screen/system outcomes, cross-file ripple effects, and failure risks.
 
-4. **🧠 Live Token Streaming for Local AI Mode**:
-   - Connects to your local Ollama models (e.g. `Qwen2.5-Coder-7B` or `Qwen3.5`).
-   - Streams neural tokens word-by-word live into your terminal in real time.
+5. **🧠 Freedom of Choice: Local AI vs. Cloud AI**:
+   - **Local AI (Ollama)**: 100% offline and private on your GPU (`Qwen2.5-Coder-7B`). Zero cloud dependencies.
+   - **Cloud AI (Groq / Gemini / OpenAI / OpenRouter)**: Blazing-fast cloud inference (Groq at 300+ tok/s or Google Gemini 2.0 Flash) with real-time SSE token streaming.
 
 5. **🗄️ First-Class SQL & Configuration Support (`.sql`, `.conf`, `.nginx`, `.cfg`, `.ini`)**:
    - Deep structural AST & semantic analysis for SQL tables, primary keys, foreign keys, constraints, and queries (`SELECT`, `JOIN`, `WHERE`).
@@ -81,18 +86,18 @@ It operates under the persona of a **World-Class Senior Developer & Master Syste
 
 ---
 
-## ⚡ Dual-Engine Parity
+## ⚡ Triple-Engine Parity
 
-CodeExplainer offers two distinct execution engines that produce the **exact same standardized line-by-line format**:
+CodeExplainer gives you 3 distinct ways to explain any code while maintaining the **exact same standardized pedagogical format**:
 
-| Feature | ⚡ Without-AI Engine [Default] | 🧠 Local AI Engine |
-| :--- | :--- | :--- |
-| **Technology** | Pure Deterministic AST & Semantic Catalog | Local LLM via Ollama (`Qwen2.5-Coder-7B`) |
-| **Speed** | Instant (< 0.05s per file) | Live Word-by-Word Streaming (~30 tokens/sec) |
-| **Requirements** | Zero! (No GPU, No Internet, 100% Offline) | Ollama running locally on CPU or GPU |
-| **Output Template** | Exact Standard (Big Picture + 6 Bullets) | Exact Standard (Big Picture + 6 Bullets) |
-| **Code Line Highlighting** | Blue (`#3b82f6`) | Blue (`#3b82f6`) |
-| **Reliability** | 100% Mathematical Precision | Context-Aware Neural Walkthrough |
+| Feature | ⚡ Without-AI Engine [Default] | 🧠 Local AI Engine | ☁️ Cloud AI Engine |
+| :--- | :--- | :--- | :--- |
+| **Technology** | Pure Deterministic AST & Knowledge Catalog | Local LLM via Ollama (`Qwen2.5-Coder-7B`) | Groq (`llama-3.3-70b`) / Gemini 2.0 Flash / OpenAI |
+| **Speed** | Instant (< 0.05s per file) | Live Streaming (~30 tokens/sec on GPU) | Ultra-Fast Live Streaming (**300+ tokens/sec**) |
+| **Privacy & Cost** | 100% Offline & Free | 100% Offline, Private & Free | Cloud API (Free tier on Groq & Google AI Studio) |
+| **Hardware Needed** | Any computer (zero GPU needed) | 4GB - 6GB VRAM GPU recommended | Zero GPU needed (runs anywhere) |
+| **Output Template** | Exact Standard (Big Picture + 6 Bullets) | Exact Standard (Big Picture + 6 Bullets) | Exact Standard (Big Picture + 6 Bullets) |
+| **Line Highlighting** | Blue (`#3b82f6`) | Blue (`#3b82f6`) | Blue (`#3b82f6`) |
 
 ---
 
@@ -216,10 +221,13 @@ This registers the global CLI command `expl` in your environment.
 
 | Command | Action |
 | :--- | :--- |
-| `expl` | Interactive wizard on the current workspace (prompts for mode & updates `-EXPL` folder). |
-| `expl <file_path>` | Direct line-by-line & word-by-word explanation of any file. |
-| `expl <file_path> --mode static` | Instant 100% offline pure AST explanation of a file. |
-| `expl <file_path> --mode ai` | Real-time live AI streaming explanation of a file. |
+| `expl` | Interactive wizard on current workspace (choose Without-AI, Local AI, or Cloud AI). |
+| `expl <file_path>` | Direct line-by-line & word-by-word explanation of any local file. |
+| `expl <remote_url>` | Direct explanation of remote Git repo (e.g. `expl https://github.com/user/repo`). |
+| `expl <remote_blob_url>` | Direct explanation of single file from GitHub blob or raw URL. |
+| `expl <file> --ai-provider groq` | Ultra-fast cloud streaming with Groq Cloud (300+ tok/s). |
+| `expl <file> --ai-provider gemini` | Cloud streaming with Google Gemini (gemini-2.0-flash). |
+| `expl <file> --mode static` | Instant 100% offline pure AST explanation of a file. |
 | `expl diff` | Explains unstaged working tree changes line-by-line. |
 | `expl diff --staged` | Explains staged Git changes line-by-line. |
 | `expl diff HEAD~1` | Explains changes compared to previous commit. |
@@ -286,9 +294,28 @@ expl
 
 ---
 
-## 🧠 Local AI & Hardware Recommendations
+## 🧠 Local AI & Cloud AI Engines
 
-CodeExplainer's AI mode connects directly to your local Ollama instance with **zero cloud dependencies**.
+CodeExplainer empowers you to choose between **Local AI on your GPU** (100% private & offline) and **Cloud AI Providers** (blazing-fast 300+ tok/s).
+
+### Option A: Cloud AI (Ultra-Fast & Zero Local GPU Required)
+You can use free cloud tiers for instantaneous streaming:
+- **Groq Cloud (Recommended for Speed)**: Delivers 300+ tokens/sec using `llama-3.3-70b-versatile`.
+  - Set `GROQ_API_KEY` or enter it when prompted (saved securely to `~/.explainer/cloud_config.json`).
+- **Google Gemini**: Uses `gemini-2.0-flash`. Set `GEMINI_API_KEY`.
+- **OpenAI**: Uses `gpt-4o-mini`. Set `OPENAI_API_KEY`.
+- **OpenRouter**: Access to 100+ open-weights models. Set `OPENROUTER_API_KEY`.
+
+```bash
+# Run with Groq Cloud streaming
+expl server.py --mode ai --ai-provider groq
+
+# Run with Google Gemini streaming
+expl https://github.com/pallets/flask/blob/main/src/flask/app.py --mode ai --ai-provider gemini
+```
+
+### Option B: Local AI (Ollama on GPU - 100% Offline & Private)
+Connects directly to your local Ollama instance with **zero cloud dependencies**.
 
 ### Recommended Local Models (Tested on Laptop GPU)
 For a laptop with an **NVIDIA GeForce RTX 4050 (6GB VRAM)** or similar:
@@ -315,13 +342,14 @@ expl server.py --mode ai
 ```text
 Explainer/
 ├── explainer/
-│   ├── cli.py                     # Click CLI entry point & dynamic command router
+│   ├── cli.py                     # Click CLI entry point, dynamic router & interactive wizard
 │   ├── models.py                  # Pydantic data models for analyses & elements
 │   ├── diff/
 │   │   └── git_diff_explainer.py  # Git diff hunk parser & line-by-line analyzer
 │   ├── engine/
 │   │   ├── rule_engine.py         # Deterministic AST & semantic explainer engine
-│   │   └── ai_engine.py           # Ollama / Local AI integration with live streaming
+│   │   ├── ai_engine.py           # Neural explainer engine with live token streaming
+│   │   └── cloud_providers.py     # Groq, Gemini, OpenAI & OpenRouter SSE client
 │   ├── graph/
 │   │   └── dependency_builder.py  # Cross-file dependency graph & import resolver
 │   ├── parsers/
@@ -341,10 +369,11 @@ Explainer/
 │   │   ├── rich_terminal.py       # Rich terminal UI, tables, panels & blue lines
 │   │   └── markdown_renderer.py   # Multi-file dossier generator (-EXPL/)
 │   └── scanner/
+│       ├── remote_resolver.py     # Remote Git cloning, GitHub blob & raw URL resolver
 │       ├── workspace_scanner.py   # Recursive file discovery & exclusion filter
 │       └── tech_stack.py          # Framework & ecosystem compatibility analyzer
 ├── samples/                       # Test fixture files (.py, .html, .css, .sql, .conf, etc.)
-├── tests/                         # 27 unit & integration tests (100% passing)
+├── tests/                         # 38 unit & integration tests (100% passing)
 ├── pyproject.toml                 # Package metadata and CLI console_scripts
 └── README.md                      # Documentation & user guide
 ```
@@ -353,13 +382,13 @@ Explainer/
 
 ## 🧪 Running Automated Tests
 
-Run the full automated test suite (27 unit & integration tests):
+Run the full automated test suite (38 unit & integration tests):
 
 ```bash
 pytest tests/ -v
 ```
 
-All 27 tests pass in ~1.1 seconds.
+All 38 tests pass in ~1.2 seconds.
 
 ---
 
