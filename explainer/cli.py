@@ -161,7 +161,7 @@ def interactive_wizard():
     else:
         # Open in Web Browser
         console.print(f"\n[bold green]🌐 Opening Webpage GUI in your default browser...[/bold green]")
-        webbrowser.open(f"file://{html_path.resolve()}")
+        webbrowser.open(html_path.resolve().as_uri())
 
 
 def run_cli_file_inspector(codebase_analysis):
