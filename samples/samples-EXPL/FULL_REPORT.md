@@ -152,31 +152,32 @@ graph LR
 ### 📄 File: `index.html`
 - **Language**: `HTML` | **Size**: 38 lines (1,201 bytes)
 - **Codebase Role**: Application Presentation & DOM Root Entrypoint
-> 🧸 **Beginner Story**: Imagine this HTML file `index.html` is a real physical toy box sitting on a stage! It sets up the roof and secret rules in `<head>`, the big living room where all the toys perform in `<body>`, and builds an empty stage `<div id="root">` waiting for your React code to jump in and build the whole interactive world!
+> 🧸 **Beginner Story**: Imagine this code is a real physical toy box sitting on a stage. It puts down an empty box on the floor (<div>), paints a big sign above it that says 'My Toy Box' (<h1>), and puts a shiny red doorbell button on the front (<button>). Then it calls the painter (style.css) to paint it with colors, and hires an invisible robot assistant (app.jsx) to open the box whenever someone presses the doorbell!
 
 - **Executive Summary**: HTML document containing 25 elements across 18 distinct tag types. Serves as the visual entrypoint or template. Configured as a React/SPA application mount point. References 1 stylesheet(s) and 1 script bundle(s).
 
 #### Elements Written in `index.html`
-- **`<html>`** (tag, Line 2): The root element of an HTML document representing the top-level container. *(🧸 Think of <html> like the front and back cover of a storybook. Everything inside the book lives between these two covers!)* 
-- **`<head>`** (tag, Line 3): The container for document metadata that is not directly rendered on the page canvas. *(🧸 Think of <head> like the brain or backpack of the webpage. You can't see the brain on the page, but it holds all the secret rules, title, and paint colors!)* 
-- **`<meta>`** (tag, Line 4): Standard HTML5 element `<meta>` providing document structure or markup styling. *(🧸 Think of `<meta>` like a Lego brick that holds a piece of your webpage in place.)* 
-- **`<title>`** (tag, Line 7): Standard HTML5 element `<title>` providing document structure or markup styling. *(🧸 Think of `<title>` like a Lego brick that holds a piece of your webpage in place.)* 
-- **`<link>`** (tag, Line 8): Specifies external resource relationships (stylesheets, fonts, favicons). *(🧸 Think of <link> like a phone call to a paint shop: 'Hey, please send over the style.css paint bucket so I can paint my page!')* 
-- **`<link>`** (tag, Line 9): Specifies external resource relationships (stylesheets, fonts, favicons). *(🧸 Think of <link> like a phone call to a paint shop: 'Hey, please send over the style.css paint bucket so I can paint my page!')* 
-- **`<body>`** (tag, Line 11): The document's primary renderable canvas containing all visual content, widgets, and layout structures. *(🧸 Think of <body> like the stage in a theater! Every actor, costume, picture, and button you see performs on this stage.)* 
-- **`<header>`** (tag, Line 12): A semantic landmark representing introductory content or top navigation. *(🧸 Think of <header> like the roof or entrance sign of a shop showing the store name and navigation arrows.)* 
-- **`<nav>`** (tag, Line 13): A semantic landmark designating a section of major navigational links. *(🧸 Think of <nav> like a signpost with arrows pointing: 'To the Playground', 'To the Cafeteria', 'To the Gift Shop'!)* 
-- **`<div>`** (tag, Line 14): The generic block-level flow container used to group elements together. *(🧸 Think of a <div> like an invisible cardboard box! You put toys (buttons, pictures, text) into the box so you can move or color them all at once.)* 
-- **`<ul>`** (tag, Line 15): Standard HTML5 element `<ul>` providing document structure or markup styling. *(🧸 Think of `<ul>` like a Lego brick that holds a piece of your webpage in place.)* 
-- **`<li>`** (tag, Line 16): Standard HTML5 element `<li>` providing document structure or markup styling. *(🧸 Think of `<li>` like a Lego brick that holds a piece of your webpage in place.)* 
-- **`<a>`** (tag, Line 16): An anchor hyperlink connecting to another web page, file, or page section. *(🧸 Think of <a> like a magic teleportation door! You step through it (click it) and zoom to another room or website!)* 
-- **`<main>`** (tag, Line 22): The dominant, unique central content area of the document body. *(🧸 Think of <main> like the main dish at dinner! Everything else (header, footer) is just the napkin and cutlery.)* 
-- **`<section>`** (tag, Line 23): Standard HTML5 element `<section>` providing document structure or markup styling. *(🧸 Think of `<section>` like a Lego brick that holds a piece of your webpage in place.)* 
-- **`<h1>`** (tag, Line 24): The most important top-level heading on the webpage. *(🧸 Think of <h1> like the big giant title on the cover of a storybook or newspaper!)* 
-- **`<p>`** (tag, Line 25): A paragraph of plain text. *(🧸 Think of <p> like a friendly sentence or paragraph in a letter to your friend.)* 
-- **`<div>`** (tag, Line 29): The generic block-level flow container used to group elements together. *(🧸 Think of a <div> like an invisible cardboard box! You put toys (buttons, pictures, text) into the box so you can move or color them all at once.)* 
-- **`<footer>`** (tag, Line 32): A semantic container for concluding information, copyright, and bottom links. *(🧸 Think of <footer> like the bottom floor of a building where you find the exit sign and copyright stamp.)* 
-- **`<script>`** (tag, Line 36): Embeds executable JavaScript code or links an external script file. *(🧸 Think of <script> like a magic spellbook or brain chip! It gives the webpage life so it can move, think, and respond when you tap things.)* 
+- **`<html>`** (tag, Line 2): A <html> element configured with lang="en". *(🧸 Think of <html> like the front and back cover of a storybook. Everything inside the book lives between these two covers!)* 
+- **`<head>`** (tag, Line 3): A standard <head> element. *(🧸 Think of <head> like the brain or backpack of the webpage. You can't see the brain on the page, but it holds all the secret rules, title, and paint colors!)* 
+- **`<meta>`** (tag, Line 4): A <meta> element configured with charset="UTF-8". *(🧸 Think of `<meta>` like a Lego brick that holds a piece of your webpage in place.)* 
+- **`<title>`** (tag, Line 7): A standard <title> element. *(🧸 Think of `<title>` like a Lego brick that holds a piece of your webpage in place.)* 
+- **`<link>`** (tag, Line 8): A link tag importing style.css. *(🧸 Like calling the painter: "Please bring your paint cans and dress up my toy box!")* 
+- **`<link>`** (tag, Line 9): A <link> element configured with rel="preconnect", href="https://fonts.googleapis.com". *(🧸 Think of <link> like a phone call to a paint shop: 'Hey, please send over the style.css paint bucket so I can paint my page!')* 
+- **`<body>`** (tag, Line 11): A standard <body> element. *(🧸 Think of <body> like the stage in a theater! Every actor, costume, picture, and button you see performs on this stage.)* 
+- **`<header>`** (tag, Line 12): A <header> element configured with class="app-header". *(🧸 Think of <header> like the roof or entrance sign of a shop showing the store name and navigation arrows.)* 
+- **`<nav>`** (tag, Line 13): A <nav> element configured with class="navbar", role="navigation", aria-label="Main Navigation". *(🧸 Think of <nav> like a signpost with arrows pointing: 'To the Playground', 'To the Cafeteria', 'To the Gift Shop'!)* 
+- **`<div>`** (tag, Line 14): A <div> tag with 1 label(s): class="logo". *(🧸 Think of a <div> like an invisible cardboard box! You put toys (buttons, pictures, text) into the box so you can move or color them all at once.)* 
+- **`<ul>`** (tag, Line 15): A <ul> element configured with class="nav-links". *(🧸 Think of `<ul>` like a Lego brick that holds a piece of your webpage in place.)* 
+- **`<li>`** (tag, Line 16): A standard <li> element. *(🧸 Think of `<li>` like a Lego brick that holds a piece of your webpage in place.)* 
+- **`<a>`** (tag, Line 16): A <a> element configured with href="#metrics". *(🧸 Think of <a> like a magic teleportation door! You step through it (click it) and zoom to another room or website!)* 
+- **`<a>`** (tag, Line 17): A <a> element configured with href="#deployments". *(🧸 Think of <a> like a magic teleportation door! You step through it (click it) and zoom to another room or website!)* 
+- **`<main>`** (tag, Line 22): A <main> element configured with id="main-content", class="container". *(🧸 Think of <main> like the main dish at dinner! Everything else (header, footer) is just the napkin and cutlery.)* 
+- **`<section>`** (tag, Line 23): A <section> element configured with class="hero-banner". *(🧸 Think of `<section>` like a Lego brick that holds a piece of your webpage in place.)* 
+- **`<h1>`** (tag, Line 24): An <h1> heading with the text "Real-Time Cluster Analytics". *(🧸 Like the big colorful title on the front cover of a storybook.)* 
+- **`<p>`** (tag, Line 25): A standard <p> element. *(🧸 Think of <p> like a friendly sentence or paragraph in a letter to your friend.)* 
+- **`<div>`** (tag, Line 29): A <div> tag with 3 label(s): id="root" and role="region" and aria-label="Application Dashboard Root". *(🧸 Think of this like setting down an empty laundry basket before you put clothes in it.)* 
+- **`<footer>`** (tag, Line 32): A <footer> element configured with class="app-footer". *(🧸 Think of <footer> like the bottom floor of a building where you find the exit sign and copyright stamp.)* 
+- **`<script>`** (tag, Line 36): A script tag loading the JavaScript code from app.jsx. *(🧸 Like inserting the batteries and brain chip into a toy robot so it can move and talk!)* 
 
 ---
 ### 📄 File: `server.py`

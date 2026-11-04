@@ -226,5 +226,54 @@ class TestFileParsers(unittest.TestCase):
         self.assertTrue(el.simple_analogy)
 
 
+    def test_user_exact_toy_box_example(self):
+        content = """<div id="root" class="container">
+  <h1 class="title">My Toy Box</h1>
+  <button class="btn-magic" onclick="openBox()">Open Box!</button>
+</div>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>"""
+        parser = HtmlParser()
+        analysis = parser.parse("index.html", content, "index.html")
+
+        from explainer.renderers.markdown_renderer import MarkdownRenderer
+        from explainer.models import CodebaseAnalysis, TechStackInfo
+
+        codebase = CodebaseAnalysis(
+            root_path=".",
+            project_name="ToyBoxApp",
+            total_files=1,
+            total_lines=len(content.splitlines()),
+            tech_stack=TechStackInfo(languages={"HTML": 1}),
+            files={"index.html": analysis},
+            architecture_style="Single Page Application (SPA)",
+            architecture_summary="Single page application structure."
+        )
+
+        renderer = MarkdownRenderer()
+        md = renderer._build_single_file_markdown("index.html", analysis, codebase)
+
+        # Verify exact standard formatting requested by user
+        self.assertIn("#### 🧸 1. The Big Picture Story (What is this code?)", md)
+        self.assertIn("│ \"Imagine this code is a real physical toy box sitting on a stage", md)
+        self.assertIn("──────", md)
+        self.assertIn("#### 🔍 2. Line-by-Line & Word-by-Word Breakdown", md)
+        self.assertIn("#### Line 1: <div id=\"root\" class=\"container\">", md)
+        self.assertIn("• What is written?: A <div> tag with 2 label(s): id=\"root\" and class=\"container\".", md)
+        self.assertIn("• What does every word mean?:", md)
+        self.assertIn("• div: Short for \"division\". An invisible cardboard box used to bundle things together.", md)
+        self.assertIn("• id=\"root\": A unique name-tag (like a personal ID card).", md)
+        self.assertIn("• class=\"container\": A style group label / costume label.", md)
+        self.assertIn("• 🧸 4-Year-Old Analogy: Think of this like setting down an empty laundry basket before you put clothes in it.", md)
+        self.assertIn("• 🖥️ What happens on screen?: Nothing visible yet! It creates an invisible box on a new line where child elements will sit.", md)
+        self.assertIn("• 🔗 Interconnection with other files:", md)
+        self.assertIn("app.js searches for this exact box using document.getElementById('root')", md)
+        self.assertIn("• 💥 What breaks if deleted?: The title and button lose their container, spill across the screen", md)
+        self.assertIn("#### Line 2: <h1 class=\"title\">My Toy Box</h1>", md)
+        self.assertIn("#### Line 3: <button class=\"btn-magic\" onclick=\"openBox()\">Open Box!</button>", md)
+        self.assertIn("#### Line 5: <link rel=\"stylesheet\" href=\"style.css\">", md)
+        self.assertIn("#### Line 6: <script src=\"app.js\"></script>", md)
+
+
 if __name__ == "__main__":
     unittest.main()

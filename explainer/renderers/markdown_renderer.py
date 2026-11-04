@@ -139,55 +139,68 @@ class MarkdownRenderer:
         out.append(f"# Deep File Explanation: `{rel_path}`\n")
         out.append(f"> **Project**: `{analysis.project_name}` | **Language**: `{fa.language}` | **Size**: {fa.line_count} lines ({fa.file_size_bytes:,} bytes)\n")
         out.append(f"> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)\n\n")
-        out.append("---\n\n")
+        out.append("──────\n\n")
 
-        # 1. Identity, Beginner Story & Summary
-        out.append("## 1. Architectural Purpose & Beginner Story\n")
-        out.append(f"**Role in Codebase**: `{fa.role_in_codebase}`\n\n")
-
-        if fa.beginner_story:
-            out.append(f"### 🧸 The Big Picture Story (Explain Like I'm 4 Years Old)\n")
-            out.append(f"> {fa.beginner_story}\n\n")
-
-        out.append(f"### Executive Technical Summary\n{fa.summary}\n\n")
+        # 1. Big Picture Story
+        story = fa.beginner_story or f"This {fa.language} file `{rel_path}` acts like a dedicated tool in the project workshop, fulfilling the role: {fa.role_in_codebase}."
+        out.append("#### 🧸 1. The Big Picture Story (What is this code?)\n\n")
+        out.append(f'│ "{story}"\n')
+        out.append("──────\n\n")
 
         # Neural AI Breakdown (if in AI mode)
         if fa.ai_insights:
             model_badge = fa.ai_model_used or analysis.ai_model_name or "Local AI Model"
-            out.append(f"### 🧠 Neural AI Deep Code Analysis (`{model_badge}`)\n")
+            out.append(f"### 🧠 Neural AI Deep Code Analysis (`{model_badge}`)\n\n")
             out.append(f"{fa.ai_insights}\n\n")
-            out.append("---\n\n")
+            out.append("──────\n\n")
 
-        if fa.concepts_detected:
-            out.append("### Key Architectural Concepts\n")
-            for c in fa.concepts_detected:
-                out.append(f"- **{c}**\n")
-            out.append("\n")
+        # 2. Line-by-Line & Word-by-Word Breakdown
+        out.append("#### 🔍 2. Line-by-Line & Word-by-Word Breakdown\n\n")
+        if fa.elements:
+            for el in fa.elements:
+                line_str = f"Line {el.line_number}" if el.line_number is not None else "Declaration"
+                snippet_line = (el.snippet or el.name).strip()
+                out.append(f"#### {line_str}: {snippet_line}\n\n")
 
-        if fa.frameworks_detected:
-            out.append("### Frameworks & Libraries Used\n")
-            for f in fa.frameworks_detected:
-                out.append(f"- `{f}`\n")
-            out.append("\n")
+                out.append(f"• What is written?: {el.what_it_is}\n")
 
-        if fa.design_and_style_notes:
-            out.append(f"### Design & Styling Architecture\n{fa.design_and_style_notes}\n\n")
+                if el.words_breakdown:
+                    out.append("• What does every word mean?:\n")
+                    for w, meaning in el.words_breakdown.items():
+                        out.append(f"    • {w}: {meaning}\n")
 
-        if fa.animations_and_interactions:
-            out.append(f"### Animations & Motion\n{fa.animations_and_interactions}\n\n")
+                if el.simple_analogy:
+                    out.append(f"• 🧸 4-Year-Old Analogy: {el.simple_analogy}\n")
 
-        # 2. Dependencies
-        out.append("## 2. Cross-File Dependencies & Interconnections\n")
+                screen_effect = el.what_happens_on_screen or "Executes instructions inside computer memory."
+                out.append(f"• 🖥️ What happens on screen?: {screen_effect}\n")
+
+                if el.interconnection_note:
+                    out.append("• 🔗 Interconnection with other files:\n")
+                    for conn in el.interconnection_note.strip().splitlines():
+                        conn_clean = conn.strip().lstrip("•-* ")
+                        if conn_clean:
+                            out.append(f"    • {conn_clean}\n")
+
+                if el.what_if_removed:
+                    out.append(f"• 💥 What breaks if deleted?: {el.what_if_removed}\n")
+
+                out.append("──────\n")
+        else:
+            out.append("• No parsed lines in this file.\n──────\n")
+
+        # 3. Cross-File Dependencies Summary
+        out.append("\n### 🔗 3. Cross-File Dependencies & Friendship Map\n")
         if fa.outbound_connections or fa.inbound_connections:
             if fa.outbound_connections:
-                out.append("### Outbound Connections (Files this file depends on)\n")
+                out.append("#### Outbound Connections (Files this file depends on)\n")
                 for outb in fa.outbound_connections:
                     out.append(f"- ➡️ **Depends on** `{outb.target_file}` (`{outb.relation_type}`)\n")
                     out.append(f"  - **How It Works**: {outb.how_it_works}\n")
                     out.append(f"  - **Why It Works**: {outb.why_it_works}\n")
                 out.append("\n")
             if fa.inbound_connections:
-                out.append("### Inbound Connections (Files that depend on this file)\n")
+                out.append("#### Inbound Connections (Files that depend on this file)\n")
                 for inb in fa.inbound_connections:
                     out.append(f"- ⬅️ **Referenced by** `{inb.source_file}` (`{inb.relation_type}`)\n")
                     out.append(f"  - **How It Works**: {inb.how_it_works}\n")
@@ -196,48 +209,7 @@ class MarkdownRenderer:
         else:
             out.append("*Isolated or standalone file with no direct internal codebase dependencies.*\n\n")
 
-        out.append("---\n\n")
-
-        # 3. Elements Breakdown (Detailed & Line-by-Line)
-        out.append(f"## 3. Line-by-Line & Word-by-Word Breakdown ({len(fa.elements)} Items Explained)\n\n")
-        if fa.elements:
-            for el in fa.elements:
-                line_str = f"Line {el.line_number}" if el.line_number else "Global / Declarative"
-                out.append(f"### 📌 {line_str}: `{el.name}`\n")
-                if el.snippet:
-                    out.append(f"```text\n{el.snippet}\n```\n")
-                
-                out.append(f"* **What is written?**: {el.what_it_is}\n")
-                
-                if el.words_breakdown:
-                    out.append("* **What does every word & symbol mean?**:\n")
-                    for w, meaning in el.words_breakdown.items():
-                        out.append(f"  * `{w}`: {meaning}\n")
-                
-                if el.simple_analogy:
-                    out.append(f"* **🧸 4-Year-Old Analogy**: {el.simple_analogy}\n")
-                
-                out.append(f"* **🎯 Why did the programmer write this?**: {el.how_it_is_used}\n")
-                
-                if el.what_happens_on_screen:
-                    out.append(f"* **🖥️ What happens on screen / inside computer?**: {el.what_happens_on_screen}\n")
-                
-                if el.interconnection_note:
-                    out.append(f"* **🔗 Interconnection with other files**: {el.interconnection_note}\n")
-                
-                if el.what_if_removed:
-                    out.append(f"* **💥 What breaks if deleted?**: {el.what_if_removed}\n")
-                
-                out.append(f"* **⚙️ Under the Hood (Why It Works)**: {el.why_it_works}\n")
-                
-                if el.best_practices_and_pitfalls:
-                    out.append(f"* **💡 Best Practice**: {el.best_practices_and_pitfalls}\n")
-                
-                out.append("\n---\n\n")
-        else:
-            out.append("*No parsed symbols or tags in this file.*\n")
-
-        out.append("\n---\n")
+        out.append("──────\n")
         out.append(f"> [⬅ Back to Main Index](../INDEX.md)\n")
         return "".join(out)
 

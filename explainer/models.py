@@ -7,7 +7,7 @@ class ElementExplanation(BaseModel):
     """Deep pedagogical explanation of a specific tag, component, function, hook, or directive."""
     name: str
     kind: str  # 'tag', 'component', 'hook', 'function', 'class', 'directive', 'property', 'concept', 'animation', 'import'
-    line_number: Optional[int] = None
+    line_number: Optional[Any] = None  # int or string range like '3-5'
     snippet: Optional[str] = None
     what_it_is: str
     how_it_is_used: str

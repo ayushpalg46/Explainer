@@ -99,7 +99,7 @@ class CssParser(BaseParser):
             removal_consequence = f"The `{selector}` elements will lose their custom colors, padding, and positioning."
             interconnection = f"Directly targets and styles matching elements in connected HTML and JSX files."
 
-            snippet_text = f"{selector} {{\n  " + "\n  ".join(props[:4]) + ("\n  ..." if len(props) > 4 else "") + "\n}"
+            snippet_text = f"{selector} {{ {'; '.join(props[:4])}; }}" if len(props) <= 4 else f"{selector} {{ {'; '.join(props[:3])}; ... }}"
 
             analysis.elements.append(ElementExplanation(
                 name=f"Rule: {selector}",
