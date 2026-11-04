@@ -249,18 +249,30 @@ def run_core_analysis(
             model_name=ai_model,
             provider=ai_provider
         )
-        console.print(f"[bold magenta]🧠 Running Local AI Engine ({engine.model_name} via {ai_provider})...[/bold magenta]")
+        console.print(f"[bold magenta]🧠 Connected to Local AI Model: [bold white]{engine.model_name}[/bold white] via {ai_provider}[/bold magenta]")
+        console.print("[dim]Analyzing system architecture and querying neural breakdown for each file...[/dim]")
+
+        def on_ai_file_progress(curr: int, total: int, fpath: str):
+            console.print(f"  [magenta]🧠 [AI {curr}/{total}][/magenta] Analyzing [bold white]{fpath}[/bold white] with [cyan]{engine.model_name}[/cyan]...")
+
+        with console.status("[bold magenta]Synthesizing system architectural critique with AI...[/bold magenta]"):
+            codebase_analysis = engine.analyze_codebase(
+                root_path=str(target_p),
+                files=analyzed_files,
+                tech_stack=tech_stack,
+                interconnections=interconnections,
+                progress_callback=on_ai_file_progress
+            )
     else:
         console.print("[bold green]⚡ Running Pure Knowledge & AST Engine (Zero-AI Deterministic Mode)...[/bold green]")
         engine = RuleExplainerEngine()
-
-    with console.status("[bold green]Synthesizing deep pedagogical dossier...[/bold green]"):
-        codebase_analysis = engine.analyze_codebase(
-            root_path=str(target_p),
-            files=analyzed_files,
-            tech_stack=tech_stack,
-            interconnections=interconnections
-        )
+        with console.status("[bold green]Synthesizing deep pedagogical dossier...[/bold green]"):
+            codebase_analysis = engine.analyze_codebase(
+                root_path=str(target_p),
+                files=analyzed_files,
+                tech_stack=tech_stack,
+                interconnections=interconnections
+            )
 
     return codebase_analysis
 

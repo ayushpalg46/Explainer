@@ -43,6 +43,8 @@ class HtmlDashboardRenderer:
                 "frameworks_detected": fa.frameworks_detected,
                 "design_and_style_notes": fa.design_and_style_notes or "",
                 "animations_and_interactions": fa.animations_and_interactions or "",
+                "ai_insights": fa.ai_insights or "",
+                "ai_model_used": fa.ai_model_used or "",
                 "elements": [
                     {
                         "name": el.name,
@@ -71,6 +73,20 @@ class HtmlDashboardRenderer:
         files_data_json = json.dumps(files_payload)
         tech_stack_json = json.dumps(analysis.tech_stack.model_dump())
         folder_roles_json = json.dumps(analysis.folder_roles)
+
+        ai_arch_html = ""
+        if analysis.ai_architecture_critique:
+            model_badge = analysis.ai_model_name or "Local AI Model"
+            safe_critique = (analysis.ai_architecture_critique
+                             .replace("&", "&amp;")
+                             .replace("<", "&lt;")
+                             .replace(">", "&gt;"))
+            ai_arch_html = f"""
+            <div class="card" style="border: 1px solid #a855f7; background: #181126; margin-bottom:20px; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);">
+              <h2 style="color:#e9d5ff; font-size:1.15rem; margin-bottom:8px;">🧠 Neural AI Architecture Review <small style="color:#c084fc; font-size:0.8rem;">({model_badge})</small></h2>
+              <div style="color:#f3e8ff; line-height:1.65; white-space:pre-wrap; font-size:0.92rem;">{safe_critique}</div>
+            </div>
+            """
 
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -209,6 +225,7 @@ class HtmlDashboardRenderer:
         <h3>Tech Stack Ecosystem Compatibility</h3>
         <p style="line-height:1.6; color:#9ca3af;">{analysis.tech_stack.compatibility_analysis}</p>
       </div>
+      {ai_arch_html}
 
       <div class="grid-2">
         <div class="card">
@@ -352,7 +369,23 @@ class HtmlDashboardRenderer:
       let inConn = f.inbound.map(c => `<li>⬅️ Referenced by <code>${{c.source}}</code> (${{c.type}})</li>`).join("");
       let outConn = f.outbound.map(c => `<li>➡️ References <code>${{c.target}}</code> (${{c.type}})</li>`).join("");
 
+      let aiCardHtml = "";
+      if (f.ai_insights) {{
+        aiCardHtml = `
+          <div class="card" style="border: 1px solid #a855f7; background: #181126; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15); margin-bottom: 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h2 style="color:#e9d5ff; font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+                <span>🧠</span> Neural AI Deep Code Analysis
+              </h2>
+              <span class="pill" style="border-color:#c084fc; color:#c084fc; font-size:0.75rem;">Model: ${{f.ai_model_used || 'Local AI'}}</span>
+            </div>
+            <div style="color:#f3e8ff; line-height:1.65; white-space:pre-wrap; font-size:0.9rem;">${{escapeHtml(f.ai_insights)}}</div>
+          </div>
+        `;
+      }}
+
       container.innerHTML = `
+        ${{aiCardHtml}}
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <h2>📄 ${{f.relative_path}}</h2>

@@ -60,6 +60,11 @@ class MarkdownRenderer:
         out.append(f"### Architectural Style: **{analysis.architecture_style}**\n")
         out.append(f"{analysis.architecture_summary}\n\n")
 
+        if analysis.ai_architecture_critique and analysis.ai_architecture_critique != analysis.architecture_summary:
+            model_lbl = analysis.ai_model_name or "Local AI Model"
+            out.append(f"### 🧠 Neural AI Architectural Review (`{model_lbl}`)\n")
+            out.append(f"{analysis.ai_architecture_critique}\n\n")
+
         out.append("### Technology Compatibility Analysis\n")
         out.append(f"{analysis.tech_stack.compatibility_analysis}\n\n")
 
@@ -128,6 +133,11 @@ class MarkdownRenderer:
         out.append("## 1. Architectural Purpose & Summary\n")
         out.append(f"**Role in Codebase**: `{fa.role_in_codebase}`\n\n")
         out.append(f"### Executive Summary\n{fa.summary}\n\n")
+
+        if fa.ai_insights:
+            model_badge = fa.ai_model_used or analysis.ai_model_name or "Local AI Model"
+            out.append(f"### 🧠 Neural AI Deep Code Analysis (`{model_badge}`)\n")
+            out.append(f"{fa.ai_insights}\n\n")
 
         if fa.concepts_detected:
             out.append("### Key Architectural Concepts\n")
@@ -253,6 +263,9 @@ class MarkdownRenderer:
             out.append(f"- **Size**: {fa.line_count} lines ({fa.file_size_bytes:,} bytes)\n")
             out.append(f"- **Codebase Role**: {fa.role_in_codebase}\n")
             out.append(f"- **Executive Summary**: {fa.summary}\n")
+            if fa.ai_insights:
+                model_lbl = fa.ai_model_used or analysis.ai_model_name or "Local AI Model"
+                out.append(f"\n> **🧠 Neural AI Insights ({model_lbl})**:\n> " + fa.ai_insights.replace("\n", "\n> ") + "\n\n")
             if fa.concepts_detected:
                 out.append(f"- **Concepts Identified**: {', '.join(fa.concepts_detected)}\n")
             if fa.frameworks_detected:

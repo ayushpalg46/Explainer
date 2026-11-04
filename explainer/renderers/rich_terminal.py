@@ -24,10 +24,16 @@ class RichTerminalRenderer:
         ))
 
         # Architecture & Tech Stack Summary
-        c.print(Panel(
+        arch_content = (
             f"[bold yellow]🏛 Architecture Style:[/bold yellow] {analysis.architecture_style}\n\n"
             f"{analysis.architecture_summary}\n\n"
-            f"[bold cyan]Tech Stack Compatibility:[/bold cyan]\n{analysis.tech_stack.compatibility_analysis}",
+            f"[bold cyan]Tech Stack Compatibility:[/bold cyan]\n{analysis.tech_stack.compatibility_analysis}"
+        )
+        if analysis.ai_architecture_critique:
+            arch_content += f"\n\n[bold magenta]🧠 Neural AI Architectural Review ({analysis.ai_model_name or 'Local AI'}):[/bold magenta]\n{analysis.ai_architecture_critique}"
+
+        c.print(Panel(
+            arch_content,
             title="Project Architecture & Ecosystem",
             border_style="blue"
         ))
@@ -101,6 +107,15 @@ class RichTerminalRenderer:
             title=f"Deep File Explainer: {fa.relative_path}",
             border_style="green"
         ))
+
+        if fa.ai_insights:
+            model_badge = fa.ai_model_used or "Local AI Model"
+            c.print(Panel(
+                Markdown(fa.ai_insights),
+                title=f"🧠 Neural AI Code Analysis ({model_badge})",
+                subtitle="Authentic AI Model Output",
+                border_style="magenta"
+            ))
 
         if fa.elements:
             elem_table = Table(title=f"Elements Breakdown ({len(fa.elements)} elements in {fa.relative_path})", border_style="dim")

@@ -44,6 +44,8 @@ class FileAnalysis(BaseModel):
     animations_and_interactions: Optional[str] = None
     raw_imports: List[str] = Field(default_factory=list)
     raw_exports: List[str] = Field(default_factory=list)
+    ai_insights: Optional[str] = None
+    ai_model_used: Optional[str] = None
 
 
 class TechStackInfo(BaseModel):
@@ -71,4 +73,6 @@ class CodebaseAnalysis(BaseModel):
     files: Dict[str, FileAnalysis] = Field(default_factory=dict)
     interconnections: List[FileInterconnection] = Field(default_factory=list)
     engine_used: str = "Rule/AST Deep Knowledge Engine"
+    ai_model_name: Optional[str] = None
+    ai_architecture_critique: Optional[str] = None
 
