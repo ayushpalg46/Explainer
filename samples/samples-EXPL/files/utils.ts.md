@@ -1,6 +1,6 @@
 # Deep File Explanation: `utils.ts`
 > **Project**: `samples` | **Language**: `TypeScript` | **Size**: 16 lines (440 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

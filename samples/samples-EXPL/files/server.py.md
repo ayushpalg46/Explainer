@@ -1,6 +1,6 @@
 # Deep File Explanation: `server.py`
 > **Project**: `samples` | **Language**: `Python` | **Size**: 23 lines (703 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

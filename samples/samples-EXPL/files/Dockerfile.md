@@ -1,6 +1,6 @@
 # Deep File Explanation: `Dockerfile`
 > **Project**: `samples` | **Language**: `Dockerfile` | **Size**: 18 lines (317 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

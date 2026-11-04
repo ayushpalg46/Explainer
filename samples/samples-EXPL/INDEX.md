@@ -1,10 +1,10 @@
 # Codebase Architecture & Technical Index: `samples`
 > **Engine Used**: Rule/AST Deep Knowledge Engine (Deterministic Zero-AI Mode)  
-> **Scope**: 10 files | 293 lines of code | 5 cross-file interconnections
+> **Scope**: 12 files | 331 lines of code | 5 cross-file interconnections
 ---
 
 ## 🏰 1. The Big Castle Story (Explain Like I'm 4 Years Old)
-> Imagine this entire project `samples` is a giant, bustling Lego castle or toy workshop! There are 10 different Lego pieces working together across 10 languages. Some files build the colorful walls and buttons that you see on screen (frontend), some files are the secret clockwork gears under the floor doing the heavy lifting (backend), and 5 plastic snap-connectors hold them tightly together so when you tap a button on the wall, the gears turn and the doors open smoothly!
+> Imagine this entire project `samples` is a giant, bustling Lego castle or toy workshop! There are 12 different Lego pieces working together across 12 languages. Some files build the colorful walls and buttons that you see on screen (frontend), some files are the secret clockwork gears under the floor doing the heavy lifting (backend), and 5 plastic snap-connectors hold them tightly together so when you tap a button on the wall, the gears turn and the doors open smoothly!
 
 ---
 
@@ -13,12 +13,12 @@
 The project implements a modern client-side Single Page Application architecture. Components are organized hierarchically, allowing rapid declarative DOM updates via the Virtual DOM and encapsulated CSS styling.
 
 ### Technology Compatibility Analysis
-**Multi-Language Ecosystem**: The codebase is composed of Dockerfile (1 files), Java (1 files), JavaScript (JSX/React) (1 files), Shell Script (1 files), Rust (1 files), Go (1 files), HTML (1 files), Python (1 files), CSS (1 files), TypeScript (1 files). The frontend leverages modern React declarative components for high-fidelity interactive state management. Styling is streamlined using atomic utility classes compiled ahead of time for minimal production bundle footprint. Environment parity is guaranteed through Docker containerization, ensuring deterministic deployment across local and cloud targets.
+**Multi-Language Ecosystem**: The codebase is composed of Dockerfile (1 files), Java (1 files), JavaScript (JSX/React) (1 files), Shell Script (1 files), Rust (1 files), Go (1 files), HTML (1 files), Server & Infrastructure Configuration (.conf) (1 files), SQL Database Script (1 files), Python (1 files), CSS (1 files), TypeScript (1 files). The frontend leverages modern React declarative components for high-fidelity interactive state management. Styling is streamlined using atomic utility classes compiled ahead of time for minimal production bundle footprint. Environment parity is guaranteed through Docker containerization, ensuring deterministic deployment across local and cloud targets.
 
 | Category | Detected Technologies & Tooling |
 | :--- | :--- |
-| **Languages** | `Dockerfile` (1 files), `Java` (1 files), `JavaScript (JSX/React)` (1 files), `Shell Script` (1 files), `Rust` (1 files), `Go` (1 files), `HTML` (1 files), `Python` (1 files), `CSS` (1 files), `TypeScript` (1 files) |
-| **Frameworks** | `CLI / Tooling Automation (echo, python, export)`, `Docker Engine Containerization`, `Go Standard net/http`, `Pydantic Data Validation`, `React / Modern SPA Mount Point`, `React.js`, `Tailwind CSS Utilities` |
+| **Languages** | `Dockerfile` (1 files), `Java` (1 files), `JavaScript (JSX/React)` (1 files), `Shell Script` (1 files), `Rust` (1 files), `Go` (1 files), `HTML` (1 files), `Server & Infrastructure Configuration (.conf)` (1 files), `SQL Database Script` (1 files), `Python` (1 files), `CSS` (1 files), `TypeScript` (1 files) |
+| **Frameworks** | `CLI / Tooling Automation (echo, python, export)`, `Docker Engine Containerization`, `Go Standard net/http`, `Nginx / Reverse Proxy / Infrastructure Configuration`, `Pydantic Data Validation`, `React / Modern SPA Mount Point`, `React.js`, `Relational SQL Database Engine (PostgreSQL / MySQL / SQLite)`, `Tailwind CSS Utilities` |
 | **Build Tools** | `Docker Container Engine` |
 | **Runtimes** | `OCI Containerized Sandbox` |
 
@@ -82,8 +82,10 @@ Each file below has its own dedicated, beginner-friendly analysis document:
 | **`engine.rs`** | `Rust` | 35 | Rust Systems Service / High-Performance Core Engine | [📄 View Explanation](files/engine.rs.md) |
 | **`handler.go`** | `Go` | 34 | Go Cloud Microservice / High-Performance Backend Routine | [📄 View Explanation](files/handler.go.md) |
 | **`index.html`** | `HTML` | 38 | Application Presentation & DOM Root Entrypoint | [📄 View Explanation](files/index.html.md) |
+| **`nginx.conf`** | `Server & Infrastructure Configuration (.conf)` | 18 | Web Server, Reverse Proxy & Network Routing Blueprint | [📄 View Explanation](files/nginx.conf.md) |
+| **`schema.sql`** | `SQL Database Script` | 20 | Database Schema Definition, Migration, or Query Script | [📄 View Explanation](files/schema.sql.md) |
 | **`server.py`** | `Python` | 23 | Python Source File | [📄 View Explanation](files/server.py.md) |
 | **`style.css`** | `CSS` | 58 | Visual Design Tokens, Layout Styling & Responsive Theming | [📄 View Explanation](files/style.css.md) |
 | **`utils.ts`** | `TypeScript` | 16 | JavaScript/TypeScript Logic & Module Utility | [📄 View Explanation](files/utils.ts.md) |
 
-> You can also view the complete consolidated dossier in [FULL_REPORT.md](FULL_REPORT.md) or launch the interactive GUI in [dashboard.html](dashboard.html).
+> You can also view the complete consolidated dossier in [FULL_REPORT.md](FULL_REPORT.md).

@@ -1,6 +1,6 @@
 # Deep File Explanation: `index.html`
 > **Project**: `samples` | **Language**: `HTML` | **Size**: 38 lines (1,201 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

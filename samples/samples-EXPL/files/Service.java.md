@@ -1,6 +1,6 @@
 # Deep File Explanation: `Service.java`
 > **Project**: `samples` | **Language**: `Java` | **Size**: 19 lines (449 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

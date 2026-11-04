@@ -1,9 +1,9 @@
 # Comprehensive Codebase & Architecture Dossier: `samples`
 > **Engine Used**: Rule/AST Deep Knowledge Engine (Deterministic Zero-AI Mode)  
-> **Scope**: 10 files | 293 lines of code | 5 interconnections
+> **Scope**: 12 files | 331 lines of code | 5 interconnections
 ---
 ## 🏰 1. The Big Castle Story (Explain Like I'm 4 Years Old)
-> Imagine this entire project `samples` is a giant, bustling Lego castle or toy workshop! There are 10 different Lego pieces working together across 10 languages. Some files build the colorful walls and buttons that you see on screen (frontend), some files are the secret clockwork gears under the floor doing the heavy lifting (backend), and 5 plastic snap-connectors hold them tightly together so when you tap a button on the wall, the gears turn and the doors open smoothly!
+> Imagine this entire project `samples` is a giant, bustling Lego castle or toy workshop! There are 12 different Lego pieces working together across 12 languages. Some files build the colorful walls and buttons that you see on screen (frontend), some files are the secret clockwork gears under the floor doing the heavy lifting (backend), and 5 plastic snap-connectors hold them tightly together so when you tap a button on the wall, the gears turn and the doors open smoothly!
 
 ---
 
@@ -12,7 +12,7 @@
 The project implements a modern client-side Single Page Application architecture. Components are organized hierarchically, allowing rapid declarative DOM updates via the Virtual DOM and encapsulated CSS styling.
 
 ### Technology Compatibility Analysis
-**Multi-Language Ecosystem**: The codebase is composed of Dockerfile (1 files), Java (1 files), JavaScript (JSX/React) (1 files), Shell Script (1 files), Rust (1 files), Go (1 files), HTML (1 files), Python (1 files), CSS (1 files), TypeScript (1 files). The frontend leverages modern React declarative components for high-fidelity interactive state management. Styling is streamlined using atomic utility classes compiled ahead of time for minimal production bundle footprint. Environment parity is guaranteed through Docker containerization, ensuring deterministic deployment across local and cloud targets.
+**Multi-Language Ecosystem**: The codebase is composed of Dockerfile (1 files), Java (1 files), JavaScript (JSX/React) (1 files), Shell Script (1 files), Rust (1 files), Go (1 files), HTML (1 files), Server & Infrastructure Configuration (.conf) (1 files), SQL Database Script (1 files), Python (1 files), CSS (1 files), TypeScript (1 files). The frontend leverages modern React declarative components for high-fidelity interactive state management. Styling is streamlined using atomic utility classes compiled ahead of time for minimal production bundle footprint. Environment parity is guaranteed through Docker containerization, ensuring deterministic deployment across local and cloud targets.
 
 ## 3. Directory Subsystem Roles
 - `root/`: Repository Scaffolding, Package Manifests & Environment Configs
@@ -178,6 +178,49 @@ graph LR
 - **Line 29**: <span style="color: #3b82f6;"><font color="#3b82f6">`<div id="root" role="region" aria-label="Application Dashboard Root"></div>`</font></span> — A <div> tag with 3 label(s): id="root" and role="region" and aria-label="Application Dashboard Root". *(🧸 Think of this like setting down an empty laundry basket before you put clothes in it.)* 
 - **Line 32**: <span style="color: #3b82f6;"><font color="#3b82f6">`<footer class="app-footer">`</font></span> — A <footer> element configured with class="app-footer". *(🧸 Think of <footer> like the bottom floor of a building where you find the exit sign and copyright stamp.)* 
 - **Line 36**: <span style="color: #3b82f6;"><font color="#3b82f6">`<script type="module" src="app.jsx"></script>`</font></span> — A script tag loading the JavaScript code from app.jsx. *(🧸 Like inserting the batteries and brain chip into a toy robot so it can move and talk!)* 
+
+---
+### 📄 File: `nginx.conf`
+- **Language**: `Server & Infrastructure Configuration (.conf)` | **Size**: 18 lines (415 bytes)
+- **Codebase Role**: Web Server, Reverse Proxy & Network Routing Blueprint
+> 🧸 **Beginner Story**: Think of a configuration (.conf) file like a friendly traffic officer standing at a busy intersection! When people on the internet visit your website, this traffic officer looks at their ticket, tells them which room (port) to go to, delivers letters to the backend computer, and makes sure every visitor gets to the right webpage quickly and safely!
+
+- **Executive Summary**: Server configuration script containing 18 lines. Configures 1 virtual server context(s). Listens on port(s): 80. Defines 2 URL route(s). Forwards traffic to 1 backend proxy target(s). 
+
+#### Elements Written in `nginx.conf`
+- **Line 2**: <span style="color: #3b82f6;"><font color="#3b82f6">`server {`</font></span> — Virtual server block configuring web traffic routing. *(🧸 Think of this server block like opening a new customer service booth in a big station!)* 
+- **Line 3**: <span style="color: #3b82f6;"><font color="#3b82f6">`listen 80;`</font></span> — Configuration directive `listen`: Network Listen Port. *(🧸 Think of listen like an open doorway with an address number where visitors knock!)* 
+- **Line 4**: <span style="color: #3b82f6;"><font color="#3b82f6">`server_name myapp.local;`</font></span> — Configuration directive `server_name`: Domain Hostname. *(🧸 Think of server_name like the name sign hanging over the door of a shop!)* 
+- **Line 5**: <span style="color: #3b82f6;"><font color="#3b82f6">`root /var/www/html;`</font></span> — Configuration directive `root`: Document Root Directory. *(🧸 Think of root like pointing to the exact bookshelf where your books are kept!)* 
+- **Line 6**: <span style="color: #3b82f6;"><font color="#3b82f6">`index index.html;`</font></span> — Configuration directive `index`: Default Index File. *(🧸 Think of index like the front door mat welcoming visitors with the main menu!)* 
+- **Line 8**: <span style="color: #3b82f6;"><font color="#3b82f6">`location /api {`</font></span> — URL route handler matching requests starting with `/api`. *(🧸 Think of location '/api' like a signpost in a zoo pointing towards '/api'!)* 
+- **Line 9**: <span style="color: #3b82f6;"><font color="#3b82f6">`proxy_pass http://localhost:8000;`</font></span> — Configuration directive `proxy_pass`: Reverse Proxy Forwarder. *(🧸 Think of proxy_pass like a helpful mail carrier taking a letter to the back office!)* 
+- **Line 14**: <span style="color: #3b82f6;"><font color="#3b82f6">`location /static {`</font></span> — URL route handler matching requests starting with `/static`. *(🧸 Think of location '/static' like a signpost in a zoo pointing towards '/static'!)* 
+
+---
+### 📄 File: `schema.sql`
+- **Language**: `SQL Database Script` | **Size**: 20 lines (598 bytes)
+- **Codebase Role**: Database Schema Definition, Migration, or Query Script
+> 🧸 **Beginner Story**: Think of a SQL file like a blueprint for a giant, super-organized filing cabinet! It builds labeled drawers (called tables), creates labeled folders with strict rules (like names and ages), and sets up fast index tabs so your computer can find any piece of information in less than a blink of an eye!
+
+- **Executive Summary**: SQL database script containing 20 lines. Defines 2 relational table(s): users, orders. Enforces 1 referential constraint(s). Interacts with backend models and application data stores.
+
+#### Elements Written in `schema.sql`
+- **Line 2**: <span style="color: #3b82f6;"><font color="#3b82f6">`CREATE TABLE users (`</font></span> — SQL table creation definition `users`. *(🧸 Think of table 'users' like building a brand new toy drawer with a name tag 'users' on it!)* 
+- **Line 3**: <span style="color: #3b82f6;"><font color="#3b82f6">`id INT PRIMARY KEY AUTO_INCREMENT,`</font></span> — Table column `id` storing type `INT` with constraints `PRIMARY KEY AUTO_INCREMENT,`. *(🧸 Think of column 'id' like a designated slot inside the drawer reserved for 'id'!)* 
+- **Line 4**: <span style="color: #3b82f6;"><font color="#3b82f6">`username VARCHAR(50) NOT NULL UNIQUE,`</font></span> — Table column `username` storing type `VARCHAR(50)` with constraints `NOT NULL UNIQUE,`. *(🧸 Think of column 'username' like a designated slot inside the drawer reserved for 'username'!)* 
+- **Line 5**: <span style="color: #3b82f6;"><font color="#3b82f6">`email VARCHAR(100) NOT NULL,`</font></span> — Table column `email` storing type `VARCHAR(100)` with constraints `NOT NULL,`. *(🧸 Think of column 'email' like a designated slot inside the drawer reserved for 'email'!)* 
+- **Line 6**: <span style="color: #3b82f6;"><font color="#3b82f6">`created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`</font></span> — Table column `created_at` storing type `TIMESTAMP` with constraints `DEFAULT CURRENT_TIMESTAMP`. *(🧸 Think of column 'created_at' like a designated slot inside the drawer reserved for 'created_at'!)* 
+- **Line 9**: <span style="color: #3b82f6;"><font color="#3b82f6">`CREATE TABLE orders (`</font></span> — SQL table creation definition `orders`. *(🧸 Think of table 'orders' like building a brand new toy drawer with a name tag 'orders' on it!)* 
+- **Line 10**: <span style="color: #3b82f6;"><font color="#3b82f6">`order_id INT PRIMARY KEY AUTO_INCREMENT,`</font></span> — Table column `order_id` storing type `INT` with constraints `PRIMARY KEY AUTO_INCREMENT,`. *(🧸 Think of column 'order_id' like a designated slot inside the drawer reserved for 'order_id'!)* 
+- **Line 11**: <span style="color: #3b82f6;"><font color="#3b82f6">`user_id INT NOT NULL,`</font></span> — Table column `user_id` storing type `INT` with constraints `NOT NULL,`. *(🧸 Think of column 'user_id' like a designated slot inside the drawer reserved for 'user_id'!)* 
+- **Line 12**: <span style="color: #3b82f6;"><font color="#3b82f6">`amount DECIMAL(10, 2) NOT NULL,`</font></span> — Table column `amount` storing type `DECIMAL(10` with constraints `, 2) NOT NULL,`. *(🧸 Think of column 'amount' like a designated slot inside the drawer reserved for 'amount'!)* 
+- **Line 13**: <span style="color: #3b82f6;"><font color="#3b82f6">`status VARCHAR(20) DEFAULT 'pending',`</font></span> — Table column `status` storing type `VARCHAR(20)` with constraints `DEFAULT 'pending',`. *(🧸 Think of column 'status' like a designated slot inside the drawer reserved for 'status'!)* 
+- **Line 14**: <span style="color: #3b82f6;"><font color="#3b82f6">`FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`</font></span> — Relational foreign key constraint linking to `users(id)`. *(🧸 Like tethering a baby toy with a little string to the mother toy 'users' so it never gets lost!)* 
+- **Line 17**: <span style="color: #3b82f6;"><font color="#3b82f6">`SELECT u.username, o.amount, o.status`</font></span> — SQL Query / DML statement clause: `SELECT u.username, o.amount, o.status`. *(🧸 Think of this query like asking the filing assistant robot: 'Please fetch or organize the cards for me!')* 
+- **Line 18**: <span style="color: #3b82f6;"><font color="#3b82f6">`FROM users u`</font></span> — SQL Query / DML statement clause: `FROM users u`. *(🧸 Think of this query like asking the filing assistant robot: 'Please fetch or organize the cards for me!')* 
+- **Line 19**: <span style="color: #3b82f6;"><font color="#3b82f6">`JOIN orders o ON u.id = o.user_id`</font></span> — SQL Query / DML statement clause: `JOIN orders o ON u.id = o.user_id`. *(🧸 Think of this query like asking the filing assistant robot: 'Please fetch or organize the cards for me!')* 
+- **Line 20**: <span style="color: #3b82f6;"><font color="#3b82f6">`WHERE o.status = 'completed';`</font></span> — SQL Query / DML statement clause: `WHERE o.status = 'completed';`. *(🧸 Think of this query like asking the filing assistant robot: 'Please fetch or organize the cards for me!')* 
 
 ---
 ### 📄 File: `server.py`

@@ -1,6 +1,6 @@
 # Deep File Explanation: `handler.go`
 > **Project**: `samples` | **Language**: `Go` | **Size**: 34 lines (586 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

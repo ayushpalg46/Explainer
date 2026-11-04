@@ -1,6 +1,6 @@
 # Deep File Explanation: `app.jsx`
 > **Project**: `samples` | **Language**: `JavaScript (JSX/React)` | **Size**: 36 lines (917 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 

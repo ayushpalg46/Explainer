@@ -1,6 +1,6 @@
 # Deep File Explanation: `engine.rs`
 > **Project**: `samples` | **Language**: `Rust` | **Size**: 35 lines (710 bytes)
-> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)
+> [⬅ Back to Main Index](../INDEX.md)
 
 ──────
 
