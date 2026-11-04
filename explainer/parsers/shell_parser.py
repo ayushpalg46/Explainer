@@ -87,3 +87,4 @@ class ShellParser(BaseParser):
             f"Sources {len(sourced_files)} child configuration/script file(s)."
         )
         return analysis
+

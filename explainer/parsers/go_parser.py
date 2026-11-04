@@ -84,3 +84,4 @@ class GoParser(BaseParser):
             f"{'Features lightweight goroutine concurrency. ' if has_goroutine else ''}"
         )
         return analysis
+

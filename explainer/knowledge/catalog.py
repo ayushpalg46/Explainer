@@ -264,3 +264,4 @@ SHELL_KNOWLEDGE: Dict[str, Dict[str, str]] = {
         "best_practices": "Place `set -euo pipefail` at the start of every production shell script to prevent catastrophic partial script execution."
     }
 }
+

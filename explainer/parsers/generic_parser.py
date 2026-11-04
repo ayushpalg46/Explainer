@@ -16,3 +16,4 @@ class GenericParser(BaseParser):
         analysis.summary = f"{self.language} file specifying parameters, structured data, or documentation ({len(lines)} lines)."
 
         return analysis
+

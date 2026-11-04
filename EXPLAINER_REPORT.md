@@ -1,5 +1,5 @@
 # Comprehensive Codebase & Architecture Dossier: `samples`
-> **Engine Used**: Rule/AST Deep Knowledge Engine (Deterministic Zero-AI Mode)  
+> **Engine Used**: Local AI Model (hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K via ollama)  
 > **Scope**: 10 files | 293 lines of code | 5 interconnections
 ---
 ## 1. Architecture & Tech Stack Ecosystem

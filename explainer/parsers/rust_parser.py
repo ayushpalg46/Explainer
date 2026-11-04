@@ -72,3 +72,4 @@ class RustParser(BaseParser):
             f"and {len(functions)} function(s). Uses {len(analysis.raw_imports)} crate/module imports."
         )
         return analysis
+

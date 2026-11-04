@@ -50,7 +50,7 @@ def interactive_wizard():
 
     ai_provider = "ollama"
     ai_endpoint = "http://localhost:11434/api/generate"
-    ai_model = "llama3"
+    ai_model = None
 
     if mode_choice == "2":
         console.print("\n[bold yellow]Local AI Model Configuration:[/bold yellow]")
@@ -60,7 +60,37 @@ def interactive_wizard():
         if p_choice == "1":
             ai_provider = "ollama"
             ai_endpoint = Prompt.ask("Ollama endpoint URL", default="http://localhost:11434/api/generate")
-            ai_model = Prompt.ask("Model name (e.g. llama3, mistral, deepseek-coder)", default="llama3")
+
+            # Auto-detect models from Ollama
+            detected_models = AIExplainerEngine.list_installed_models()
+            if detected_models:
+                console.print(f"\n[bold green]✓ Discovered {len(detected_models)} installed Ollama model(s):[/bold green]")
+                model_choices = []
+                for idx, m_name in enumerate(detected_models, 1):
+                    badge = " [bold green]⭐ (Specialized Code Model)[/bold green]" if "coder" in m_name.lower() else ""
+                    console.print(f"  [cyan][{idx}][/cyan] {m_name}{badge}")
+                    model_choices.append(str(idx))
+
+                console.print(f"  [cyan][{len(detected_models) + 1}][/cyan] Enter another model name manually")
+                model_choices.append(str(len(detected_models) + 1))
+
+                # Default to coder model if present
+                def_choice = "1"
+                for idx, m_name in enumerate(detected_models, 1):
+                    if "coder" in m_name.lower():
+                        def_choice = str(idx)
+                        break
+
+                m_select = Prompt.ask("Select model", choices=model_choices, default=def_choice)
+                if int(m_select) <= len(detected_models):
+                    ai_model = detected_models[int(m_select) - 1]
+                else:
+                    ai_model = Prompt.ask("Enter model identifier")
+            else:
+                ai_model = Prompt.ask(
+                    "Model identifier",
+                    default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
+                )
         else:
             ai_provider = "openai_compatible"
             ai_endpoint = Prompt.ask("Server endpoint URL", default="http://localhost:1234/v1")
@@ -90,7 +120,7 @@ def interactive_wizard():
 @click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
 @click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default="llama3", help="AI model identifier.")
+@click.option("--ai-model", default=None, help="AI model identifier (defaults to detected local Qwen/Coder model).")
 @click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
 @click.option("--output-dir", default=".", help="Directory to save generated markdown and HTML reports.")
 def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
@@ -113,7 +143,7 @@ def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, ou
 @click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
 @click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default="llama3", help="AI model identifier.")
+@click.option("--ai-model", default=None, help="AI model identifier (defaults to detected local Qwen/Coder model).")
 @click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
 @click.option("--output-dir", default=".", help="Directory to save generated markdown and HTML reports.")
 def scan_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
@@ -178,12 +208,12 @@ def run_pipeline(
 
     # Execute Explainer Engine
     if mode == "ai":
-        console.print(f"[bold magenta]🧠 Running Local AI Engine ({ai_model} via {ai_provider})...[/bold magenta]")
         engine = AIExplainerEngine(
             endpoint_url=ai_endpoint,
             model_name=ai_model,
             provider=ai_provider
         )
+        console.print(f"[bold magenta]🧠 Running Local AI Engine ({engine.model_name} via {ai_provider})...[/bold magenta]")
     else:
         console.print("[bold green]⚡ Running Pure Knowledge & AST Engine (Zero-AI Deterministic Mode)...[/bold green]")
         engine = RuleExplainerEngine()

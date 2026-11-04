@@ -71,3 +71,4 @@ class CodebaseAnalysis(BaseModel):
     files: Dict[str, FileAnalysis] = Field(default_factory=dict)
     interconnections: List[FileInterconnection] = Field(default_factory=list)
     engine_used: str = "Rule/AST Deep Knowledge Engine"
+

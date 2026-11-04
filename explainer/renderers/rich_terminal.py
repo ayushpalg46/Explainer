@@ -122,3 +122,4 @@ class RichTerminalRenderer:
                 )
             c.print(elem_table)
             c.print()
+

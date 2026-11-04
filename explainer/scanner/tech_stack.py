@@ -118,3 +118,4 @@ class TechStackAnalyzer:
             parts.append("Standard modular software architecture with standard compiler/interpreter toolchains.")
 
         return " ".join(parts)
+

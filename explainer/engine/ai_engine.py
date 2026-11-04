@@ -1,6 +1,9 @@
 import json
+import subprocess
+import shutil
+import time
 import requests
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from ..models import CodebaseAnalysis, FileAnalysis, TechStackInfo, FileInterconnection
 from .rule_engine import RuleExplainerEngine
 
@@ -9,18 +12,81 @@ class AIExplainerEngine:
     """
     Augments the deterministic AST & Knowledge facts with a local AI model
     (Ollama, LM Studio, or any OpenAI-compatible local server).
+    Features native auto-detection for installed models (e.g. Qwen2.5-Coder and Qwen3.5).
     """
+
+    DEFAULT_CODER_MODEL = "hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
+    DEFAULT_GENERAL_MODEL = "qwen35-uncensored:latest"
 
     def __init__(
         self,
         endpoint_url: str = "http://localhost:11434/api/generate",
-        model_name: str = "llama3",
+        model_name: Optional[str] = None,
         provider: str = "ollama"  # 'ollama' or 'openai_compatible'
     ):
         self.endpoint_url = endpoint_url
-        self.model_name = model_name
         self.provider = provider
         self.rule_engine = RuleExplainerEngine()
+
+        # If model_name is not provided or generic, auto-resolve to best available local model
+        if not model_name or model_name == "llama3":
+            installed = self.list_installed_models()
+            if installed:
+                # Prefer coder model first, then general model, then first available
+                coder_candidates = [m for m in installed if "coder" in m.lower()]
+                self.model_name = coder_candidates[0] if coder_candidates else installed[0]
+            else:
+                self.model_name = self.DEFAULT_CODER_MODEL
+        else:
+            self.model_name = model_name
+
+    @classmethod
+    def ensure_ollama_running(cls, host: str = "http://localhost:11434") -> bool:
+        """Checks if Ollama server is responding; if not, attempts to start it in the background."""
+        try:
+            res = requests.get(f"{host.rstrip('/')}/api/tags", timeout=1.5)
+            if res.status_code == 200:
+                return True
+        except Exception:
+            pass
+
+        # Try to locate and launch 'ollama serve'
+        ollama_bin = shutil.which("ollama")
+        if not ollama_bin:
+            import os
+            appdata = os.environ.get("LOCALAPPDATA", "")
+            candidate = os.path.join(appdata, "Programs", "Ollama", "ollama.exe")
+            if os.path.exists(candidate):
+                ollama_bin = candidate
+
+        if ollama_bin:
+            try:
+                subprocess.Popen(
+                    [ollama_bin, "serve"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)
+                )
+                time.sleep(2.0)
+                res = requests.get(f"{host.rstrip('/')}/api/tags", timeout=2.0)
+                return res.status_code == 200
+            except Exception:
+                return False
+
+        return False
+
+    @classmethod
+    def list_installed_models(cls, host: str = "http://localhost:11434") -> List[str]:
+        """Fetches the list of all currently installed Ollama models."""
+        cls.ensure_ollama_running(host)
+        try:
+            res = requests.get(f"{host.rstrip('/')}/api/tags", timeout=3.0)
+            if res.status_code == 200:
+                data = res.json()
+                return [m.get("name") for m in data.get("models", []) if m.get("name")]
+        except Exception:
+            pass
+        return []
 
     def analyze_codebase(
         self,
@@ -35,7 +101,7 @@ class AIExplainerEngine:
         )
         base_analysis.engine_used = f"Local AI Model ({self.model_name} via {self.provider})"
 
-        # Step 2: Attempt to call the local AI model to augment the architectural summary
+        # Step 2: Call the local AI model to synthesize conversational architectural analysis
         ai_narrative = self._query_local_model(base_analysis)
         if ai_narrative:
             base_analysis.architecture_summary = f"{ai_narrative}\n\n*(Verified against AST structural analysis)*"
@@ -62,13 +128,12 @@ class AIExplainerEngine:
                     "prompt": prompt,
                     "stream": False
                 }
-                res = requests.post(self.endpoint_url, json=payload, timeout=12)
+                res = requests.post(self.endpoint_url, json=payload, timeout=25)
                 if res.status_code == 200:
                     data = res.json()
                     return data.get("response", "").strip()
 
             elif self.provider == "openai_compatible":
-                # E.g. LM Studio or vLLM at http://localhost:1234/v1/chat/completions
                 url = self.endpoint_url
                 if not url.endswith("/chat/completions"):
                     url = url.rstrip("/") + "/chat/completions"
@@ -80,15 +145,14 @@ class AIExplainerEngine:
                     ],
                     "temperature": 0.2
                 }
-                res = requests.post(url, json=payload, timeout=12)
+                res = requests.post(url, json=payload, timeout=25)
                 if res.status_code == 200:
                     data = res.json()
                     choices = data.get("choices", [])
                     if choices:
                         return choices[0].get("message", {}).get("content", "").strip()
 
-        except Exception as e:
-            # Graceful fallback: return None so baseline AST summary is preserved
+        except Exception:
             return None
 
         return None

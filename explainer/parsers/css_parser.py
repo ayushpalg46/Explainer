@@ -144,3 +144,4 @@ class CssParser(BaseParser):
             )
 
         return analysis
+

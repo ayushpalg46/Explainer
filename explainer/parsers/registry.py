@@ -53,3 +53,4 @@ class ParserRegistry:
             return self._parsers[suffix]
 
         return GenericParser(f"{suffix.upper()[1:] if suffix else 'Plain Text'} File")
+

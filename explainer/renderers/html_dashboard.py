@@ -483,3 +483,4 @@ class HtmlDashboardRenderer:
         out_p.parent.mkdir(parents=True, exist_ok=True)
         out_p.write_text(html_content, encoding="utf-8")
         return str(out_p)
+

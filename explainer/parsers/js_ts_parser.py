@@ -154,3 +154,4 @@ class JsTsParser(BaseParser):
             )
 
         return analysis
+
