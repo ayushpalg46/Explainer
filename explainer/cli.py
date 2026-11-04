@@ -21,6 +21,14 @@ from .diff.git_diff_explainer import GitDiffExplainer, DiffAnalysis
 from .models import CodebaseAnalysis, TechStackInfo
 
 console = Console()
+_flush_token = lambda t: (sys.stdout.write(t), sys.stdout.flush())
+
+
+def resolve_file_key(arg: str, file_keys: List[str], files_dict: Dict) -> Optional[str]:
+    """Resolves an index number or relative path to a valid file key in the codebase."""
+    if arg.isdigit() and 1 <= int(arg) <= len(file_keys):
+        return file_keys[int(arg) - 1]
+    return arg if arg in files_dict else None
 
 
 class ExplGroup(click.Group):
@@ -194,12 +202,7 @@ def run_cli_file_inspector(codebase_analysis):
             break
         elif u_clean.lower().startswith("ai "):
             arg = u_clean[3:].strip()
-            target_f = None
-            if arg.isdigit() and 1 <= int(arg) <= len(file_keys):
-                target_f = file_keys[int(arg) - 1]
-            elif arg in codebase_analysis.files:
-                target_f = arg
-
+            target_f = resolve_file_key(arg, file_keys, codebase_analysis.files)
             if target_f:
                 fa = codebase_analysis.files[target_f]
                 run_single_file_cli(
@@ -216,13 +219,12 @@ def run_cli_file_inspector(codebase_analysis):
             for f_path in file_keys:
                 terminal_renderer.render(codebase_analysis, inspect_file=f_path)
             break
-        elif u_clean.isdigit() and 1 <= int(u_clean) <= len(file_keys):
-            selected_path = file_keys[int(u_clean) - 1]
-            terminal_renderer.render(codebase_analysis, inspect_file=selected_path)
-        elif u_clean in codebase_analysis.files:
-            terminal_renderer.render(codebase_analysis, inspect_file=u_clean)
         else:
-            console.print("[red]Invalid selection. Please choose a valid file number or 'q'.[/red]")
+            selected_path = resolve_file_key(u_clean, file_keys, codebase_analysis.files)
+            if selected_path:
+                terminal_renderer.render(codebase_analysis, inspect_file=selected_path)
+            else:
+                console.print("[red]Invalid selection. Please choose a valid file number or 'q'.[/red]")
 
 
 def run_core_analysis(
@@ -277,14 +279,8 @@ def run_core_analysis(
         console.print(f"\n[bold magenta]🧠 Connected to Local AI Model: [bold white]{engine.model_name}[/bold white] via {ai_provider}[/bold magenta]")
         console.print("[dim]Streaming neural architecture synthesis and per-file breakdowns word-by-word...[/dim]\n")
 
-        def stream_live_token(tok: str):
-            sys.stdout.write(tok)
-            sys.stdout.flush()
-
         def on_ai_file_progress(curr: int, total: int, fpath: str):
-            console.print(f"\n\n[bold magenta]════════════════════════════════════════════════════════════════════[/bold magenta]")
-            console.print(f"  [magenta]🧠 [AI {curr}/{total}][/magenta] Live Streaming Breakdown for: [bold white]{fpath}[/bold white] [cyan]({engine.model_name})[/cyan]")
-            console.print(f"[bold magenta]════════════════════════════════════════════════════════════════════[/bold magenta]\n")
+            console.print(f"\n\n[bold magenta]════════════════════════════════════════════════════════════════════\n  🧠 [AI {curr}/{total}] Live Streaming Breakdown for: [bold white]{fpath}[/bold white] [cyan]({engine.model_name})[/cyan]\n════════════════════════════════════════════════════════════════════[/bold magenta]\n")
 
         console.print("[bold cyan]🏛️ Synthesizing System Architecture Review (Streaming Live):[/bold cyan]\n")
         codebase_analysis = engine.analyze_codebase(
@@ -293,7 +289,7 @@ def run_core_analysis(
             tech_stack=tech_stack,
             interconnections=interconnections,
             progress_callback=on_ai_file_progress,
-            stream_callback=stream_live_token
+            stream_callback=_flush_token
         )
         console.print("\n")
     else:
@@ -359,15 +355,11 @@ def run_single_file_cli(
             architecture_summary=f"Single source file ({fa.language}) within {file_path.parent.name}."
         )
 
-        def stream_tok(tok: str):
-            sys.stdout.write(tok)
-            sys.stdout.flush()
-
         ai_out = engine._query_file_analysis(
             fa=fa,
             codebase=dummy_codebase,
             root_path=str(file_path.parent),
-            stream_callback=stream_tok if stream else None
+            stream_callback=_flush_token if stream else None
         )
         console.print("\n")
         fa.ai_insights = ai_out
@@ -419,16 +411,12 @@ def run_git_diff_cli(
         ai_engine.ensure_ollama_running()
         console.print(f"\n[bold magenta]🧠 Streaming Git Diff AI Walkthrough with: [bold white]{ai_engine.model_name}[/bold white][/bold magenta]\n")
 
-    def stream_tok(tok: str):
-        sys.stdout.write(tok)
-        sys.stdout.flush()
-
     analysis = explainer.analyze_diff(
         files=diff_files,
         ref_label=ref_label,
         mode=mode or "static",
         ai_engine=ai_engine,
-        stream_callback=stream_tok if stream else None
+        stream_callback=_flush_token if stream else None
     )
 
     console.print()
