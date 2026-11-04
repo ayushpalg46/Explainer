@@ -107,7 +107,8 @@ class AIExplainerEngine:
         files: Dict[str, FileAnalysis],
         tech_stack: TechStackInfo,
         interconnections: List[FileInterconnection],
-        progress_callback: Optional[Callable[[int, int, str], None]] = None
+        progress_callback: Optional[Callable[[int, int, str], None]] = None,
+        stream_callback: Optional[Callable[[str], None]] = None
     ) -> CodebaseAnalysis:
         # Step 1: Compute high-precision baseline analysis using the static AST engine
         base_analysis = self.rule_engine.analyze_codebase(
@@ -117,7 +118,7 @@ class AIExplainerEngine:
         base_analysis.ai_model_name = self.model_name
 
         # Step 2: System-level AI Architectural Synthesis (Beginner / Lego Factory Analogy)
-        ai_narrative = self._query_architecture(base_analysis)
+        ai_narrative = self._query_architecture(base_analysis, stream_callback=stream_callback)
         if ai_narrative:
             base_analysis.ai_architecture_critique = ai_narrative
 
@@ -129,14 +130,23 @@ class AIExplainerEngine:
             if progress_callback:
                 progress_callback(idx, total_files, rel_path)
 
-            file_ai_insight = self._query_file_analysis(fa, base_analysis, root_path)
+            file_ai_insight = self._query_file_analysis(
+                fa,
+                base_analysis,
+                root_path,
+                stream_callback=stream_callback
+            )
             if file_ai_insight:
                 fa.ai_insights = file_ai_insight
                 fa.ai_model_used = self.model_name
 
         return base_analysis
 
-    def _query_architecture(self, base_analysis: CodebaseAnalysis) -> Optional[str]:
+    def _query_architecture(
+        self,
+        base_analysis: CodebaseAnalysis,
+        stream_callback: Optional[Callable[[str], None]] = None
+    ) -> Optional[str]:
         """Queries the local AI model for codebase architectural synthesis explained to a beginner."""
         prompt = (
             f"{self.SYSTEM_PROMPT}\n\n"
@@ -160,7 +170,7 @@ class AIExplainerEngine:
             f"Give 2-3 friendly recommendations on how to keep the project clean, fast, and organized.\n"
         )
 
-        return self._send_prompt(prompt, max_tokens=400, temperature=0.3)
+        return self._send_prompt(prompt, max_tokens=400, temperature=0.3, stream_callback=stream_callback)
 
     def _query_file_analysis(
         self,

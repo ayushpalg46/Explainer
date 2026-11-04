@@ -182,24 +182,45 @@ def run_cli_file_inspector(codebase_analysis):
 
     while True:
         console.print("\n[bold cyan]🔎 Inspect Individual File Breakdown in CLI:[/bold cyan]")
-        console.print("Enter file number, file path, 'all', or 'q' to quit:")
+        console.print("Enter file number, 'ai <num>' for live AI streaming, 'all', or 'q' to quit:")
         for idx, f_path in enumerate(file_keys, 1):
             fa = codebase_analysis.files[f_path]
             console.print(f"  [cyan][{idx}][/cyan] {f_path} [dim]({fa.language} • {fa.line_count} LOC)[/dim]")
 
         user_input = Prompt.ask("\nSelect file to inspect", default="q")
-        if user_input.strip().lower() in ("q", "quit", "exit"):
+        u_clean = user_input.strip()
+        if u_clean.lower() in ("q", "quit", "exit"):
             console.print("[dim]Exiting CLI Inspector. All files remain saved in your `-EXPL` folder.[/dim]\n")
             break
-        elif user_input.strip().lower() == "all":
+        elif u_clean.lower().startswith("ai "):
+            arg = u_clean[3:].strip()
+            target_f = None
+            if arg.isdigit() and 1 <= int(arg) <= len(file_keys):
+                target_f = file_keys[int(arg) - 1]
+            elif arg in codebase_analysis.files:
+                target_f = arg
+
+            if target_f:
+                fa = codebase_analysis.files[target_f]
+                run_single_file_cli(
+                    filepath=fa.file_path,
+                    mode="ai",
+                    ai_provider="ollama",
+                    ai_model=codebase_analysis.ai_model_name,
+                    stream=True
+                )
+            else:
+                console.print(f"[red]Invalid file selection: '{arg}'.[/red]")
+            continue
+        elif u_clean.lower() == "all":
             for f_path in file_keys:
                 terminal_renderer.render(codebase_analysis, inspect_file=f_path)
             break
-        elif user_input.isdigit() and 1 <= int(user_input) <= len(file_keys):
-            selected_path = file_keys[int(user_input) - 1]
+        elif u_clean.isdigit() and 1 <= int(u_clean) <= len(file_keys):
+            selected_path = file_keys[int(u_clean) - 1]
             terminal_renderer.render(codebase_analysis, inspect_file=selected_path)
-        elif user_input in codebase_analysis.files:
-            terminal_renderer.render(codebase_analysis, inspect_file=user_input)
+        elif u_clean in codebase_analysis.files:
+            terminal_renderer.render(codebase_analysis, inspect_file=u_clean)
         else:
             console.print("[red]Invalid selection. Please choose a valid file number or 'q'.[/red]")
 
@@ -252,20 +273,29 @@ def run_core_analysis(
             model_name=ai_model,
             provider=ai_provider
         )
-        console.print(f"[bold magenta]🧠 Connected to Local AI Model: [bold white]{engine.model_name}[/bold white] via {ai_provider}[/bold magenta]")
-        console.print("[dim]Analyzing system architecture and querying neural breakdown for each file...[/dim]")
+        engine.ensure_ollama_running()
+        console.print(f"\n[bold magenta]🧠 Connected to Local AI Model: [bold white]{engine.model_name}[/bold white] via {ai_provider}[/bold magenta]")
+        console.print("[dim]Streaming neural architecture synthesis and per-file breakdowns word-by-word...[/dim]\n")
+
+        def stream_live_token(tok: str):
+            sys.stdout.write(tok)
+            sys.stdout.flush()
 
         def on_ai_file_progress(curr: int, total: int, fpath: str):
-            console.print(f"  [magenta]🧠 [AI {curr}/{total}][/magenta] Analyzing [bold white]{fpath}[/bold white] with [cyan]{engine.model_name}[/cyan]...")
+            console.print(f"\n\n[bold magenta]════════════════════════════════════════════════════════════════════[/bold magenta]")
+            console.print(f"  [magenta]🧠 [AI {curr}/{total}][/magenta] Live Streaming Breakdown for: [bold white]{fpath}[/bold white] [cyan]({engine.model_name})[/cyan]")
+            console.print(f"[bold magenta]════════════════════════════════════════════════════════════════════[/bold magenta]\n")
 
-        with console.status("[bold magenta]Synthesizing system architectural critique with AI...[/bold magenta]"):
-            codebase_analysis = engine.analyze_codebase(
-                root_path=str(target_p),
-                files=analyzed_files,
-                tech_stack=tech_stack,
-                interconnections=interconnections,
-                progress_callback=on_ai_file_progress
-            )
+        console.print("[bold cyan]🏛️ Synthesizing System Architecture Review (Streaming Live):[/bold cyan]\n")
+        codebase_analysis = engine.analyze_codebase(
+            root_path=str(target_p),
+            files=analyzed_files,
+            tech_stack=tech_stack,
+            interconnections=interconnections,
+            progress_callback=on_ai_file_progress,
+            stream_callback=stream_live_token
+        )
+        console.print("\n")
     else:
         console.print("[bold green]⚡ Running Pure Knowledge & AST Engine (Zero-AI Deterministic Mode)...[/bold green]")
         engine = RuleExplainerEngine()
@@ -330,7 +360,8 @@ def run_single_file_cli(
         )
 
         def stream_tok(tok: str):
-            console.print(tok, end="")
+            sys.stdout.write(tok)
+            sys.stdout.flush()
 
         ai_out = engine._query_file_analysis(
             fa=fa,
@@ -389,7 +420,8 @@ def run_git_diff_cli(
         console.print(f"\n[bold magenta]🧠 Streaming Git Diff AI Walkthrough with: [bold white]{ai_engine.model_name}[/bold white][/bold magenta]\n")
 
     def stream_tok(tok: str):
-        console.print(tok, end="")
+        sys.stdout.write(tok)
+        sys.stdout.flush()
 
     analysis = explainer.analyze_diff(
         files=diff_files,
