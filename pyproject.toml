@@ -2,6 +2,9 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+include = ["explainer*"]
+
 [project]
 name = "explainer-engine"
 version = "1.0.0"
@@ -13,8 +16,7 @@ dependencies = [
     "rich>=13.0.0",
     "click>=8.0.0",
     "pydantic>=2.0.0",
-    "pygments>=2.15.0",
-    "httpx>=0.25.0",
+    "requests>=2.28.0",
 ]
 
 [project.scripts]

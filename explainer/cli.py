@@ -463,18 +463,7 @@ def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, ou
     run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
 
 
-@main.command(name="scan")
-@click.argument("path", default=".", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
-@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default=None, help="AI model identifier.")
-@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
-@click.option("--output-dir", default=None, help="Directory to save generated markdown files.")
-def scan_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
-    """Scan and explain a codebase (alias for analyze)."""
-    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
+main.add_command(analyze_cmd, name="scan")
 
 
 def run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):

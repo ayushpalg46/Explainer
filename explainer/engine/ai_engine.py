@@ -65,13 +65,6 @@ class AIExplainerEngine:
             pass
 
         ollama_bin = shutil.which("ollama")
-        if not ollama_bin:
-            import os
-            appdata = os.environ.get("LOCALAPPDATA", "")
-            candidate = os.path.join(appdata, "Programs", "Ollama", "ollama.exe")
-            if os.path.exists(candidate):
-                ollama_bin = candidate
-
         if ollama_bin:
             try:
                 subprocess.Popen(

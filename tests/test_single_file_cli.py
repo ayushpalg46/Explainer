@@ -10,9 +10,9 @@ class TestSingleFileCLI(unittest.TestCase):
         self.runner = CliRunner()
 
     def test_direct_file_arg_routing(self):
-        result = self.runner.invoke(main, ["setup.py", "--mode", "static"])
+        result = self.runner.invoke(main, ["samples/server.py", "--mode", "static"])
         self.assertEqual(result.exit_code, 0)
-        self.assertIn("File Overview: setup.py", result.output)
+        self.assertIn("File Overview: server.py", result.output)
         self.assertIn("The Big Picture Story", result.output)
         self.assertIn("Line-by-Line & Word-by-Word Breakdown", result.output)
         self.assertIn("What is written?:", result.output)
