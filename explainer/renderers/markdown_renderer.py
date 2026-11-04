@@ -160,7 +160,7 @@ class MarkdownRenderer:
             for el in fa.elements:
                 line_str = f"Line {el.line_number}" if el.line_number is not None else "Declaration"
                 snippet_line = (el.snippet or el.name).strip()
-                out.append(f"#### {line_str}: {snippet_line}\n\n")
+                out.append(f"#### {line_str}: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`{snippet_line}`</font></span>\n\n")
 
                 out.append(f"• What is written?: {el.what_it_is}\n")
 
@@ -277,7 +277,8 @@ class MarkdownRenderer:
                 out.append(f"\n#### Elements Written in `{rel_path}`\n")
                 for el in fa.elements:
                     line_str = f"Line {el.line_number}" if el.line_number else "-"
-                    out.append(f"- **`{el.name}`** ({el.kind}, {line_str}): {el.what_it_is} ")
+                    code_snip = f"<span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`{(el.snippet or el.name).strip()}`</font></span>"
+                    out.append(f"- **{line_str}**: {code_snip} — {el.what_it_is} ")
                     if el.simple_analogy:
                         out.append(f"*(🧸 {el.simple_analogy})* ")
                     out.append("\n")

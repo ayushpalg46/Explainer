@@ -258,7 +258,7 @@ class TestFileParsers(unittest.TestCase):
         self.assertIn("│ \"Imagine this code is a real physical toy box sitting on a stage", md)
         self.assertIn("──────", md)
         self.assertIn("#### 🔍 2. Line-by-Line & Word-by-Word Breakdown", md)
-        self.assertIn("#### Line 1: <div id=\"root\" class=\"container\">", md)
+        self.assertIn("#### Line 1: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`<div id=\"root\" class=\"container\">`</font></span>", md)
         self.assertIn("• What is written?: A <div> tag with 2 label(s): id=\"root\" and class=\"container\".", md)
         self.assertIn("• What does every word mean?:", md)
         self.assertIn("• div: Short for \"division\". An invisible cardboard box used to bundle things together.", md)
@@ -269,10 +269,10 @@ class TestFileParsers(unittest.TestCase):
         self.assertIn("• 🔗 Interconnection with other files:", md)
         self.assertIn("app.js searches for this exact box using document.getElementById('root')", md)
         self.assertIn("• 💥 What breaks if deleted?: The title and button lose their container, spill across the screen", md)
-        self.assertIn("#### Line 2: <h1 class=\"title\">My Toy Box</h1>", md)
-        self.assertIn("#### Line 3: <button class=\"btn-magic\" onclick=\"openBox()\">Open Box!</button>", md)
-        self.assertIn("#### Line 5: <link rel=\"stylesheet\" href=\"style.css\">", md)
-        self.assertIn("#### Line 6: <script src=\"app.js\"></script>", md)
+        self.assertIn("#### Line 2: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`<h1 class=\"title\">My Toy Box</h1>`</font></span>", md)
+        self.assertIn("#### Line 3: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`<button class=\"btn-magic\" onclick=\"openBox()\">Open Box!</button>`</font></span>", md)
+        self.assertIn("#### Line 5: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`<link rel=\"stylesheet\" href=\"style.css\">`</font></span>", md)
+        self.assertIn("#### Line 6: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`<script src=\"app.js\"></script>`</font></span>", md)
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: #!/usr/bin/env bash
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`#!/usr/bin/env bash`</font></span>
 
 • What is written?: The first line `#!/bin/bash` telling the computer which shell program to use.
 • What does every word mean?:
@@ -25,7 +25,7 @@
     • Ensures all child commands and syntax run in the intended shell interpreter.
 • 💥 What breaks if deleted?: The computer might run the script with the wrong program and get confused.
 ──────
-#### Line 2: set -euo pipefail
+#### Line 2: <span style="color: #3b82f6;"><font color="#3b82f6">`set -euo pipefail`</font></span>
 
 • What is written?: Strict mode safeguard configuring immediate exit on errors or unset variables.
 • What does every word mean?:
@@ -38,7 +38,7 @@
     • Protects all subsequent commands from executing if previous steps fail.
 • 💥 What breaks if deleted?: The script might keep running even if files are missing and corrupt data.
 ──────
-#### Line 4: export ENVIRONMENT="production"
+#### Line 4: <span style="color: #3b82f6;"><font color="#3b82f6">`export ENVIRONMENT="production"`</font></span>
 
 • What is written?: Command invocation: `export` (Environment Export).
 • What does every word mean?:
@@ -50,7 +50,7 @@
     • May interact with other files or tools (echo, python, export).
 • 💥 What breaks if deleted?: This specific automation step is skipped.
 ──────
-#### Line 5: export PORT="8000"
+#### Line 5: <span style="color: #3b82f6;"><font color="#3b82f6">`export PORT="8000"`</font></span>
 
 • What is written?: Command invocation: `export` (Environment Export).
 • What does every word mean?:
@@ -62,7 +62,7 @@
     • May interact with other files or tools (echo, python, export).
 • 💥 What breaks if deleted?: This specific automation step is skipped.
 ──────
-#### Line 7: log_info() {
+#### Line 7: <span style="color: #3b82f6;"><font color="#3b82f6">`log_info() {`</font></span>
 
 • What is written?: Reusable shell routine `log_info`.
 • What does every word mean?:
@@ -74,7 +74,7 @@
     • Can be called by other functions or main execution routines in this script.
 • 💥 What breaks if deleted?: Any line calling `log_info` will fail with `command not found`.
 ──────
-#### Line 8: echo "[$(date -u +'%Y-%m-%dT%H:%M:%SZ')] [INFO] $1"
+#### Line 8: <span style="color: #3b82f6;"><font color="#3b82f6">`echo "[$(date -u +'%Y-%m-%dT%H:%M:%SZ')] [INFO] $1"`</font></span>
 
 • What is written?: Command invocation: `echo` (Print Text).
 • What does every word mean?:
@@ -89,7 +89,7 @@
     • May interact with other files or tools (echo, python, export).
 • 💥 What breaks if deleted?: This specific automation step is skipped.
 ──────
-#### Line 11: start_application() {
+#### Line 11: <span style="color: #3b82f6;"><font color="#3b82f6">`start_application() {`</font></span>
 
 • What is written?: Reusable shell routine `start_application`.
 • What does every word mean?:
@@ -101,7 +101,7 @@
     • Can be called by other functions or main execution routines in this script.
 • 💥 What breaks if deleted?: Any line calling `start_application` will fail with `command not found`.
 ──────
-#### Line 13: python -m server
+#### Line 13: <span style="color: #3b82f6;"><font color="#3b82f6">`python -m server`</font></span>
 
 • What is written?: Command invocation: `python` (Python Interpreter).
 • What does every word mean?:

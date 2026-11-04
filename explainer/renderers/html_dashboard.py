@@ -374,8 +374,8 @@ class HtmlDashboardRenderer:
         elementsRows += `
           <tr>
             <td>
-              <strong style="color:var(--accent);">${{escapeHtml(el.name)}}</strong>
-              ${{el.snippet ? '<pre style="background:#0b1120; padding:4px 8px; border-radius:4px; font-size:0.75rem; margin-top:4px; color:#cbd5e1; overflow-x:auto;">' + escapeHtml(el.snippet) + '</pre>' : ''}}
+              <strong style="color:#60a5fa; font-size:0.95rem;">${{escapeHtml(el.name)}}</strong>
+              ${{el.snippet ? '<pre style="background:#0c192c; border-left:3px solid #38bdf8; padding:6px 10px; border-radius:4px; font-size:0.8rem; margin-top:4px; color:#38bdf8; font-weight:600; overflow-x:auto;">' + escapeHtml(el.snippet) + '</pre>' : ''}}
             </td>
             <td><span class="kind-badge">${{el.kind}}</span></td>
             <td>${{el.line_number || '-'}}</td>

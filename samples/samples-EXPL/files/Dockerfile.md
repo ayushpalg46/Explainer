@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 2: FROM python:3.12-slim AS builder
+#### Line 2: <span style="color: #3b82f6;"><font color="#3b82f6">`FROM python:3.12-slim AS builder`</font></span>
 
 • What is written?: Dockerfile instruction `FROM`: Specifies the starting foundation image for the container.
 • What does every word mean?:
@@ -25,7 +25,7 @@
     • Initializes the base operating environment needed by code files in this project.
 • 💥 What breaks if deleted?: Docker has no operating system or foundation to build your app on and halts immediately.
 ──────
-#### Line 4: WORKDIR /app
+#### Line 4: <span style="color: #3b82f6;"><font color="#3b82f6">`WORKDIR /app`</font></span>
 
 • What is written?: Dockerfile instruction `WORKDIR`: Sets the active folder inside the container for all subsequent commands.
 • What does every word mean?:
@@ -35,7 +35,7 @@
 • 🖥️ What happens on screen?: Keeps all application files organized inside `/app` instead of polluting the root system.
 • 💥 What breaks if deleted?: Files get dumped into the messy root folder of the container.
 ──────
-#### Line 5: COPY server.py .
+#### Line 5: <span style="color: #3b82f6;"><font color="#3b82f6">`COPY server.py .`</font></span>
 
 • What is written?: Dockerfile instruction `COPY`: Copies files from your computer into the container.
 • What does every word mean?:
@@ -48,7 +48,7 @@
     • Injects local codebase asset `server.py` into container destination `.`.
 • 💥 What breaks if deleted?: The container has no code to run!
 ──────
-#### Line 7: RUN pip install --no-cache-dir pydantic
+#### Line 7: <span style="color: #3b82f6;"><font color="#3b82f6">`RUN pip install --no-cache-dir pydantic`</font></span>
 
 • What is written?: Dockerfile instruction `RUN`: Runs commands during build time (like installing libraries).
 • What does every word mean?:
@@ -61,7 +61,7 @@
 • 🖥️ What happens on screen?: Downloads and installs necessary packages.
 • 💥 What breaks if deleted?: The container won't have the libraries it needs to run your code.
 ──────
-#### Line 9: FROM python:3.12-alpine AS production
+#### Line 9: <span style="color: #3b82f6;"><font color="#3b82f6">`FROM python:3.12-alpine AS production`</font></span>
 
 • What is written?: Dockerfile instruction `FROM`: Specifies the starting foundation image for the container.
 • What does every word mean?:
@@ -75,7 +75,7 @@
     • Initializes the base operating environment needed by code files in this project.
 • 💥 What breaks if deleted?: Docker has no operating system or foundation to build your app on and halts immediately.
 ──────
-#### Line 11: WORKDIR /app
+#### Line 11: <span style="color: #3b82f6;"><font color="#3b82f6">`WORKDIR /app`</font></span>
 
 • What is written?: Dockerfile instruction `WORKDIR`: Sets the active folder inside the container for all subsequent commands.
 • What does every word mean?:
@@ -85,7 +85,7 @@
 • 🖥️ What happens on screen?: Keeps all application files organized inside `/app` instead of polluting the root system.
 • 💥 What breaks if deleted?: Files get dumped into the messy root folder of the container.
 ──────
-#### Line 12: COPY --from=builder /app /app
+#### Line 12: <span style="color: #3b82f6;"><font color="#3b82f6">`COPY --from=builder /app /app`</font></span>
 
 • What is written?: Dockerfile instruction `COPY`: Copies files from your computer into the container.
 • What does every word mean?:
@@ -98,7 +98,7 @@
     • Injects local codebase asset `--from=builder` into container destination `/app`.
 • 💥 What breaks if deleted?: The container has no code to run!
 ──────
-#### Line 13: COPY deploy.sh .
+#### Line 13: <span style="color: #3b82f6;"><font color="#3b82f6">`COPY deploy.sh .`</font></span>
 
 • What is written?: Dockerfile instruction `COPY`: Copies files from your computer into the container.
 • What does every word mean?:
@@ -111,7 +111,7 @@
     • Injects local codebase asset `deploy.sh` into container destination `.`.
 • 💥 What breaks if deleted?: The container has no code to run!
 ──────
-#### Line 15: RUN chmod +x deploy.sh
+#### Line 15: <span style="color: #3b82f6;"><font color="#3b82f6">`RUN chmod +x deploy.sh`</font></span>
 
 • What is written?: Dockerfile instruction `RUN`: Runs commands during build time (like installing libraries).
 • What does every word mean?:
@@ -123,7 +123,7 @@
 • 🖥️ What happens on screen?: Downloads and installs necessary packages.
 • 💥 What breaks if deleted?: The container won't have the libraries it needs to run your code.
 ──────
-#### Line 17: EXPOSE 8000
+#### Line 17: <span style="color: #3b82f6;"><font color="#3b82f6">`EXPOSE 8000`</font></span>
 
 • What is written?: Dockerfile instruction `EXPOSE`: Documents the network port the container listens on.
 • What does every word mean?:
@@ -135,7 +135,7 @@
     • Documents that external web traffic on port 8000 connects to server processes in this codebase.
 • 💥 What breaks if deleted?: People won't easily know which port the server is listening to.
 ──────
-#### Line 18: ENTRYPOINT ["./deploy.sh"]
+#### Line 18: <span style="color: #3b82f6;"><font color="#3b82f6">`ENTRYPOINT ["./deploy.sh"]`</font></span>
 
 • What is written?: Dockerfile instruction `ENTRYPOINT`: Configures the container to run as a fixed executable.
 • What does every word mean?:

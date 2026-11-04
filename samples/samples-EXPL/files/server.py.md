@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: import asyncio
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`import asyncio`</font></span>
 
 • What is written?: Brings tools and helpers from the module `asyncio` into this script.
 • What does every word mean?:
@@ -23,7 +23,7 @@
     • Directly connects to and borrows functions from `asyncio`.
 • 💥 What breaks if deleted?: The program crashes with an error: 'NameError: name is not defined' when trying to call `asyncio`.
 ──────
-#### Line 2: import pydantic (BaseModel)
+#### Line 2: <span style="color: #3b82f6;"><font color="#3b82f6">`import pydantic (BaseModel)`</font></span>
 
 • What is written?: Brings tools and helpers from the module `pydantic (BaseModel)` into this script.
 • What does every word mean?:
@@ -35,7 +35,7 @@
     • Directly connects to and borrows functions from `pydantic (BaseModel)`.
 • 💥 What breaks if deleted?: The program crashes with an error: 'NameError: name is not defined' when trying to call `pydantic (BaseModel)`.
 ──────
-#### Line 3: import typing (Dict, Any)
+#### Line 3: <span style="color: #3b82f6;"><font color="#3b82f6">`import typing (Dict, Any)`</font></span>
 
 • What is written?: Brings tools and helpers from the module `typing (Dict, Any)` into this script.
 • What does every word mean?:
@@ -47,7 +47,7 @@
     • Directly connects to and borrows functions from `typing (Dict, Any)`.
 • 💥 What breaks if deleted?: The program crashes with an error: 'NameError: name is not defined' when trying to call `typing (Dict, Any)`.
 ──────
-#### Line 5: class MetricResponse(BaseModel):
+#### Line 5: <span style="color: #3b82f6;"><font color="#3b82f6">`class MetricResponse(BaseModel):`</font></span>
 
 • What is written?: A blueprint creating `MetricResponse` objects that bundle data and actions together.
 • What does every word mean?:
@@ -58,7 +58,7 @@
 • 🖥️ What happens on screen?: Organizes complicated information into neat, reusable objects.
 • 💥 What breaks if deleted?: The program won't know how to create `MetricResponse` objects and will crash.
 ──────
-#### Line 10: class ClusterService():
+#### Line 10: <span style="color: #3b82f6;"><font color="#3b82f6">`class ClusterService():`</font></span>
 
 • What is written?: A blueprint creating `ClusterService` objects that bundle data and actions together.
 • What does every word mean?:
@@ -69,7 +69,7 @@
 • 🖥️ What happens on screen?: Organizes complicated information into neat, reusable objects.
 • 💥 What breaks if deleted?: The program won't know how to create `ClusterService` objects and will crash.
 ──────
-#### Line 20: async def handle_metrics_route():
+#### Line 20: <span style="color: #3b82f6;"><font color="#3b82f6">`async def handle_metrics_route():`</font></span>
 
 • What is written?: A named recipe of instructions that takes inputs `()` and calculates an output.
 • What does every word mean?:
@@ -80,7 +80,7 @@
 • 🖥️ What happens on screen?: Executes calculations, transforms data, or triggers actions behind the scenes.
 • 💥 What breaks if deleted?: Any code that calls `handle_metrics_route` will crash with an error saying the function does not exist.
 ──────
-#### Line 11: def __init__(self, cluster_name):
+#### Line 11: <span style="color: #3b82f6;"><font color="#3b82f6">`def __init__(self, cluster_name):`</font></span>
 
 • What is written?: A named recipe of instructions that takes inputs `(self, cluster_name)` and calculates an output.
 • What does every word mean?:
@@ -91,7 +91,7 @@
 • 🖥️ What happens on screen?: Executes calculations, transforms data, or triggers actions behind the scenes.
 • 💥 What breaks if deleted?: Any code that calls `__init__` will crash with an error saying the function does not exist.
 ──────
-#### Line 14: async def get_system_telemetry(self):
+#### Line 14: <span style="color: #3b82f6;"><font color="#3b82f6">`async def get_system_telemetry(self):`</font></span>
 
 • What is written?: A named recipe of instructions that takes inputs `(self)` and calculates an output.
 • What does every word mean?:
@@ -102,7 +102,7 @@
 • 🖥️ What happens on screen?: Executes calculations, transforms data, or triggers actions behind the scenes.
 • 💥 What breaks if deleted?: Any code that calls `get_system_telemetry` will crash with an error saying the function does not exist.
 ──────
-#### Line 11: def __init__(self, cluster_name: str):
+#### Line 11: <span style="color: #3b82f6;"><font color="#3b82f6">`def __init__(self, cluster_name: str):`</font></span>
 
 • What is written?: A Python function `__init__` that performs calculations or actions.
 • What does every word mean?:
@@ -113,7 +113,7 @@
 • 🖥️ What happens on screen?: Executes logic behind the scenes and returns answers.
 • 💥 What breaks if deleted?: The program cannot run this calculation and will crash with an error.
 ──────
-#### Line 4: class MetricResponse(BaseModel):
+#### Line 4: <span style="color: #3b82f6;"><font color="#3b82f6">`class MetricResponse(BaseModel):`</font></span>
 
 • What is written?: A Python class `MetricResponse` structuring data and behaviors.
 • What does every word mean?:
@@ -123,7 +123,7 @@
 • 🖥️ What happens on screen?: Organizes application data cleanly.
 • 💥 What breaks if deleted?: The program won't know how to create `MetricResponse` objects.
 ──────
-#### Line 9: class ClusterService:
+#### Line 9: <span style="color: #3b82f6;"><font color="#3b82f6">`class ClusterService:`</font></span>
 
 • What is written?: A Python class `ClusterService` structuring data and behaviors.
 • What does every word mean?:
@@ -133,11 +133,11 @@
 • 🖥️ What happens on screen?: Organizes application data cleanly.
 • 💥 What breaks if deleted?: The program won't know how to create `ClusterService` objects.
 ──────
-#### Line 1: import asyncio
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`import asyncio
 from pydantic import BaseModel
 from typing import Dict, Any
 
-class MetricResponse
+class MetricResponse`</font></span>
 
 • What is written?: Imports external module `asyncio
 from pydantic import BaseModel

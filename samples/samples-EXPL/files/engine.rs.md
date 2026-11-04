@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: use std::sync::Arc;
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`use std::sync::Arc;`</font></span>
 
 • What is written?: Rust import bringing `std::sync::Arc` into scope.
 • What does every word mean?:
@@ -23,7 +23,7 @@
     • Dependency link to `std::sync::Arc`.
 • 💥 What breaks if deleted?: Code using these types will fail to compile unless fully qualified.
 ──────
-#### Line 2: use tokio::sync::Mutex;
+#### Line 2: <span style="color: #3b82f6;"><font color="#3b82f6">`use tokio::sync::Mutex;`</font></span>
 
 • What is written?: Rust import bringing `tokio::sync::Mutex` into scope.
 • What does every word mean?:
@@ -35,7 +35,7 @@
     • Dependency link to `tokio::sync::Mutex`.
 • 💥 What breaks if deleted?: Code using these types will fail to compile unless fully qualified.
 ──────
-#### Line 5: pub struct ClusterNode {
+#### Line 5: <span style="color: #3b82f6;"><font color="#3b82f6">`pub struct ClusterNode {`</font></span>
 
 • What is written?: Rust data structure `ClusterNode` defining memory layout and fields.
 • What does every word mean?:
@@ -48,7 +48,7 @@
     • Core domain entity passed across functions and crates.
 • 💥 What breaks if deleted?: Any code instantiating or referencing `ClusterNode` will fail to compile.
 ──────
-#### Line 19: fn check_health(&self) -> HealthStatus;
+#### Line 19: <span style="color: #3b82f6;"><font color="#3b82f6">`fn check_health(&self) -> HealthStatus;`</font></span>
 
 • What is written?: Rust function `check_health` implementing typed logic.
 • What does every word mean?:
@@ -61,7 +61,7 @@
     • Callable within this module or across crates if public.
 • 💥 What breaks if deleted?: Callers invoking `check_health` will fail to compile.
 ──────
-#### Line 23: fn check_health(&self) -> HealthStatus {
+#### Line 23: <span style="color: #3b82f6;"><font color="#3b82f6">`fn check_health(&self) -> HealthStatus {`</font></span>
 
 • What is written?: Rust function `check_health` implementing typed logic.
 • What does every word mean?:
@@ -74,7 +74,7 @@
     • Callable within this module or across crates if public.
 • 💥 What breaks if deleted?: Callers invoking `check_health` will fail to compile.
 ──────
-#### Line 32: pub async fn run_monitoring_engine(node: Arc<Mutex<ClusterNode>>) {
+#### Line 32: <span style="color: #3b82f6;"><font color="#3b82f6">`pub async fn run_monitoring_engine(node: Arc<Mutex<ClusterNode>>) {`</font></span>
 
 • What is written?: Rust function `run_monitoring_engine` implementing typed logic.
 • What does every word mean?:

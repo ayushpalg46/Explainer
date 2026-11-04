@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: package main
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`package main`</font></span>
 
 • What is written?: Go package declaration organizing code into the `main` namespace.
 • What does every word mean?:
@@ -23,7 +23,7 @@
     • Shared across all files in the `main` package.
 • 💥 What breaks if deleted?: Go compilation fails because every Go file must begin with a package clause.
 ──────
-#### Line 9: type TelemetryPayload struct {
+#### Line 9: <span style="color: #3b82f6;"><font color="#3b82f6">`type TelemetryPayload struct {`</font></span>
 
 • What is written?: Go composite data structure `TelemetryPayload`.
 • What does every word mean?:
@@ -36,7 +36,7 @@
     • Data model passed between functions and API endpoints across this project.
 • 💥 What breaks if deleted?: Any function expecting a `TelemetryPayload` object will report a type error.
 ──────
-#### Line 18: func HandleMetrics(w http.ResponseWriter, r *http.Request) {
+#### Line 18: <span style="color: #3b82f6;"><font color="#3b82f6">`func HandleMetrics(w http.ResponseWriter, r *http.Request) {`</font></span>
 
 • What is written?: Go function `HandleMetrics`.
 • What does every word mean?:

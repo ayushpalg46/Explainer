@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 8: function formatLatency(...) { ... }
+#### Line 8: <span style="color: #3b82f6;"><font color="#3b82f6">`function formatLatency(...) { ... }`</font></span>
 
 • What is written?: JavaScript function `formatLatency` that executes calculations or event handling.
 • What does every word mean?:
@@ -23,7 +23,7 @@
 • 🖥️ What happens on screen?: Calculates values or triggers changes on the screen.
 • 💥 What breaks if deleted?: Any button or code calling `formatLatency` will crash.
 ──────
-#### Line 14: function calculateUptime(...) { ... }
+#### Line 14: <span style="color: #3b82f6;"><font color="#3b82f6">`function calculateUptime(...) { ... }`</font></span>
 
 • What is written?: JavaScript function `calculateUptime` that executes calculations or event handling.
 • What does every word mean?:

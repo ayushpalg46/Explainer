@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 2: <html lang="en">
+#### Line 2: <span style="color: #3b82f6;"><font color="#3b82f6">`<html lang="en">`</font></span>
 
 • What is written?: A <html> element configured with lang="en".
 • What does every word mean?:
@@ -21,7 +21,7 @@
 • 🖥️ What happens on screen?: It doesn't show a picture directly, but it prepares the entire white canvas for the browser to draw on.
 • 💥 What breaks if deleted?: The browser gets confused about what language and standards you are using, and might display the page in broken 'quirks' mode.
 ──────
-#### Line 3: <head>
+#### Line 3: <span style="color: #3b82f6;"><font color="#3b82f6">`<head>`</font></span>
 
 • What is written?: A standard <head> element.
 • What does every word mean?:
@@ -30,7 +30,7 @@
 • 🖥️ What happens on screen?: Nothing directly appears on the screen, but it sets the tab title and loads all the beautiful colors and fonts.
 • 💥 What breaks if deleted?: The page loses its styling, title, and mobile screen sizing, turning into plain black text on white background.
 ──────
-#### Line 4: <meta charset="UTF-8">
+#### Line 4: <span style="color: #3b82f6;"><font color="#3b82f6">`<meta charset="UTF-8">`</font></span>
 
 • What is written?: A <meta> element configured with charset="UTF-8".
 • What does every word mean?:
@@ -40,7 +40,7 @@
 • 🖥️ What happens on screen?: Displays or organizes content on the page.
 • 💥 What breaks if deleted?: The `<meta>` section will disappear from the screen.
 ──────
-#### Line 7: <title>Cloud Analytics Dashboard</title>
+#### Line 7: <span style="color: #3b82f6;"><font color="#3b82f6">`<title>Cloud Analytics Dashboard</title>`</font></span>
 
 • What is written?: A standard <title> element.
 • What does every word mean?:
@@ -50,7 +50,7 @@
 • 🖥️ What happens on screen?: Displays or organizes content on the page.
 • 💥 What breaks if deleted?: The `<title>` section will disappear from the screen.
 ──────
-#### Line 8: <link rel="stylesheet" href="style.css">
+#### Line 8: <span style="color: #3b82f6;"><font color="#3b82f6">`<link rel="stylesheet" href="style.css">`</font></span>
 
 • What is written?: A link tag importing style.css.
 • What does every word mean?:
@@ -63,7 +63,7 @@
     • Pulls all design rules, colors, and fonts from style.css.
 • 💥 What breaks if deleted?: All colors, fonts, centering, and button designs vanish, leaving bare, ugly text.
 ──────
-#### Line 9: <link rel="preconnect" href="https://fonts.googleapis.com">
+#### Line 9: <span style="color: #3b82f6;"><font color="#3b82f6">`<link rel="preconnect" href="https://fonts.googleapis.com">`</font></span>
 
 • What is written?: A <link> element configured with rel="preconnect", href="https://fonts.googleapis.com".
 • What does every word mean?:
@@ -74,7 +74,7 @@
 • 🖥️ What happens on screen?: Invisible on the page itself, but it gives the entire page its vibrant colors, fonts, and layout.
 • 💥 What breaks if deleted?: The webpage loses its external CSS stylesheets and turns into bare, unstyled black-and-white text.
 ──────
-#### Line 11: <body>
+#### Line 11: <span style="color: #3b82f6;"><font color="#3b82f6">`<body>`</font></span>
 
 • What is written?: A standard <body> element.
 • What does every word mean?:
@@ -83,7 +83,7 @@
 • 🖥️ What happens on screen?: Everything you actually see with your eyes—buttons, cards, pictures, text—lives inside here.
 • 💥 What breaks if deleted?: Your webpage would be a completely blank white screen!
 ──────
-#### Line 12: <header class="app-header">
+#### Line 12: <span style="color: #3b82f6;"><font color="#3b82f6">`<header class="app-header">`</font></span>
 
 • What is written?: A <header> element configured with class="app-header".
 • What does every word mean?:
@@ -95,7 +95,7 @@
     • style.css uses .app-header to apply styling and layout rules.
 • 💥 What breaks if deleted?: The page loses its top navigation structure.
 ──────
-#### Line 13: <nav class="navbar" role="navigation" aria-label="Main Navigation">
+#### Line 13: <span style="color: #3b82f6;"><font color="#3b82f6">`<nav class="navbar" role="navigation" aria-label="Main Navigation">`</font></span>
 
 • What is written?: A <nav> element configured with class="navbar", role="navigation", aria-label="Main Navigation".
 • What does every word mean?:
@@ -109,7 +109,7 @@
     • style.css uses .navbar to apply styling and layout rules.
 • 💥 What breaks if deleted?: Users and screen readers have to hunt through the whole page to find the menu.
 ──────
-#### Line 14: <div class="logo">⚡ CloudSphere</div>
+#### Line 14: <span style="color: #3b82f6;"><font color="#3b82f6">`<div class="logo">⚡ CloudSphere</div>`</font></span>
 
 • What is written?: A <div> tag with 1 label(s): class="logo".
 • What does every word mean?:
@@ -122,7 +122,7 @@
     • style.css uses .logo to apply styling and layout rules.
 • 💥 What breaks if deleted?: The items inside spill all over the page and lose their neat layout, positioning, and background colors.
 ──────
-#### Line 15: <ul class="nav-links">
+#### Line 15: <span style="color: #3b82f6;"><font color="#3b82f6">`<ul class="nav-links">`</font></span>
 
 • What is written?: A <ul> element configured with class="nav-links".
 • What does every word mean?:
@@ -134,7 +134,7 @@
     • style.css uses .nav-links to apply styling and layout rules.
 • 💥 What breaks if deleted?: The `<ul>` section will disappear from the screen.
 ──────
-#### Line 16: <li><a href="#metrics">Metrics</a></li>
+#### Line 16: <span style="color: #3b82f6;"><font color="#3b82f6">`<li><a href="#metrics">Metrics</a></li>`</font></span>
 
 • What is written?: A standard <li> element.
 • What does every word mean?:
@@ -144,7 +144,7 @@
 • 🖥️ What happens on screen?: Displays or organizes content on the page.
 • 💥 What breaks if deleted?: The `<li>` section will disappear from the screen.
 ──────
-#### Line 16: <li><a href="#metrics">Metrics</a></li>
+#### Line 16: <span style="color: #3b82f6;"><font color="#3b82f6">`<li><a href="#metrics">Metrics</a></li>`</font></span>
 
 • What is written?: A <a> element configured with href="#metrics".
 • What does every word mean?:
@@ -155,7 +155,7 @@
 • 🖥️ What happens on screen?: Shows colored, underlined text (or a button) that turns into a hand cursor when hovered.
 • 💥 What breaks if deleted?: Users cannot navigate to other pages or links.
 ──────
-#### Line 17: <li><a href="#deployments">Deployments</a></li>
+#### Line 17: <span style="color: #3b82f6;"><font color="#3b82f6">`<li><a href="#deployments">Deployments</a></li>`</font></span>
 
 • What is written?: A <a> element configured with href="#deployments".
 • What does every word mean?:
@@ -166,7 +166,7 @@
 • 🖥️ What happens on screen?: Shows colored, underlined text (or a button) that turns into a hand cursor when hovered.
 • 💥 What breaks if deleted?: Users cannot navigate to other pages or links.
 ──────
-#### Line 22: <main id="main-content" class="container">
+#### Line 22: <span style="color: #3b82f6;"><font color="#3b82f6">`<main id="main-content" class="container">`</font></span>
 
 • What is written?: A <main> element configured with id="main-content", class="container".
 • What does every word mean?:
@@ -180,7 +180,7 @@
     • style.css uses .container to apply styling and layout rules.
 • 💥 What breaks if deleted?: Screen readers cannot easily skip past repeated headers to get straight to the good stuff.
 ──────
-#### Line 23: <section class="hero-banner">
+#### Line 23: <span style="color: #3b82f6;"><font color="#3b82f6">`<section class="hero-banner">`</font></span>
 
 • What is written?: A <section> element configured with class="hero-banner".
 • What does every word mean?:
@@ -192,7 +192,7 @@
     • style.css uses .hero-banner to apply styling and layout rules.
 • 💥 What breaks if deleted?: The `<section>` section will disappear from the screen.
 ──────
-#### Line 24: <h1>Real-Time Cluster Analytics</h1>
+#### Line 24: <span style="color: #3b82f6;"><font color="#3b82f6">`<h1>Real-Time Cluster Analytics</h1>`</font></span>
 
 • What is written?: An <h1> heading with the text "Real-Time Cluster Analytics".
 • What does every word mean?:
@@ -202,7 +202,7 @@
 • 🖥️ What happens on screen?: Big, bold text appears on the screen reading: Real-Time Cluster Analytics.
 • 💥 What breaks if deleted?: Visitors won't see any title and won't know what this page is for.
 ──────
-#### Line 25: <p>Continuous monitoring across microservices and cloud workloads.</p>
+#### Line 25: <span style="color: #3b82f6;"><font color="#3b82f6">`<p>Continuous monitoring across microservices and cloud workloads.</p>`</font></span>
 
 • What is written?: A standard <p> element.
 • What does every word mean?:
@@ -212,7 +212,7 @@
 • 🖥️ What happens on screen?: Renders readable sentences with comfortable spacing above and below so it's easy to read.
 • 💥 What breaks if deleted?: Sentences get squished together into one giant unreadable clump.
 ──────
-#### Line 29: <div id="root" role="region" aria-label="Application Dashboard Root"></div>
+#### Line 29: <span style="color: #3b82f6;"><font color="#3b82f6">`<div id="root" role="region" aria-label="Application Dashboard Root"></div>`</font></span>
 
 • What is written?: A <div> tag with 3 label(s): id="root" and role="region" and aria-label="Application Dashboard Root".
 • What does every word mean?:
@@ -226,7 +226,7 @@
     • app.js searches for this exact box using document.getElementById('root') to place the app inside it.
 • 💥 What breaks if deleted?: The title and button lose their container, spill across the screen, and the JavaScript code crashes because it cannot find "root".
 ──────
-#### Line 32: <footer class="app-footer">
+#### Line 32: <span style="color: #3b82f6;"><font color="#3b82f6">`<footer class="app-footer">`</font></span>
 
 • What is written?: A <footer> element configured with class="app-footer".
 • What does every word mean?:
@@ -238,7 +238,7 @@
     • style.css uses .app-footer to apply styling and layout rules.
 • 💥 What breaks if deleted?: Visitors won't know who made the website or where to find legal and contact info.
 ──────
-#### Line 36: <script type="module" src="app.jsx"></script>
+#### Line 36: <span style="color: #3b82f6;"><font color="#3b82f6">`<script type="module" src="app.jsx"></script>`</font></span>
 
 • What is written?: A script tag loading the JavaScript code from app.jsx.
 • What does every word mean?:

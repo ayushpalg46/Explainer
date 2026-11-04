@@ -200,7 +200,7 @@ class AIExplainerEngine:
             f"──────\n"
             f"#### 🔍 2. Line-by-Line & Word-by-Word Breakdown\n\n"
             f"For every major line or block from the code file, write:\n\n"
-            f"#### Line X: [exact code line from the codefile]\n\n"
+            f"#### Line X: <span style=\"color: #3b82f6;\"><font color=\"#3b82f6\">`[exact code line from the codefile]`</font></span>\n\n"
             f"• What is written?: [Plain English description of what tag, function, or statement this is]\n"
             f"• What does every word mean?:\n"
             f"    • [word/tag/attr]: [What this exact word means in simple terms]\n"

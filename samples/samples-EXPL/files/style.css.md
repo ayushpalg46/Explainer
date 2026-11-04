@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: :root { --primary-color: #3b82f6; --secondary-color: #10b981; --bg-dark: #090d16; ... }
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`:root { --primary-color: #3b82f6; --secondary-color: #10b981; --bg-dark: #090d16; ... }`</font></span>
 
 • What is written?: CSS styling rule targeting `:root` with 8 property declarations.
 • What does every word mean?:
@@ -27,7 +27,7 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `:root` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 10: body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-base); ... }
+#### Line 10: <span style="color: #3b82f6;"><font color="#3b82f6">`body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-base); ... }`</font></span>
 
 • What is written?: CSS styling rule targeting `body` with 5 property declarations.
 • What does every word mean?:
@@ -43,7 +43,7 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `body` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 18: .app-header { display: flex; justify-content: space-between; align-items: center; ... }
+#### Line 18: <span style="color: #3b82f6;"><font color="#3b82f6">`.app-header { display: flex; justify-content: space-between; align-items: center; ... }`</font></span>
 
 • What is written?: CSS styling rule targeting `.app-header` with 8 property declarations.
 • What does every word mean?:
@@ -59,7 +59,7 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `.app-header` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 29: .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 3); }
+#### Line 29: <span style="color: #3b82f6;"><font color="#3b82f6">`.container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: calc(var(--spacing-unit) * 3); padding: calc(var(--spacing-unit) * 3); }`</font></span>
 
 • What is written?: CSS styling rule targeting `.container` with 4 property declarations.
 • What does every word mean?:
@@ -75,7 +75,7 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `.container` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 36: .hero-banner { animation: fadeIn 0.6s ease-out; }
+#### Line 36: <span style="color: #3b82f6;"><font color="#3b82f6">`.hero-banner { animation: fadeIn 0.6s ease-out; }`</font></span>
 
 • What is written?: CSS styling rule targeting `.hero-banner` with 1 property declarations.
 • What does every word mean?:
@@ -88,8 +88,8 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `.hero-banner` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 40: @keyframes fadeIn { from {
-    opacity: 0; transform: translateY(12px); }
+#### Line 40: <span style="color: #3b82f6;"><font color="#3b82f6">`@keyframes fadeIn { from {
+    opacity: 0; transform: translateY(12px); }`</font></span>
 
 • What is written?: CSS styling rule targeting `@keyframes fadeIn` with 2 property declarations.
 • What does every word mean?:
@@ -105,7 +105,7 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `@keyframes fadeIn` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 46: to { opacity: 1; transform: translateY(0); }
+#### Line 46: <span style="color: #3b82f6;"><font color="#3b82f6">`to { opacity: 1; transform: translateY(0); }`</font></span>
 
 • What is written?: CSS styling rule targeting `to` with 2 property declarations.
 • What does every word mean?:
@@ -119,10 +119,10 @@
     • Directly targets and styles matching elements in connected HTML and JSX files.
 • 💥 What breaks if deleted?: The `to` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Line 50: }
+#### Line 50: <span style="color: #3b82f6;"><font color="#3b82f6">`}
 
 @media (max-width: 768px) { .container {
-    grid-template-columns: 1fr; padding: calc(var(--spacing-unit) * 2); }
+    grid-template-columns: 1fr; padding: calc(var(--spacing-unit) * 2); }`</font></span>
 
 • What is written?: CSS styling rule targeting `}
 
@@ -152,35 +152,35 @@
 
 @media (max-width: 768px)` elements will lose their custom colors, padding, and positioning.
 ──────
-#### Declaration: display: flex; justify-content: ...; align-items: ...
+#### Declaration: <span style="color: #3b82f6;"><font color="#3b82f6">`display: flex; justify-content: ...; align-items: ...`</font></span>
 
 • What is written?: A layout engine that arranges items neatly in a single line (row or column).
 • 🧸 4-Year-Old Analogy: Think of Flexbox like a teacher arranging children in a neat line holding hands, spacing them evenly across the playground!
 • 🖥️ What happens on screen?: Buttons, cards, or menu items sit side-by-side with perfect equal spacing and never bump into each other.
 • 💥 What breaks if deleted?: Items fall on top of each other in a messy, ugly vertical pile.
 ──────
-#### Declaration: display: grid; grid-template-columns: ...
+#### Declaration: <span style="color: #3b82f6;"><font color="#3b82f6">`display: grid; grid-template-columns: ...`</font></span>
 
 • What is written?: A two-dimensional layout engine managing both rows and columns like a checkerboard.
 • 🧸 4-Year-Old Analogy: Think of CSS Grid like a giant ice-cube tray or bento box! You give each food item its own special compartment.
 • 🖥️ What happens on screen?: Creates neat photo grids, card galleries, and multi-column dashboards.
 • 💥 What breaks if deleted?: The neat table or card grid collapses into a single disorganized list.
 ──────
-#### Declaration: --primary-color: #...; --bg-surface: ...;
+#### Declaration: <span style="color: #3b82f6;"><font color="#3b82f6">`--primary-color: #...; --bg-surface: ...;`</font></span>
 
 • What is written?: Reusable color and size tokens (like `--primary-color: #3b82f6`).
 • 🧸 4-Year-Old Analogy: Think of a CSS variable like a bucket of blue paint with a label 'MY_FAVORITE_BLUE'. Whenever you want blue, you just point to the bucket!
 • 🖥️ What happens on screen?: Allows changing all buttons from light blue to dark theme with one single switch.
 • 💥 What breaks if deleted?: You have to hunt down and re-type the color in 500 different places if you ever want to change it.
 ──────
-#### Declaration: @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+#### Declaration: <span style="color: #3b82f6;"><font color="#3b82f6">`@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }`</font></span>
 
 • What is written?: A rule that makes elements move, spin, fade, or bounce over time.
 • 🧸 4-Year-Old Analogy: Think of @keyframes like a flipbook cartoon! You draw how the toy looks at the start (0%) and end (100%), and the computer flips the pages super fast!
 • 🖥️ What happens on screen?: Buttons pulse, loading spinners twirl, and menus glide smoothly into view.
 • 💥 What breaks if deleted?: Everything stays completely still and motionless.
 ──────
-#### Declaration: @media (max-width: 768px)...
+#### Declaration: <span style="color: #3b82f6;"><font color="#3b82f6">`@media (max-width: 768px)...`</font></span>
 
 • What is written?: Conditional CSS rules applying styles depending on device screen width or orientation.
 • 🧸 4-Year-Old Analogy: Think of media queries like an outfit changer! When you go outside in the cold (small mobile phone), it puts on a winter jacket, and in the sun (big monitor), it puts on sunglasses!

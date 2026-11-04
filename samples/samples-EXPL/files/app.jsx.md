@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: import React, { useState, useEffect } from 'react'
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`import React, { useState, useEffect } from 'react'`</font></span>
 
 • What is written?: Brings tools or components (`React, { useState, useEffect }`) from the external file or library `react`.
 • What does every word mean?:
@@ -25,7 +25,7 @@
     • Directly links to and imports code from 'react'.
 • 💥 What breaks if deleted?: The file crashes with an error saying: 'I cannot find React, { useState, useEffect }!'
 ──────
-#### Line 2: import { formatLatency, calculateUptime } from './utils.ts'
+#### Line 2: <span style="color: #3b82f6;"><font color="#3b82f6">`import { formatLatency, calculateUptime } from './utils.ts'`</font></span>
 
 • What is written?: Brings tools or components (`{ formatLatency, calculateUptime }`) from the external file or library `./utils.ts`.
 • What does every word mean?:
@@ -39,7 +39,7 @@
     • Directly links to and imports code from './utils.ts'.
 • 💥 What breaks if deleted?: The file crashes with an error saying: 'I cannot find { formatLatency, calculateUptime }!'
 ──────
-#### Line 5: const [...] = useState(...)
+#### Line 5: <span style="color: #3b82f6;"><font color="#3b82f6">`const [...] = useState(...)`</font></span>
 
 • What is written?: A React Hook that stores memory (state) that redraws the screen when changed.
 • What does every word mean?:
@@ -51,7 +51,7 @@
 • 🖥️ What happens on screen?: The number on the screen (like a counter or shopping cart item count) instantly updates before your eyes.
 • 💥 What breaks if deleted?: The computer forgets what the user clicked, and the numbers on the screen never change.
 ──────
-#### Line 8: const [...] = useEffect(...)
+#### Line 8: <span style="color: #3b82f6;"><font color="#3b82f6">`const [...] = useEffect(...)`</font></span>
 
 • What is written?: A React Hook that runs side effects (fetching data, setting timers, listening to events).
 • What does every word mean?:
@@ -61,7 +61,7 @@
 • 🖥️ What happens on screen?: Automatically loads data from the internet or starts a timer right after the page appears.
 • 💥 What breaks if deleted?: External data won't load from servers, and timers or window listeners won't start.
 ──────
-#### Line 4: function Dashboard(props) { return <...> }
+#### Line 4: <span style="color: #3b82f6;"><font color="#3b82f6">`function Dashboard(props) { return <...> }`</font></span>
 
 • What is written?: Declarative React UI component `<Dashboard />` building a section of the user interface.
 • What does every word mean?:
@@ -75,7 +75,7 @@
     • Can be imported and rendered as `<Dashboard />` by other components or HTML entrypoints.
 • 💥 What breaks if deleted?: The entire `Dashboard` section will disappear from the screen.
 ──────
-#### Declaration: async () => { const res = await fetch(...); }
+#### Declaration: <span style="color: #3b82f6;"><font color="#3b82f6">`async () => { const res = await fetch(...); }`</font></span>
 
 • What is written?: Non-blocking asynchronous control flow pattern.
 • What does every word mean?:

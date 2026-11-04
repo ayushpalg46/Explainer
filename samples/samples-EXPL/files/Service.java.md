@@ -11,7 +11,7 @@
 
 #### 🔍 2. Line-by-Line & Word-by-Word Breakdown
 
-#### Line 1: package com.cloudsphere.analytics;
+#### Line 1: <span style="color: #3b82f6;"><font color="#3b82f6">`package com.cloudsphere.analytics;`</font></span>
 
 • What is written?: Java package namespace `com.cloudsphere.analytics`.
 • What does every word mean?:
@@ -23,7 +23,7 @@
     • Namespace shared across files in `com.cloudsphere.analytics`.
 • 💥 What breaks if deleted?: Class gets placed into default package, which breaks imports in other packages.
 ──────
-#### Line 3: import java.util.Map;
+#### Line 3: <span style="color: #3b82f6;"><font color="#3b82f6">`import java.util.Map;`</font></span>
 
 • What is written?: Java import bringing `java.util.Map` into scope.
 • What does every word mean?:
@@ -35,7 +35,7 @@
     • Dependency link to `java.util.Map`.
 • 💥 What breaks if deleted?: References to `Map` will cause compiler 'cannot find symbol' errors.
 ──────
-#### Line 4: import java.util.HashMap;
+#### Line 4: <span style="color: #3b82f6;"><font color="#3b82f6">`import java.util.HashMap;`</font></span>
 
 • What is written?: Java import bringing `java.util.HashMap` into scope.
 • What does every word mean?:
@@ -47,7 +47,7 @@
     • Dependency link to `java.util.HashMap`.
 • 💥 What breaks if deleted?: References to `HashMap` will cause compiler 'cannot find symbol' errors.
 ──────
-#### Line 6: public class Service {
+#### Line 6: <span style="color: #3b82f6;"><font color="#3b82f6">`public class Service {`</font></span>
 
 • What is written?: Java class `Service` defined in package `com.cloudsphere.analytics`.
 • What does every word mean?:
