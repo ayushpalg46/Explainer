@@ -53,3 +53,5 @@ htmlcov/
 # Allow generated output examples if explicitly committed, but ignore local run dumps:
 explainer_output/
 *.log
+.explainer/
+*cloud_config.json
