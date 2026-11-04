@@ -26,8 +26,8 @@ class WorkspaceScanner:
 
         valid_files = []
         for dirpath, dirnames, filenames in os.walk(self.root):
-            # Prune ignored directories in-place
-            dirnames[:] = [d for d in dirnames if d not in IGNORE_DIRS and not d.startswith(".")]
+            # Prune ignored directories in-place (including any previous -EXPL folders)
+            dirnames[:] = [d for d in dirnames if d not in IGNORE_DIRS and not d.startswith(".") and not d.endswith("-EXPL")]
 
             for fname in filenames:
                 fpath = Path(dirpath) / fname
