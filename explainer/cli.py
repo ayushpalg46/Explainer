@@ -1,6 +1,7 @@
 import os
 import sys
 import webbrowser
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict
 import click
@@ -115,6 +116,21 @@ def interactive_wizard():
     codebase_folder_name = current_cwd.name or "Codebase"
     expl_folder_name = f"{codebase_folder_name}-EXPL"
     expl_output_dir = current_cwd / expl_folder_name
+
+    # If the folder already exists, ask the user whether to update or create a new one
+    if expl_output_dir.exists():
+        console.print()
+        console.print(f"[bold yellow]📁 Existing explanation folder '[white]{expl_folder_name}[/white]' already exists.[/bold yellow]")
+        console.print("  [cyan][1][/cyan] [bold green]Update & refresh existing folder[/bold green] [dim](Default / Clean update)[/dim]")
+        console.print("  [cyan][2][/cyan] [bold cyan]Create a new timestamped folder[/bold cyan] [dim](Keep both)[/dim]")
+        folder_choice = Prompt.ask("Choose option", choices=["1", "2"], default="1")
+        if folder_choice == "2":
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            expl_folder_name = f"{codebase_folder_name}-EXPL-{timestamp}"
+            expl_output_dir = current_cwd / expl_folder_name
+            console.print(f"[bold cyan]📁 Will generate new folder:[/bold cyan] [bold white]{expl_folder_name}[/bold white]")
+        else:
+            console.print(f"[bold green]🔄 Will update existing folder:[/bold green] [bold white]{expl_folder_name}[/bold white]")
 
     # 2. Run the analysis engine
     codebase_analysis = run_core_analysis(

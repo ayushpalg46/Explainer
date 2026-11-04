@@ -21,6 +21,13 @@ class MarkdownRenderer:
         """
         out_dir = Path(output_dir).resolve()
         files_dir = out_dir / "files"
+        if files_dir.exists():
+            # Clean old markdown files so deleted or renamed source files do not linger as stale artifacts
+            for old_md in files_dir.glob("*.md"):
+                try:
+                    old_md.unlink()
+                except Exception:
+                    pass
         files_dir.mkdir(parents=True, exist_ok=True)
 
         generated_files = {}
