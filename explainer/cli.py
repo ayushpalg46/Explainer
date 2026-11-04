@@ -42,44 +42,74 @@ def interactive_wizard():
     current_cwd = Path.cwd().resolve()
     console.print(f"[bold]📁 Current Codebase:[/bold] [underline white]{current_cwd}[/underline white]")
     
-    # 1. First Prompt: Choose between Without-AI and AI (Default: 1)
-    console.print("\n[bold yellow]Choose Explanation Mode:[/bold yellow]")
-    console.print("  [cyan][1][/cyan] [bold]Without-AI Explanation[/bold] (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [bold green][Default][/bold green]")
-    console.print("  [cyan][2][/cyan] [bold]AI Explanation[/bold] (Local Ollama / Qwen Model)")
-    mode_choice = Prompt.ask("Select mode", choices=["1", "2"], default="1")
-
+    # 1. First Prompt: Choose between Without-AI and AI (Default: 1) with "GO BACK" support
+    mode_choice = "1"
     ai_provider = "ollama"
     ai_endpoint = "http://localhost:11434/api/generate"
     ai_model = None
 
-    if mode_choice == "2":
-        console.print("\n[bold yellow]Local AI Model Configuration:[/bold yellow]")
-        detected_models = AIExplainerEngine.list_installed_models()
-        if detected_models:
-            console.print(f"[bold green]✓ Discovered {len(detected_models)} installed Ollama model(s):[/bold green]")
-            model_choices = []
-            def_choice = "1"
-            for idx, m_name in enumerate(detected_models, 1):
-                is_coder = "coder" in m_name.lower()
-                badge = " [bold green]⭐ (Specialized Code Model)[/bold green]" if is_coder else ""
-                console.print(f"  [cyan][{idx}][/cyan] {m_name}{badge}")
-                model_choices.append(str(idx))
-                if is_coder:
-                    def_choice = str(idx)
+    while True:
+        console.print("\n[bold yellow]Choose Explanation Mode:[/bold yellow]")
+        console.print("  [cyan][1][/cyan] [bold]Without-AI Explanation[/bold] (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [bold green][Default][/bold green]")
+        console.print("  [cyan][2][/cyan] [bold]AI Explanation[/bold] (Local Ollama / Qwen Model)")
+        mode_choice = Prompt.ask("Select mode", choices=["1", "2"], default="1")
 
-            console.print(f"  [cyan][{len(detected_models) + 1}][/cyan] Enter another model name manually")
-            model_choices.append(str(len(detected_models) + 1))
+        if mode_choice == "1":
+            # Proceed directly with Without-AI mode
+            break
 
-            m_select = Prompt.ask("Select model", choices=model_choices, default=def_choice)
-            if int(m_select) <= len(detected_models):
-                ai_model = detected_models[int(m_select) - 1]
+        elif mode_choice == "2":
+            console.print("\n[bold yellow]Select Local AI Model:[/bold yellow]")
+            detected_models = AIExplainerEngine.list_installed_models()
+            
+            if detected_models:
+                console.print(f"[bold green]✓ Discovered {len(detected_models)} installed Ollama model(s):[/bold green]")
+                model_choices = []
+                def_choice = "1"
+                
+                for idx, m_name in enumerate(detected_models, 1):
+                    is_coder = "coder" in m_name.lower()
+                    badge = " [bold green]⭐ (Specialized Code Model)[/bold green]" if is_coder else ""
+                    console.print(f"  [cyan][{idx}][/cyan] {m_name}{badge}")
+                    model_choices.append(str(idx))
+                    if is_coder:
+                        def_choice = str(idx)
+
+                manual_idx = str(len(detected_models) + 1)
+                back_idx = str(len(detected_models) + 2)
+
+                console.print(f"  [cyan][{manual_idx}][/cyan] Enter another model name manually")
+                model_choices.append(manual_idx)
+
+                console.print(f"  [cyan][{back_idx}][/cyan] [bold yellow]↩ GO BACK[/bold yellow] (Return to Main Menu)")
+                model_choices.append(back_idx)
+
+                m_select = Prompt.ask("Choose option", choices=model_choices, default=def_choice)
+                
+                if m_select == back_idx:
+                    console.print("[dim]Returning to main menu...[/dim]")
+                    continue  # Loops back to Choose Explanation Mode
+                elif m_select == manual_idx:
+                    ai_model = Prompt.ask("Enter model identifier")
+                    break
+                else:
+                    ai_model = detected_models[int(m_select) - 1]
+                    break
             else:
-                ai_model = Prompt.ask("Enter model identifier")
-        else:
-            ai_model = Prompt.ask(
-                "Enter Ollama model name",
-                default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
-            )
+                console.print("[yellow]No local Ollama models detected automatically.[/yellow]")
+                console.print("  [cyan][1][/cyan] Enter Ollama model name manually")
+                console.print("  [cyan][2][/cyan] [bold yellow]↩ GO BACK[/bold yellow] (Return to Main Menu)")
+                m_select = Prompt.ask("Choose option", choices=["1", "2"], default="1")
+                
+                if m_select == "2":
+                    console.print("[dim]Returning to main menu...[/dim]")
+                    continue  # Loops back to Choose Explanation Mode
+                else:
+                    ai_model = Prompt.ask(
+                        "Enter Ollama model name",
+                        default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
+                    )
+                    break
 
     # Automatically derive the folder name: (<Codebase folder-name>-EXPL)
     codebase_folder_name = current_cwd.name or "Codebase"

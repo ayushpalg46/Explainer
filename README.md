@@ -90,6 +90,16 @@ pip install -e .
      [2] AI Explanation (Local Ollama / Qwen Model)
    Select mode [1]:
    ```
+   * If you choose **[1]**: Runs immediately in 100% offline, zero-latency AST mode.
+   * If you choose **[2]**: Discovers your local Ollama models and presents:
+     ```text
+     Select Local AI Model:
+       [1] hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K ⭐ (Specialized Code Model)
+       [2] qwen35-uncensored:latest (Reasoning & Architecture)
+       [3] Enter another model name manually
+       [4] ↩ GO BACK (Return to Main Menu)
+     ```
+     Selecting `[4]` immediately returns you to the main menu without restarting!
 4. **Step 2: Automatic Multi-File Folder Generation**:
    The tool analyzes all files and creates a dedicated folder named:
    `📁 <Codebase_Folder_Name>-EXPL/`
