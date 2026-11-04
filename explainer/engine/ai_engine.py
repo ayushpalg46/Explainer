@@ -118,7 +118,7 @@ class AIExplainerEngine:
             f"Languages: {json.dumps(base_analysis.tech_stack.languages)}\n"
             f"Frameworks: {', '.join(base_analysis.tech_stack.frameworks)}\n"
             f"Interconnections: {len(base_analysis.interconnections)} cross-file dependencies.\n\n"
-            f"Provide an insightful 2-paragraph architectural appraisal."
+            f"Provide an insightful architectural appraisal in 2 concise paragraphs (under 150 words)."
         )
 
         try:
@@ -126,9 +126,13 @@ class AIExplainerEngine:
                 payload = {
                     "model": self.model_name,
                     "prompt": prompt,
-                    "stream": False
+                    "stream": False,
+                    "options": {
+                        "num_predict": 250,
+                        "temperature": 0.2
+                    }
                 }
-                res = requests.post(self.endpoint_url, json=payload, timeout=25)
+                res = requests.post(self.endpoint_url, json=payload, timeout=120)
                 if res.status_code == 200:
                     data = res.json()
                     return data.get("response", "").strip()
@@ -143,9 +147,10 @@ class AIExplainerEngine:
                         {"role": "system", "content": "You are an expert software codebase analyzer."},
                         {"role": "user", "content": prompt}
                     ],
-                    "temperature": 0.2
+                    "temperature": 0.2,
+                    "max_tokens": 250
                 }
-                res = requests.post(url, json=payload, timeout=25)
+                res = requests.post(url, json=payload, timeout=120)
                 if res.status_code == 200:
                     data = res.json()
                     choices = data.get("choices", [])
