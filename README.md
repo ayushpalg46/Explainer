@@ -1,51 +1,133 @@
-# 🔍 CodeExplainer - Dual-Engine Codebase & File Explainer
+# 🔍 CodeExplainer (`expl`)
 
-An advanced, pedagogical code intelligence and explanation engine that delivers comprehensive architectural dossiers, tech stack compatibility evaluations, cross-file interconnection graphs, and deep file-by-file breakdowns across 11+ programming languages and frameworks.
+> **Deep Codebase & Per-File Architecture Intelligence Engine**  
+> *Explaining code line-by-line and word-by-word for beginners and 4-year-olds with real-world analogies.*
 
-Designed with a **Dual-Engine Architecture**:
-- ⚡ **Pure Knowledge & AST Engine (Zero-AI Mode)**: 100% deterministic, offline, and instant. Analyzes syntax trees, language grammar, and design patterns, cross-referencing an exhaustive built-in semantic knowledge dictionary to produce elaborated, high-fidelity explanations without needing an AI model.
-- 🧠 **Local AI Engine**: Seamlessly connects to local LLMs (Ollama, LM Studio, or local GGUF models) to provide conversational synthesis while anchoring all facts to ground-truth AST data.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://python.org)
+[![Tests: 19 Passed](https://img.shields.io/badge/Tests-19%20Passed-success.svg)](tests/)
 
 ---
 
-## 🌟 Key Capabilities
+## 🌟 What is CodeExplainer?
 
-### 1. High-Level Architecture & Tech Stack Ecosystem
-- **Architectural Style Classification**: Identifies SPA, Microservices, Decoupled Client-Server, MVC, Systems Engineering, and Cloud Native architectures.
-- **Tech Stack Compatibility**: Analyzes language versions, build tools, package managers, and container configurations, explaining how the stack layers collaborate.
-- **Subsystem & Directory Mapping**: Classifies directory roles (`components/`, `routes/`, `models/`, `utils/`, `tests/`, etc.).
+**CodeExplainer** is a developer tool and learning engine that breaks down any software codebase into plain, beginner-friendly explanations. Whether you are an absolute beginner who has never touched code or a developer trying to understand a massive unfamiliar project, CodeExplainer reads every single file in your repository and explains what is written **line-by-line, word-by-word, and tag-by-tag**.
 
-### 2. Deep File-by-File Explainer (11+ Supported Languages)
-For every file in the codebase, CodeExplainer breaks down:
-- **Language, Size & Role**: Core function within the repository.
-- **Summary & Purpose**: Multi-paragraph executive summary.
-- **Concepts & Design Patterns**: Detected patterns (e.g. Hooks, Object-Oriented, Immutability, Reactive Streams, Concurrency).
-- **Styling & Motion Details**: Flexbox/Grid layouts, design tokens, keyframe animations, Canvas/WebGL rendering.
-- **Exhaustive Element Breakdown**: Every tag, component, hook, class, directive, and function explained across 5 critical dimensions:
-  1. **What It Is**: Architectural & technical definition.
-  2. **How It's Used**: Syntactic usage and execution context.
-  3. **Where It's Used**: Line numbers and file references.
-  4. **Why It Works**: Underlying runtime mechanics (e.g. DOM/CSSOM, React Fiber, JVM bytecode, LLVM machine code).
-  5. **Best Practices & Pitfalls**: Production recommendations and caveats.
+It operates under the persona of a **World-Class Senior Developer & Master System Architect** who translates complex software concepts into fun, vivid real-world analogies (toys, Lego blocks, kitchen blenders, doorbell buttons, and helpful robot assistants).
 
-| Language / Format | Covered Constructs & Features |
+---
+
+## ⚡ Dual-Engine Parity
+
+CodeExplainer offers two distinct execution engines that produce the **exact same standardized line-by-line format**:
+
+1. **Option 1: Without-AI Explanation (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [Default]**
+   - ⚡ **Zero-Latency & Instant**: Runs 100% locally and offline without needing an internet connection, GPU, or AI model.
+   - 🎯 **AST Grammar & Semantic Catalog**: Extracts exact code lines, attributes, properties, functions, and cross-file dependencies with mathematical precision.
+   - 🧸 **Deep Pedagogical Catalog**: Powered by an extensive semantic dictionary containing 4-year-old analogies, screen outcomes, and failure consequences.
+
+2. **Option 2: Local AI Explanation (Local Ollama / Qwen2.5-Coder Model)**
+   - 🧠 **Authentic Neural Intelligence**: Auto-detects and connects to your local Ollama models (e.g. `Qwen2.5-Coder-7B` or `Qwen3.5`).
+   - 🎓 **Senior Developer (ELI4) Prompt**: Instructed to analyze every file line-by-line and word-by-word using the exact standardized template.
+   - 🛡️ **Zero Cloud Dependency**: Runs entirely on your local machine with full data privacy.
+
+---
+
+## 📖 The Standard Output Format
+
+Every single file in your codebase receives an explanation structured in this exact standard template:
+
+```markdown
+#### 🧸 1. The Big Picture Story (What is this code?)
+
+│ "Imagine this code is a real physical toy box sitting on a stage. It puts down an empty box on the floor (<div>), paints a big sign above it that says 'My Toy Box' (<h1>), and puts a shiny red doorbell button on the front (<button>). Then it calls the painter (style.css) to paint it with colors, and hires an invisible robot assistant (app.js) to open the box whenever someone presses the doorbell!"
+──────
+#### 🔍 2. Line-by-Line & Word-by-Word Breakdown
+
+#### Line 1: <div id="root" class="container">
+
+• What is written?: A <div> tag with 2 label(s): id="root" and class="container".
+• What does every word mean?:
+    • div: Short for "division". An invisible cardboard box used to bundle things together.
+    • id="root": A unique name-tag (like a personal ID card). There is only one "root" box in the whole world.
+    • class="container": A style group label / costume label. It tells CSS: "Treat this like a container box."
+• 🧸 4-Year-Old Analogy: Think of this like setting down an empty laundry basket before you put clothes in it.
+• 🖥️ What happens on screen?: Nothing visible yet! It creates an invisible box on a new line where child elements will sit.
+• 🔗 Interconnection with other files:
+    • app.js searches for this exact box using document.getElementById('root') to place the app inside it.
+    • style.css uses .container to apply styling and layout rules.
+• 💥 What breaks if deleted?: The title and button lose their container, spill across the screen, and the JavaScript code crashes because it cannot find "root".
+──────
+#### Line 2: <h1 class="title">My Toy Box</h1>
+
+• What is written?: An <h1> heading with the text "My Toy Box".
+• What does every word mean?:
+    • h1: "Heading 1" — the biggest, most important title on the page.
+    • class="title": A style group label / costume label. It tells CSS: "Treat this like a title box."
+    • "My Toy Box": The actual words displayed to the user.
+• 🧸 4-Year-Old Analogy: Like the big colorful title on the front cover of a storybook.
+• 🖥️ What happens on screen?: Big, bold text appears on the screen reading: My Toy Box.
+• 💥 What breaks if deleted?: Visitors won't see any title and won't know what this page is for.
+──────
+#### Line 3: <button class="btn-magic" onclick="openBox()">Open Box!</button>
+
+• What is written?: A clickable button that runs openBox().
+• What does every word mean?:
+    • button: An interactive push-button.
+    • class="btn-magic": A style group label / costume label. It tells CSS: "Treat this like a btn-magic box."
+    • onclick="openBox()": An "ear" listening for clicks. The moment a finger or mouse clicks this button, it shouts: "Robot, run the openBox recipe now!"
+    • "Open Box!": The actual words displayed to the user.
+• 🧸 4-Year-Old Analogy: Like a doorbell on a front door. When you push it, the bell rings inside the house!
+• 🖥️ What happens on screen?: Renders a clickable rectangular button that sinks slightly when clicked.
+• 🔗 Interconnection with other files:
+    • Directly triggers the openBox() function written inside connected JavaScript files.
+• 💥 What breaks if deleted?: Users have no way to open the box or trigger the action.
+──────
+#### Line 5: <link rel="stylesheet" href="style.css">
+
+• What is written?: A link tag importing style.css.
+• What does every word mean?:
+    • link: Connects an outside file to this HTML page.
+    • rel="stylesheet": Tells the browser: "This outside file contains stylesheet rules."
+    • href="style.css": The address of the linked resource: "style.css".
+• 🧸 4-Year-Old Analogy: Like calling the painter: "Please bring your paint cans and dress up my toy box!"
+• 🖥️ What happens on screen?: The plain black-and-white page transforms into beautiful colors, fonts, and shadows.
+• 🔗 Interconnection with other files:
+    • Pulls all design rules, colors, and fonts from style.css.
+• 💥 What breaks if deleted?: All colors, fonts, centering, and button designs vanish, leaving bare, ugly text.
+──────
+#### Line 6: <script src="app.js"></script>
+
+• What is written?: A script tag loading the JavaScript code from app.js.
+• What does every word mean?:
+    • script: Tells the browser: "Here is a book of code instructions."
+    • src="app.js": The file path where the brain code lives: "app.js".
+• 🧸 4-Year-Old Analogy: Like inserting the batteries and brain chip into a toy robot so it can move and talk!
+• 🖥️ What happens on screen?: Invisible on screen, but gives the page life so clicks actually do things.
+• 🔗 Interconnection with other files:
+    • Directly loads and executes the JavaScript code inside app.js.
+• 💥 What breaks if deleted?: The page is frozen like a statue. Clicking the button does absolutely nothing.
+──────
+```
+
+---
+
+## 🛠️ Supported Languages & Manifests
+
+CodeExplainer extracts exact code lines and builds word-by-word dictionaries across all major development stacks:
+
+| Language / Filetype | What Gets Explained Line-by-Line |
 | :--- | :--- |
-| **HTML (`.html`, `.htm`)** | All HTML5 tags (`<main>`, `<header>`, `<nav>`, `<form>`, `<canvas>`, etc.), meta tags, SEO, accessibility hooks (`aria-*`, `role`), SPA anchors (`#root`), asset links. |
-| **CSS (`.css`, `.scss`)** | Flexbox, CSS Grid, media query breakpoints, CSS custom properties (variables), `@keyframes` animations, transitions, utility frameworks (Tailwind). |
-| **JavaScript / TypeScript (`.js`, `.ts`)** | Imports/exports, module resolution, Promises, async/await, API fetch pipelines, type interfaces. |
-| **React (`.jsx`, `.tsx`)** | Components, props, Virtual DOM reconciliation, React Hooks (`useState`, `useEffect`, `useMemo`, `useCallback`, `useRef`, `useContext`, custom hooks). |
-| **Python (`.py`)** | AST-parsed classes, inheritance, decorators, functions, type hints, docstrings, frameworks (FastAPI, Flask, Django, Pydantic). |
-| **Rust (`.rs`)** | Structs, enums, traits, `impl` blocks, macros, ownership, lifetimes, `Result`/`Option` error handling. |
-| **Java (`.java`)** | Classes, interfaces, packages, annotations (`@RestController`, `@Service`, `@Autowired`), Spring Boot patterns. |
-| **Go (`.go`)** | Packages, structs, interfaces, methods, goroutines, channels, HTTP handlers. |
-| **Docker (`Dockerfile`, `compose.yml`)** | Multi-stage builds, base images (`FROM`), layer caching (`COPY`, `RUN`), ports (`EXPOSE`), volumes, entrypoints. |
-| **Shell (`.sh`, `.bash`, `.zsh`)** | Shebangs, safety flags (`set -euo pipefail`), pipes, loops, traps, external CLI orchestration. |
-
-### 3. Cross-File Interconnection Graph (How & Why Files Connect)
-Maps all dependencies across your project:
-- Resolves relative imports, stylesheet links, script tags, Docker context copies, and shell execution links.
-- Explains **HOW** the files communicate technically (e.g. module imports, HTTP endpoints, CSSOM cascade).
-- Explains **WHY** the interconnection exists architecturally (e.g. separation of concerns, presentation vs state, environment parity).
+| **HTML (`.html`, `.htm`)** | Tags (`<html>`, `<head>`, `<body>`, `<div>`, `<span>`, `<h1>-<h6>`, `<button>`, `<canvas>`, `<a>`, `<img>`), attributes (`id`, `class`, `src`, `href`, `rel`, `onclick`), inner text. |
+| **CSS (`.css`, `.scss`)** | Selectors (`.class`, `#id`, `:root`, `element`), properties (`display: flex`, `grid`, `background`, `padding`, `margin`, `border-radius`, custom `--variables`), `@keyframes` animations, `@media` queries. |
+| **JavaScript / TypeScript / React (`.js`, `.jsx`, `.ts`, `.tsx`)** | ES module imports/exports, components, JSX tags, React hooks (`useState`, `useEffect`), event handlers (`onClick`), functions, async/await flows. |
+| **Python (`.py`)** | Imports, classes, `@dataclass`, functions, parameters, return types, main execution guards (`if __name__ == '__main__':`). |
+| **Go (`.go`)** | Package clauses, imports, composite structs, interfaces, methods, functions, goroutines (`go ...`), channels (`chan`). |
+| **Rust (`.rs`)** | `use` declarations, modules, structs, enums, traits, functions, ownership/borrowing mechanics, Tokio async tasks. |
+| **Java (`.java`)** | Package namespaces, imports, annotations (`@SpringBootApplication`, `@Service`, `@RestController`), classes, methods. |
+| **Dockerfile & Docker Compose** | Build directives (`FROM`, `WORKDIR`, `COPY`, `RUN`, `EXPOSE`, `CMD`, `ENTRYPOINT`), microservice definitions, ports, volumes, environment links. |
+| **Shell Scripts (`.sh`, `.bash`, `.zsh`)** | Shebang lines (`#!/usr/bin/env bash`), strict safety flags (`set -euo pipefail`), sourced scripts, functions, CLI tools (`docker`, `python`, `npm`, `curl`, `mkdir`). |
+| **Manifests & Config (`package.json`, `requirements.txt`, `.env`)** | npm scripts, production & dev dependencies, pinned Python libraries, environment secrets, YAML/TOML settings, Markdown headers. |
 
 ---
 
@@ -58,120 +140,107 @@ Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/ayushpalg46/Explainer.git
 cd Explainer
-pip install -r requirements.txt
-```
-
-Or install in editable mode:
-
-```bash
 pip install -e .
 ```
 
+This registers the global CLI command `expl` in your PATH.
+
 ---
 
-## 🖥 Usage
+## 🖥 How to Use It
 
-### 1. Interactive Workflow with `expl` Command (Recommended)
+### The Interactive CLI (`expl`)
 
-1. Open **CMD** or **PowerShell** inside any codebase folder:
+1. Open **CMD** or **PowerShell** and navigate to your codebase directory:
    ```bash
-   cd path/to/your/codebase
+   cd D:\my-awesome-project
    ```
-2. Type and run:
+
+2. Run the command:
    ```bash
    expl
    ```
-   *(or `EXPL` / `explainer`)*
 
-3. **Step 1: Choose Mode** (Default: `[1]`):
+3. **Step 1: Choose Explanation Mode** (Default: `[1]`):
    ```text
    Choose Explanation Mode:
      [1] Without-AI Explanation (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [Default]
      [2] AI Explanation (Local Ollama / Qwen Model)
    Select mode [1]:
    ```
-   * If you choose **[1]**: Runs immediately in 100% offline, zero-latency AST mode.
-   * If you choose **[2]**: Discovers your local Ollama models and presents:
-     ```text
-     Select Local AI Model:
-       [1] hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K ⭐ (Specialized Code Model)
-       [2] qwen35-uncensored:latest (Reasoning & Architecture)
-       [3] Enter another model name manually
-       [4] ↩ GO BACK (Return to Main Menu)
-     ```
-     Selecting `[4]` immediately returns you to the main menu without restarting!
-4. **Step 2: Automatic Multi-File Folder Generation**:
-   The tool analyzes all files and creates a dedicated folder named:
-   `📁 <Codebase_Folder_Name>-EXPL/`
-   Containing:
-   * `files/<filename>.md`: **Individual, exhaustive explanation document for each file in the codebase** (tags, symbols, functions, hooks, and how/why connections).
-   * `INDEX.md`: Master architecture index, tech stack compatibility, directory roles, and Mermaid dependency graph.
-   * `dashboard.html`: Interactive visual web GUI with draggable network graph.
-   * `FULL_REPORT.md`: Consolidated single-file dossier.
+   - Press **Enter** to run in instant, zero-latency Without-AI mode.
+   - Or press **2** to select from your installed local Ollama models (with an option `[4] ↩ GO BACK` to return to the menu).
 
-5. **Step 3: Choose How to View** (Default: `[1]`):
+4. **Step 2: Existing Folder Handling (Safe & Clean Updates)**:
+   If `<Codebase>-EXPL` already exists from a previous run, the tool prompts you:
+   ```text
+   Folder 'my-awesome-project-EXPL' already exists! Choose an action:
+     [1] Update & refresh existing folder (Default / Clean update)
+     [2] Create a new timestamped folder (Keep both)
+   Select option [1]:
+   ```
+   - **Option 1**: Cleans any deleted files and refreshes the dossier in-place.
+   - **Option 2**: Preserves your existing folder and creates a timestamped archive (e.g. `my-awesome-project-EXPL_20261104_120000`).
+
+5. **Step 3: Dedicated Multi-File Output Generation**:
+   The tool analyzes the codebase and generates:
+   ```text
+   📁 <Codebase_Name>-EXPL/
+   ├── 📁 files/
+   │   ├── index.html.md    <-- Dedicated line-by-line breakdown of index.html
+   │   ├── style.css.md     <-- Dedicated line-by-line breakdown of style.css
+   │   ├── app.jsx.md       <-- Dedicated line-by-line breakdown of app.jsx
+   │   ├── server.py.md     <-- Dedicated line-by-line breakdown of server.py
+   │   └── Dockerfile.md    <-- Dedicated line-by-line breakdown of Dockerfile
+   ├── INDEX.md             <-- Architecture summary & file catalog with links
+   ├── FULL_REPORT.md       <-- Consolidated comprehensive dossier
+   └── dashboard.html       <-- Interactive web GUI with dependency network graph
+   ```
+
+6. **Step 4: Choose How to View** (Default: `[1]`):
    ```text
    ✔ Work has been done successfully!
-   📁 Created Folder: <Codebase_Folder_Name>-EXPL
+   📁 Folder: my-awesome-project-EXPL
 
    How would you like to view the explanation?
      [1] Want To See In Codebase Files Explanation In CLI [Default]
      [2] Want To See In Codebase Files Explanation In Webpage (GUI)
    Choose view format [1]:
    ```
-   * **Option 1 (CLI)**: Displays the project overview and an interactive file selector to inspect any file's deep tags and symbols directly in your terminal.
-   * **Option 2 (Webpage GUI)**: Automatically launches `dashboard.html` in your default web browser!
+   - **Option 1 (CLI)**: Displays styled cards and an interactive file selector directly in your terminal.
+   - **Option 2 (Webpage GUI)**: Automatically launches `dashboard.html` in your default web browser!
 
 ---
 
-### 2. Direct Command-Line Execution
+## 💻 CLI Flags (Non-Interactive / Scripting Mode)
 
-#### Run with Pure Static Engine (Zero-AI, Fast & Deterministic):
+You can also run CodeExplainer via direct command-line flags:
+
 ```bash
+# Run Without-AI analysis and generate markdown, HTML, and terminal output
 python -m explainer.cli analyze ./my-project --mode static --format all
+
+# Run with Local AI (Ollama)
+python -m explainer.cli analyze ./my-project --mode ai --ai-model qwen2.5-coder:7b --format all
+
+# Inspect a single file directly in terminal
+python -m explainer.cli analyze ./my-project --inspect index.html --format terminal
 ```
-
-#### Run with Local AI Model (Ollama):
-```bash
-python -m explainer.cli analyze ./my-project --mode ai --ai-provider ollama --ai-model llama3 --format all
-```
-
-#### Run with LM Studio or Local OpenAI-Compatible Server:
-```bash
-python -m explainer.cli analyze ./my-project --mode ai --ai-provider openai_compatible --ai-endpoint http://localhost:1234/v1 --ai-model local-model --format all
-```
-
-#### Inspect a Specific File in Terminal:
-```bash
-python -m explainer.cli analyze ./my-project --inspect src/App.jsx --format terminal
-```
-
----
-
-## 📊 Output Formats
-
-1. **Rich Terminal Interface**:
-   - Styled cards, color-coded tables, and formatted pedagogical descriptions directly in your terminal.
-2. **Markdown Dossier (`EXPLAINER_REPORT.md`)**:
-   - Complete GitHub-flavored Markdown document with Mermaid architecture flowcharts, tables, and section anchors.
-3. **Interactive Visual Dashboard (`explainer_dashboard.html`)**:
-   - 100% self-contained single-file HTML report.
-   - Interactive Network Dependency Graph (zoom, pan, drag, click to highlight inbound/outbound links).
-   - Sidebar file tree with live search & filtering.
-   - Tabbed inspector for Architecture, Dependency Graph, and granular Element Tables.
 
 ---
 
 ## 🧪 Running Automated Tests
 
-Run the test suite using Python's standard `unittest`:
+Run the full automated test suite (19 unit & integration tests):
 
 ```bash
-python -m unittest discover tests
+pytest tests/ -v
 ```
+
+All 19 tests pass in under 1 second.
 
 ---
 
 ## 📄 License
 
-MIT License. Designed and developed with care.
+This project is licensed under the [MIT License](LICENSE).
