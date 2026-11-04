@@ -1,133 +1,140 @@
-# ⚡ Explainer: Dual-Engine Codebase & Deep File Architecture Analysis Tool
+# 🔍 CodeExplainer - Dual-Engine Codebase & File Explainer
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Engine: Dual](https://img.shields.io/badge/Engine-Zero--AI%20%7C%20Local%20LLM-emerald.svg)](#dual-engine-architecture)
+An advanced, pedagogical code intelligence and explanation engine that delivers comprehensive architectural dossiers, tech stack compatibility evaluations, cross-file interconnection graphs, and deep file-by-file breakdowns across 11+ programming languages and frameworks.
 
-**Explainer** is a high-precision, deep-dive software intelligence engine that analyzes, dissects, and explains entire codebases and individual files in exhaustive pedagogical detail.
-
-It uncovers architecture styles, audits tech stack compatibility, generates cross-file interconnection graphs explaining **HOW** and **WHY** files connect, and inspects every element, tag, symbol, and design concept across **all major programming formats** (`.html`, `.css`, `.js`, `.jsx`, `.ts`, `.tsx`, `.py`, `.rs`, `.java`, `.go`, `Dockerfile`, `.sh`).
+Designed with a **Dual-Engine Architecture**:
+- ⚡ **Pure Knowledge & AST Engine (Zero-AI Mode)**: 100% deterministic, offline, and instant. Analyzes syntax trees, language grammar, and design patterns, cross-referencing an exhaustive built-in semantic knowledge dictionary to produce elaborated, high-fidelity explanations without needing an AI model.
+- 🧠 **Local AI Engine**: Seamlessly connects to local LLMs (Ollama, LM Studio, or local GGUF models) to provide conversational synthesis while anchoring all facts to ground-truth AST data.
 
 ---
 
-## 🌟 Key Highlights
+## 🌟 Key Capabilities
 
-### 1. Dual-Engine Parity Workflow
-Explainer gives users the choice between two operating modes with **identical analytical depth**:
-- ⚡ **Pure Knowledge & AST Engine (Zero-AI Deterministic Mode)**:
-  - 100% Offline, instantaneous, zero GPU/VRAM requirement.
-  - Pure grammar parsing, tokenizer, and deterministic architectural rule engine.
-  - Generates the exact same rich, exhaustive breakdown as an AI model.
-- 🧠 **Local AI Brain Mode**:
-  - Connects to local Ollama models (`qwen35-uncensored`, `qwen2.5-coder`, `llama3`, etc.) or LM Studio / local OpenAI-compatible endpoints.
-  - Synthesizes conversational summaries and contextual analogies.
+### 1. High-Level Architecture & Tech Stack Ecosystem
+- **Architectural Style Classification**: Identifies SPA, Microservices, Decoupled Client-Server, MVC, Systems Engineering, and Cloud Native architectures.
+- **Tech Stack Compatibility**: Analyzes language versions, build tools, package managers, and container configurations, explaining how the stack layers collaborate.
+- **Subsystem & Directory Mapping**: Classifies directory roles (`components/`, `routes/`, `models/`, `utils/`, `tests/`, etc.).
 
----
+### 2. Deep File-by-File Explainer (11+ Supported Languages)
+For every file in the codebase, CodeExplainer breaks down:
+- **Language, Size & Role**: Core function within the repository.
+- **Summary & Purpose**: Multi-paragraph executive summary.
+- **Concepts & Design Patterns**: Detected patterns (e.g. Hooks, Object-Oriented, Immutability, Reactive Streams, Concurrency).
+- **Styling & Motion Details**: Flexbox/Grid layouts, design tokens, keyframe animations, Canvas/WebGL rendering.
+- **Exhaustive Element Breakdown**: Every tag, component, hook, class, directive, and function explained across 5 critical dimensions:
+  1. **What It Is**: Architectural & technical definition.
+  2. **How It's Used**: Syntactic usage and execution context.
+  3. **Where It's Used**: Line numbers and file references.
+  4. **Why It Works**: Underlying runtime mechanics (e.g. DOM/CSSOM, React Fiber, JVM bytecode, LLVM machine code).
+  5. **Best Practices & Pitfalls**: Production recommendations and caveats.
 
-### 2. Supported File Formats & Deep Per-File Inspection
-
-| File Format | Exhaustive Analysis Capabilities |
+| Language / Format | Covered Constructs & Features |
 | :--- | :--- |
-| **`.html`** | All HTML5 tags, semantic landmarks (`<main>`, `<nav>`, `<header>`), forms, media, `<link>` stylesheets, `<script>` module invocations, SPA root mount points (`#root`), responsive viewport meta, ARIA accessibility attributes, and DOM tree construction. |
-| **`.css`** | CSS variables / design tokens (`:root`), Flexbox one-dimensional flow, CSS Grid two-dimensional layouts, `@keyframes` motion sequences, responsive `@media` query breakpoints, and UI framework class detection. |
-| **`.js` / `.jsx` / `.ts` / `.tsx`** | ES6 module imports/exports, React component hierarchies, React Hooks (`useState`, `useEffect`, `useContext`), state updates, props flow, JSX render trees, and client-side `fetch` / `axios` API calls. |
-| **`.py`** | Full Python AST parsing: classes, inheritance, functions, async coroutines, decorators, Pydantic schemas, and web framework route decorators (`@app.get(...)`). |
-| **`.rs`** | Rust crates, `use` declarations, structs, enums, traits, `impl` blocks, `tokio` async runtimes, and thread-safe concurrency primitives (`Arc`, `Mutex`). |
-| **`.java`** | Package namespaces, class hierarchies, interfaces, methods, and enterprise annotations (`@SpringBootApplication`, `@RestController`, `@Autowired`). |
-| **`.go`** | Go packages, structs, interfaces, methods, receiver functions, CSP concurrency (`go` routines, `chan` channels), and HTTP handlers. |
-| **`Dockerfile`** | Multi-stage build pipelines, base images (`FROM`), layer caching (`COPY`, `RUN`), port exposures (`EXPOSE`), entrypoints (`ENTRYPOINT`, `CMD`), and container security best practices. |
-| **`.sh`** | Shebang interpreters, strict safety flags (`set -euo pipefail`), functions, environment variable exports, CLI tool invocations, and command pipelines. |
+| **HTML (`.html`, `.htm`)** | All HTML5 tags (`<main>`, `<header>`, `<nav>`, `<form>`, `<canvas>`, etc.), meta tags, SEO, accessibility hooks (`aria-*`, `role`), SPA anchors (`#root`), asset links. |
+| **CSS (`.css`, `.scss`)** | Flexbox, CSS Grid, media query breakpoints, CSS custom properties (variables), `@keyframes` animations, transitions, utility frameworks (Tailwind). |
+| **JavaScript / TypeScript (`.js`, `.ts`)** | Imports/exports, module resolution, Promises, async/await, API fetch pipelines, type interfaces. |
+| **React (`.jsx`, `.tsx`)** | Components, props, Virtual DOM reconciliation, React Hooks (`useState`, `useEffect`, `useMemo`, `useCallback`, `useRef`, `useContext`, custom hooks). |
+| **Python (`.py`)** | AST-parsed classes, inheritance, decorators, functions, type hints, docstrings, frameworks (FastAPI, Flask, Django, Pydantic). |
+| **Rust (`.rs`)** | Structs, enums, traits, `impl` blocks, macros, ownership, lifetimes, `Result`/`Option` error handling. |
+| **Java (`.java`)** | Classes, interfaces, packages, annotations (`@RestController`, `@Service`, `@Autowired`), Spring Boot patterns. |
+| **Go (`.go`)** | Packages, structs, interfaces, methods, goroutines, channels, HTTP handlers. |
+| **Docker (`Dockerfile`, `compose.yml`)** | Multi-stage builds, base images (`FROM`), layer caching (`COPY`, `RUN`), ports (`EXPOSE`), volumes, entrypoints. |
+| **Shell (`.sh`, `.bash`, `.zsh`)** | Shebangs, safety flags (`set -euo pipefail`), pipes, loops, traps, external CLI orchestration. |
+
+### 3. Cross-File Interconnection Graph (How & Why Files Connect)
+Maps all dependencies across your project:
+- Resolves relative imports, stylesheet links, script tags, Docker context copies, and shell execution links.
+- Explains **HOW** the files communicate technically (e.g. module imports, HTTP endpoints, CSSOM cascade).
+- Explains **WHY** the interconnection exists architecturally (e.g. separation of concerns, presentation vs state, environment parity).
 
 ---
 
-### 3. Cross-File Interconnection Graph (HOW & WHY It Works)
-Explainer maps every relationship between files across the codebase and answers two critical questions for every connection:
-- **HOW it works**: The syntactic mechanism (e.g. `<link rel="stylesheet">`, ES module import, Docker `COPY`, API route binding).
-- **WHY it works**: The architectural rationale (e.g. separation of presentation from content, reusable component composition, container environment isolation).
+## 🚀 Quick Start
 
----
+### Installation
 
-### 4. Multi-Channel Output System
-1. 🖥️ **Interactive Terminal UI**: High-fidelity formatted tables, architecture overview cards, and color-coded status badges via `rich`.
-2. 📝 **Comprehensive Markdown Report (`EXPLAINER_REPORT.md`)**: Complete technical dossier with embedded Mermaid dependency graphs.
-3. 🌐 **Interactive Web Dashboard (`explainer_dashboard.html`)**: Self-contained, responsive single-page web application with interactive draggable network graphs, live search, and file detail drawers.
+Clone the repository and install dependencies:
 
----
-
-## 🚀 Installation & Quick Start
-
-### Prerequisites
-- Python 3.9+
-- (Optional for AI mode): Ollama or local LLM server
-
-### Clone & Install
 ```bash
 git clone https://github.com/ayushpalg46/Explainer.git
 cd Explainer
+pip install -r requirements.txt
+```
+
+Or install in editable mode:
+
+```bash
 pip install -e .
-```
-
-### Run Explainer
-
-#### 1. Interactive Wizard
-Simply run:
-```bash
-explainer
-# or
-python -m explainer.cli
-```
-The interactive wizard will guide you through choosing:
-1. Target codebase path
-2. Engine mode (Pure Knowledge AST Engine vs Local AI Model)
-3. Output format (Terminal, Markdown, HTML Dashboard, or All)
-
-#### 2. Direct CLI Commands
-```bash
-# Scan a codebase using deterministic Zero-AI mode and generate all reports
-explainer scan ./samples --mode static --format all
-
-# Inspect an individual file in deep detail
-explainer scan ./samples --inspect app.jsx
-
-# Connect to local Ollama model
-explainer scan ./samples --mode ai --ai-provider ollama --ai-model qwen35-uncensored:latest
-
-# Run automated tests
-pytest tests/ -v
 ```
 
 ---
 
-## 📂 Project Structure
+## 🖥 Usage
 
+### 1. Interactive Wizard Mode (Recommended)
+Simply run without arguments to launch the step-by-step interactive configuration prompt:
+
+```bash
+python -m explainer.cli
+# or if installed via pip:
+explainer
 ```
-Explainer/
-├── explainer/
-│   ├── cli.py                     # CLI entrypoint & interactive wizard
-│   ├── models.py                  # Pydantic data schemas
-│   ├── scanner/                   # Workspace scanner & tech stack detector
-│   ├── parsers/                   # Multi-language AST & token parsers
-│   │   ├── html_parser.py         # HTML semantic tag & accessibility parser
-│   │   ├── css_parser.py          # CSS design tokens, Flexbox & Grid parser
-│   │   ├── js_ts_parser.py        # JavaScript / TypeScript / React parser
-│   │   ├── python_parser.py       # Python AST & framework parser
-│   │   ├── rust_parser.py         # Rust struct, trait & concurrency parser
-│   │   ├── java_parser.py         # Java class, interface & Spring parser
-│   │   ├── go_parser.py           # Go struct, interface & goroutine parser
-│   │   ├── docker_parser.py       # Dockerfile multi-stage & security parser
-│   │   ├── shell_parser.py        # Shell script pipeline & flag parser
-│   │   └── generic_parser.py      # Config, JSON, YAML, SQL parser
-│   ├── graph/                     # Cross-file dependency & interconnection builder
-│   ├── engine/                    # Dual analysis engines (Rule/AST + Local AI)
-│   ├── knowledge/                 # Pedagogical technical catalog & rulebook
-│   └── renderers/                 # Terminal, Markdown & HTML Dashboard generators
-├── samples/                       # Demonstration multi-language test codebase
-├── tests/                         # Comprehensive unit & integration tests
-├── pyproject.toml                 # Package configuration
-└── setup.py                       # Packaging script
+
+The wizard will guide you to:
+1. Enter your target codebase directory or file path.
+2. Select your engine: **[1] Pure Knowledge/AST Engine (Zero-AI)** or **[2] Local AI Model**.
+3. Choose your output format: **Terminal**, **Markdown**, **HTML Dashboard**, or **All**.
+
+---
+
+### 2. Direct Command-Line Execution
+
+#### Run with Pure Static Engine (Zero-AI, Fast & Deterministic):
+```bash
+python -m explainer.cli analyze ./my-project --mode static --format all
+```
+
+#### Run with Local AI Model (Ollama):
+```bash
+python -m explainer.cli analyze ./my-project --mode ai --ai-provider ollama --ai-model llama3 --format all
+```
+
+#### Run with LM Studio or Local OpenAI-Compatible Server:
+```bash
+python -m explainer.cli analyze ./my-project --mode ai --ai-provider openai_compatible --ai-endpoint http://localhost:1234/v1 --ai-model local-model --format all
+```
+
+#### Inspect a Specific File in Terminal:
+```bash
+python -m explainer.cli analyze ./my-project --inspect src/App.jsx --format terminal
+```
+
+---
+
+## 📊 Output Formats
+
+1. **Rich Terminal Interface**:
+   - Styled cards, color-coded tables, and formatted pedagogical descriptions directly in your terminal.
+2. **Markdown Dossier (`EXPLAINER_REPORT.md`)**:
+   - Complete GitHub-flavored Markdown document with Mermaid architecture flowcharts, tables, and section anchors.
+3. **Interactive Visual Dashboard (`explainer_dashboard.html`)**:
+   - 100% self-contained single-file HTML report.
+   - Interactive Network Dependency Graph (zoom, pan, drag, click to highlight inbound/outbound links).
+   - Sidebar file tree with live search & filtering.
+   - Tabbed inspector for Architecture, Dependency Graph, and granular Element Tables.
+
+---
+
+## 🧪 Running Automated Tests
+
+Run the test suite using Python's standard `unittest`:
+
+```bash
+python -m unittest discover tests
 ```
 
 ---
 
 ## 📄 License
-MIT License. Free for open-source and commercial use.
+
+MIT License. Designed and developed with care.
