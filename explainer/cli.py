@@ -1,6 +1,5 @@
 import os
 import sys
-import webbrowser
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -18,7 +17,6 @@ from .engine.rule_engine import RuleExplainerEngine
 from .engine.ai_engine import AIExplainerEngine
 from .renderers.rich_terminal import RichTerminalRenderer
 from .renderers.markdown_renderer import MarkdownRenderer
-from .renderers.html_dashboard import HtmlDashboardRenderer
 
 console = Console()
 
@@ -146,11 +144,6 @@ def interactive_wizard():
         md_renderer = MarkdownRenderer()
         generated_files = md_renderer.render_multi_file_dossier(codebase_analysis, str(expl_output_dir))
 
-        # Generate HTML Dashboard inside the folder
-        html_renderer = HtmlDashboardRenderer()
-        html_path = expl_output_dir / "dashboard.html"
-        html_renderer.render(codebase_analysis, str(html_path))
-
     # 4. Notify user work has been done
     file_count = len(codebase_analysis.files)
     console.print()
@@ -159,25 +152,14 @@ def interactive_wizard():
     console.print(f"[bold cyan] 📁 Created Folder:[/bold cyan] [bold white]{expl_folder_name}[/bold white]")
     console.print(f"[dim]    • Generated separate detailed explanations for each of the {file_count} files in:[/dim] [white]{expl_folder_name}/files/[/white]")
     console.print(f"[dim]    • Generated Master Architecture Index in:[/dim] [white]{expl_folder_name}/INDEX.md[/white]")
-    console.print(f"[dim]    • Generated Interactive Visual Web GUI in:[/dim] [white]{expl_folder_name}/dashboard.html[/white]")
     console.print("[bold green]════════════════════════════════════════════════════════════════════[/bold green]")
     console.print()
 
-    # 5. Second Prompt: Choose how to view (Default: 1)
-    console.print("[bold yellow]How would you like to view the explanation?[/bold yellow]")
-    console.print("  [cyan][1][/cyan] [bold]Want To See In Codebase Files Explanation In CLI[/bold] [bold green][Default][/bold green]")
-    console.print("  [cyan][2][/cyan] [bold]Want To See In Codebase Files Explanation In Webpage (GUI)[/bold]")
-    view_choice = Prompt.ask("Choose view format", choices=["1", "2"], default="1")
-
-    if view_choice == "1":
-        # Interactive CLI Viewer
-        terminal_renderer = RichTerminalRenderer()
-        terminal_renderer.render(codebase_analysis, inspect_file=None)
-        run_cli_file_inspector(codebase_analysis)
-    else:
-        # Open in Web Browser
-        console.print(f"\n[bold green]🌐 Opening Webpage GUI in your default browser...[/bold green]")
-        webbrowser.open(html_path.resolve().as_uri())
+    # 5. Launch CLI Viewer directly
+    console.print("[bold cyan]🔍 Opening Codebase Explanation in CLI Interface...[/bold cyan]\n")
+    terminal_renderer = RichTerminalRenderer()
+    terminal_renderer.render(codebase_analysis, inspect_file=None)
+    run_cli_file_inspector(codebase_analysis)
 
 
 def run_cli_file_inspector(codebase_analysis):
@@ -310,9 +292,6 @@ def run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, o
     md_renderer = MarkdownRenderer()
     md_renderer.render_multi_file_dossier(analysis, str(out_dir))
 
-    html_renderer = HtmlDashboardRenderer()
-    html_renderer.render(analysis, str(out_dir / "dashboard.html"))
-
     if fmt in ("terminal", "all"):
         terminal_renderer = RichTerminalRenderer()
         terminal_renderer.render(analysis, inspect_file=inspect)
@@ -324,12 +303,12 @@ def run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, o
 @main.command(name="analyze")
 @click.argument("path", default=".", type=click.Path(exists=True))
 @click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
 @click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
 @click.option("--ai-model", default=None, help="AI model identifier.")
 @click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
-@click.option("--output-dir", default=None, help="Directory to save generated markdown and HTML reports.")
+@click.option("--output-dir", default=None, help="Directory to save generated markdown files.")
 def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
     """Analyze a repository or individual file from CLI flags."""
     run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
@@ -338,7 +317,7 @@ def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, ou
 @main.command(name="scan")
 @click.argument("path", default=".", type=click.Path(exists=True))
 @click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
 @click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
 @click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
 @click.option("--ai-model", default=None, help="AI model identifier.")

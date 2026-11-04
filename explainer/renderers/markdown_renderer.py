@@ -130,7 +130,7 @@ class MarkdownRenderer:
             safe_name = rel_path.replace("/", "_").replace("\\", "_") + ".md"
             link = f"files/{safe_name}"
             out.append(f"| **`{rel_path}`** | `{fa.language}` | {fa.line_count} | {fa.role_in_codebase} | [📄 View Explanation]({link}) |\n")
-        out.append("\n> You can also view the complete consolidated dossier in [FULL_REPORT.md](FULL_REPORT.md) or launch the interactive GUI in [dashboard.html](dashboard.html).\n")
+        out.append("\n> You can also view the complete consolidated dossier in [FULL_REPORT.md](FULL_REPORT.md).\n")
 
         return "".join(out)
 
@@ -138,7 +138,7 @@ class MarkdownRenderer:
         out = []
         out.append(f"# Deep File Explanation: `{rel_path}`\n")
         out.append(f"> **Project**: `{analysis.project_name}` | **Language**: `{fa.language}` | **Size**: {fa.line_count} lines ({fa.file_size_bytes:,} bytes)\n")
-        out.append(f"> [⬅ Back to Main Index](../INDEX.md) | [🌐 Open Interactive GUI Dashboard](../dashboard.html)\n\n")
+        out.append(f"> [⬅ Back to Main Index](../INDEX.md)\n\n")
         out.append("──────\n\n")
 
         # 1. Big Picture Story

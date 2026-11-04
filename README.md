@@ -193,22 +193,13 @@ This registers the global CLI command `expl` in your PATH.
    │   ├── server.py.md     <-- Dedicated line-by-line breakdown of server.py
    │   └── Dockerfile.md    <-- Dedicated line-by-line breakdown of Dockerfile
    ├── INDEX.md             <-- Architecture summary & file catalog with links
-   ├── FULL_REPORT.md       <-- Consolidated comprehensive dossier
-   └── dashboard.html       <-- Interactive web GUI with dependency network graph
+   └── FULL_REPORT.md       <-- Consolidated comprehensive dossier
    ```
 
-6. **Step 4: Choose How to View** (Default: `[1]`):
-   ```text
-   ✔ Work has been done successfully!
-   📁 Folder: my-awesome-project-EXPL
-
-   How would you like to view the explanation?
-     [1] Want To See In Codebase Files Explanation In CLI [Default]
-     [2] Want To See In Codebase Files Explanation In Webpage (GUI)
-   Choose view format [1]:
-   ```
-   - **Option 1 (CLI)**: Displays styled cards and an interactive file selector directly in your terminal.
-   - **Option 2 (Webpage GUI)**: Automatically launches `dashboard.html` in your default web browser!
+6. **Step 4: Interactive CLI File Inspector**:
+   The tool immediately opens the rich terminal interface:
+   - Displays project architecture cards, tech stack compatibility, and cross-file links.
+   - Launches an interactive terminal menu where you can type any file number to deeply inspect its lines, word-by-word dictionaries, 4-year-old analogies, and failure consequences right in your terminal (or press `q` to exit).
 
 ---
 
@@ -217,7 +208,7 @@ This registers the global CLI command `expl` in your PATH.
 You can also run CodeExplainer via direct command-line flags:
 
 ```bash
-# Run Without-AI analysis and generate markdown, HTML, and terminal output
+# Run Without-AI analysis and generate markdown and terminal output
 python -m explainer.cli analyze ./my-project --mode static --format all
 
 # Run with Local AI (Ollama)
