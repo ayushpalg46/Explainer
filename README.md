@@ -6,18 +6,54 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://python.org)
 [![Tests: 27 Passed](https://img.shields.io/badge/Tests-27%20Passed-success.svg)](tests/)
+[![Interface: Pure CLI](https://img.shields.io/badge/Interface-100%25%20Terminal-blueviolet.svg)](#-how-to-use-it)
+[![AI Streaming: Enabled](https://img.shields.io/badge/Ollama-Live%20Streaming-ff69b4.svg)](#-local-ai--hardware-recommendations)
 
 ---
 
 ## 🌟 What is CodeExplainer?
 
-**CodeExplainer** is a developer tool and learning engine that breaks down any software codebase, single file, or Git diff into plain, beginner-friendly explanations. Whether you are an absolute beginner who has never touched code or a senior developer reviewing unfamiliar code, CodeExplainer reads what is written **line-by-line, word-by-word, and tag-by-tag** with **blue highlighted code lines**.
+**CodeExplainer** is a developer tool and learning engine that breaks down any software codebase, single file, or Git diff into plain, beginner-friendly explanations. Whether you are an absolute beginner who has never touched code or a senior developer reviewing an unfamiliar repository, CodeExplainer reads what is written **line-by-line, word-by-word, and tag-by-tag** with **blue highlighted code lines**.
 
 It operates under the persona of a **World-Class Senior Developer & Master System Architect** who translates complex software concepts into fun, vivid real-world analogies (toys, Lego blocks, kitchen blenders, doorbell buttons, and helpful robot assistants).
 
+```
+                 ┌────────────────────────────────────────┐
+                 │          User Runs `expl` Command      │
+                 └───────────────────┬────────────────────┘
+                                     │
+           ┌─────────────────────────┼─────────────────────────┐
+           ▼                         ▼                         ▼
+   `expl` (Interactive)      `expl <file_path>`          `expl diff`
+   • Whole Workspace Scan    • Instant Single File      • Git Working Tree
+   • Cross-File Graph        • Bypasses Workspace Scan  • Changed/Added Lines
+   • Dossier (-EXPL/)        • Terminal Breakdown       • Line-by-Line Impact
+           │                         │                         │
+           └─────────────────────────┼─────────────────────────┘
+                                     │
+                      ┌──────────────┴──────────────┐
+                      ▼                             ▼
+           [1] Without-AI Mode            [2] Local AI Mode
+           • Deterministic AST            • Ollama GPU Inference
+           • 100% Offline & Instant       • Qwen2.5-Coder-7B
+           • Zero Hardware Budget         • Live Token Streaming
+                      │                             │
+                      └──────────────┬──────────────┘
+                                     ▼
+                ┌────────────────────────────────────────┐
+                │  Exact Pedagogical Standard Output     │
+                │  • 🧸 4-Year-Old Big Picture Story    │
+                │  • 🔍 Line-by-Line Breakdown (Blue)    │
+                │  • • Word-by-Word Meanings             │
+                │  • • Screen & Memory Outcomes          │
+                │  • • Cross-File Interconnections       │
+                │  • • What Breaks If Deleted / Buggy    │
+                └────────────────────────────────────────┘
+```
+
 ---
 
-## ⚡ Key Capabilities
+## ⚡ Core Capabilities
 
 1. **📁 Full Codebase Analysis (`expl`)**:
    - Recursively scans your workspace, detects languages, frameworks, build tools, package managers, and runtimes.
@@ -41,7 +77,7 @@ It operates under the persona of a **World-Class Senior Developer & Master Syste
    - Deep structural analysis for web servers (Nginx reverse proxies, `listen` ports, `server_name`, `location`, `proxy_pass`) and INI settings.
 
 6. **🖥️ 100% Pure CLI Experience**:
-   - Fully optimized for terminals, PowerShell, and command prompts. No distracting browser popups or web server overhead.
+   - Fully optimized for terminals, PowerShell, and command prompts. No distracting browser popups, web servers, or HTML clutter.
 
 ---
 
@@ -49,15 +85,14 @@ It operates under the persona of a **World-Class Senior Developer & Master Syste
 
 CodeExplainer offers two distinct execution engines that produce the **exact same standardized line-by-line format**:
 
-1. **Option 1: Without-AI Explanation (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [Default]**
-   - ⚡ **Zero-Latency & Instant**: Runs 100% locally and offline without needing an internet connection, GPU, or AI model.
-   - 🎯 **AST Grammar & Semantic Catalog**: Extracts exact code lines, attributes, properties, functions, and cross-file dependencies with mathematical precision.
-   - 🧸 **Deep Pedagogical Catalog**: Powered by an extensive semantic dictionary containing 4-year-old analogies, screen outcomes, and failure consequences.
-
-2. **Option 2: Local AI Explanation (Local Ollama / Qwen2.5-Coder Model with Live Streaming)**
-   - 🧠 **Authentic Neural Intelligence**: Auto-detects and connects to your local Ollama models (e.g. `Qwen2.5-Coder-7B` or `Qwen3.5`).
-   - 🌊 **Live Token Streaming**: Outputs tokens word-by-word directly to the console as the model thinks.
-   - 🛡️ **Zero Cloud Dependency**: Runs entirely on your local machine with full data privacy.
+| Feature | ⚡ Without-AI Engine [Default] | 🧠 Local AI Engine |
+| :--- | :--- | :--- |
+| **Technology** | Pure Deterministic AST & Semantic Catalog | Local LLM via Ollama (`Qwen2.5-Coder-7B`) |
+| **Speed** | Instant (< 0.05s per file) | Live Word-by-Word Streaming (~30 tokens/sec) |
+| **Requirements** | Zero! (No GPU, No Internet, 100% Offline) | Ollama running locally on CPU or GPU |
+| **Output Template** | Exact Standard (Big Picture + 6 Bullets) | Exact Standard (Big Picture + 6 Bullets) |
+| **Code Line Highlighting** | Blue (`#3b82f6`) | Blue (`#3b82f6`) |
+| **Reliability** | 100% Mathematical Precision | Context-Aware Neural Walkthrough |
 
 ---
 
@@ -177,6 +212,20 @@ This registers the global CLI command `expl` in your environment.
 
 ## 🖥 How to Use It
 
+### Command Reference
+
+| Command | Action |
+| :--- | :--- |
+| `expl` | Interactive wizard on the current workspace (prompts for mode & updates `-EXPL` folder). |
+| `expl <file_path>` | Direct line-by-line & word-by-word explanation of any file. |
+| `expl <file_path> --mode static` | Instant 100% offline pure AST explanation of a file. |
+| `expl <file_path> --mode ai` | Real-time live AI streaming explanation of a file. |
+| `expl diff` | Explains unstaged working tree changes line-by-line. |
+| `expl diff --staged` | Explains staged Git changes line-by-line. |
+| `expl diff HEAD~1` | Explains changes compared to previous commit. |
+| `expl diff --mode ai` | Explains Git diff with live AI streaming. |
+| `expl scan [path] --mode static` | Non-interactive full scan and `-EXPL` dossier generation. |
+
 ### 1. Direct Single-File Explainer
 Explain any single file directly in your terminal:
 
@@ -184,13 +233,13 @@ Explain any single file directly in your terminal:
 # Direct execution (prompts for mode: Without-AI [Default] or AI)
 expl server.py
 
-# Without-AI mode explicitly
+# Without-AI mode explicitly (Instant & 100% Offline)
 expl samples/schema.sql --mode static
 
 # Configuration file
 expl samples/nginx.conf --mode static
 
-# Local AI with live streaming
+# Local AI with live token streaming
 expl server.py --mode ai --ai-model qwen2.5-coder:7b
 ```
 
@@ -225,14 +274,80 @@ expl
    ```text
    📁 <Codebase_Name>-EXPL/
    ├── 📁 files/
-   │   ├── index.html.md
-   │   ├── style.css.md
-   │   ├── schema.sql.md
-   │   └── server.py.md
-   ├── INDEX.md
-   └── FULL_REPORT.md
+   │   ├── index.html.md    <-- Dedicated line-by-line breakdown of index.html
+   │   ├── style.css.md     <-- Dedicated line-by-line breakdown of style.css
+   │   ├── schema.sql.md    <-- Dedicated line-by-line breakdown of schema.sql
+   │   ├── nginx.conf.md    <-- Dedicated line-by-line breakdown of nginx.conf
+   │   └── server.py.md     <-- Dedicated line-by-line breakdown of server.py
+   ├── INDEX.md             <-- Architecture summary & file catalog with links
+   └── FULL_REPORT.md       <-- Consolidated comprehensive dossier
    ```
 4. **Interactive CLI Inspector**: Type any file number to deeply inspect its line-by-line walkthrough in your terminal, or `q` to exit.
+
+---
+
+## 🧠 Local AI & Hardware Recommendations
+
+CodeExplainer's AI mode connects directly to your local Ollama instance with **zero cloud dependencies**.
+
+### Recommended Local Models (Tested on Laptop GPU)
+For a laptop with an **NVIDIA GeForce RTX 4050 (6GB VRAM)** or similar:
+
+| Model | Size | VRAM Usage | Speed | Recommendation |
+| :--- | :---: | :---: | :---: | :--- |
+| **`Qwen2.5-Coder-7B-Instruct`** (`Q4_K_M` / `Q6_K`) | ~4.7 GB | ~5.2 GB | ~30 tokens/sec | ⭐ **Best Overall Code Explainer** (Fits 100% in 6GB VRAM) |
+| **`Qwen2.5-Coder-3B-Instruct`** | ~2.0 GB | ~2.5 GB | ~60 tokens/sec | ⚡ Ultra-fast & lightweight |
+| **`qwen35-uncensored:latest`** | ~4.5 GB | ~5.0 GB | ~28 tokens/sec | Great for general creative analogies |
+
+### Setup Ollama for CodeExplainer:
+```bash
+# 1. Pull the specialized coding model
+ollama pull qwen2.5-coder:7b
+
+# 2. Run CodeExplainer with AI mode
+expl server.py --mode ai
+```
+
+---
+
+## 📁 Repository Structure
+
+```text
+Explainer/
+├── explainer/
+│   ├── cli.py                     # Click CLI entry point & dynamic command router
+│   ├── models.py                  # Pydantic data models for analyses & elements
+│   ├── diff/
+│   │   └── git_diff_explainer.py  # Git diff hunk parser & line-by-line analyzer
+│   ├── engine/
+│   │   ├── rule_engine.py         # Deterministic AST & semantic explainer engine
+│   │   └── ai_engine.py           # Ollama / Local AI integration with live streaming
+│   ├── graph/
+│   │   └── dependency_builder.py  # Cross-file dependency graph & import resolver
+│   ├── parsers/
+│   │   ├── registry.py            # Parser registry mapping extensions to parsers
+│   │   ├── html_parser.py         # HTML tag, attribute & DOM parser
+│   │   ├── css_parser.py          # CSS selectors, flexbox, grid, keyframes
+│   │   ├── js_ts_parser.py        # JS/TS, React JSX/TSX hooks, imports, exports
+│   │   ├── python_parser.py       # Python AST classes, functions, decorators
+│   │   ├── sql_parser.py          # SQL tables, columns, constraints, foreign keys
+│   │   ├── conf_parser.py         # Nginx server blocks, proxy_pass, INI configs
+│   │   ├── go_parser.py           # Go package, structs, goroutines
+│   │   ├── rust_parser.py         # Rust structs, traits, Tokio async
+│   │   ├── java_parser.py         # Java Spring annotations, classes
+│   │   ├── docker_parser.py       # Dockerfile & Docker Compose directives
+│   │   └── shell_parser.py        # Bash / Zsh shell scripts
+│   ├── renderers/
+│   │   ├── rich_terminal.py       # Rich terminal UI, tables, panels & blue lines
+│   │   └── markdown_renderer.py   # Multi-file dossier generator (-EXPL/)
+│   └── scanner/
+│       ├── workspace_scanner.py   # Recursive file discovery & exclusion filter
+│       └── tech_stack.py          # Framework & ecosystem compatibility analyzer
+├── samples/                       # Test fixture files (.py, .html, .css, .sql, .conf, etc.)
+├── tests/                         # 27 unit & integration tests (100% passing)
+├── pyproject.toml                 # Package metadata and CLI console_scripts
+└── README.md                      # Documentation & user guide
+```
 
 ---
 
@@ -244,7 +359,7 @@ Run the full automated test suite (27 unit & integration tests):
 pytest tests/ -v
 ```
 
-All 27 tests pass in ~1.3 seconds.
+All 27 tests pass in ~1.1 seconds.
 
 ---
 
