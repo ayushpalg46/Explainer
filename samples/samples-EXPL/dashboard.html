@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explainer Dashboard - samples</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --purple: #8b5cf6;
+      --rose: #f43f5e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+    
+    /* Layout */
+    #sidebar { width: 340px; background: #0c1322; border-right: 1px solid var(--card-border); display: flex; flex-direction: column; }
+    #main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    
+    /* Sidebar header */
+    .brand { padding: 18px 20px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; }
+    .brand h1 { font-size: 1.15rem; color: #fff; font-weight: 700; letter-spacing: -0.5px; }
+    .brand .badge { font-size: 0.7rem; background: var(--accent-glow); color: var(--accent); padding: 3px 8px; border-radius: 999px; border: 1px solid var(--accent); }
+    
+    .search-box { padding: 12px 16px; border-bottom: 1px solid var(--card-border); }
+    .search-box input { width: 100%; background: #162032; border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 0.85rem; outline: none; }
+    .search-box input:focus { border-color: var(--accent); }
+
+    .file-tree { flex: 1; overflow-y: auto; padding: 10px; }
+    .file-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s ease; border: 1px solid transparent; }
+    .file-item:hover { background: #162032; border-color: var(--card-border); }
+    .file-item.active { background: #1a2744; border-color: var(--accent); }
+    .file-name { font-size: 0.85rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+    .file-meta { font-size: 0.7rem; color: var(--text-muted); }
+
+    /* Main Navigation Tabs */
+    .nav-tabs { display: flex; background: #0c1322; border-bottom: 1px solid var(--card-border); padding: 0 20px; }
+    .tab-btn { padding: 14px 20px; color: var(--text-muted); background: none; border: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Tab Panes */
+    .tab-pane { flex: 1; overflow-y: auto; padding: 24px 30px; display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Cards */
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    .card h2 { font-size: 1.2rem; margin-bottom: 12px; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .card h3 { font-size: 1.0rem; margin: 16px 0 8px; color: var(--accent); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    
+    .stat-box { background: #162032; border: 1px solid var(--card-border); border-radius: 8px; padding: 14px 18px; }
+    .stat-box .title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; }
+    .stat-box .value { font-size: 1.4rem; font-weight: 700; color: #fff; margin-top: 4px; }
+
+    /* Graph Canvas */
+    #graph-container { width: 100%; height: 550px; background: #0c1322; border-radius: 10px; border: 1px solid var(--card-border); position: relative; }
+    #graph-canvas { width: 100%; height: 100%; }
+    .graph-instructions { position: absolute; bottom: 12px; left: 16px; font-size: 0.8rem; color: var(--text-muted); background: rgba(12,19,34,0.85); padding: 6px 12px; border-radius: 4px; pointer-events: none; }
+
+    /* Table styling */
+    table.data-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    table.data-table th, table.data-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 0.85rem; }
+    table.data-table th { background: #162032; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+    table.data-table tr:hover td { background: #141d2f; }
+    
+    .tag-badge { background: var(--accent-glow); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .kind-badge { background: #26334d; color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; margin-right: 6px; margin-bottom: 6px; background: #1a2538; border: 1px solid #283750; color: #cbd5e1; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar File Browser -->
+  <aside id="sidebar">
+    <div class="brand">
+      <div>
+        <h1>samples</h1>
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Dual-Engine Explainer</div>
+      </div>
+      <span class="badge">10 Files</span>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="fileSearch" placeholder="Filter files or tags..." onkeyup="filterFiles()">
+    </div>
+
+    <div class="file-tree" id="fileTree"></div>
+  </aside>
+
+  <!-- Main View Area -->
+  <main id="main-content">
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('overview')">🏛 Architecture & Stack</button>
+      <button class="tab-btn" onclick="switchTab('graph')">🌐 Dependency Graph</button>
+      <button class="tab-btn" onclick="switchTab('file-detail')">📄 File Deep Dive</button>
+      <button class="tab-btn" onclick="switchTab('interconnections')">🔗 Interconnections (5)</button>
+    </nav>
+
+    <!-- Tab 1: Architecture Overview -->
+    <div id="tab-overview" class="tab-pane active">
+      <div class="grid-4">
+        <div class="stat-box">
+          <div class="title">Total Files</div>
+          <div class="value">10</div>
+        </div>
+        <div class="stat-box">
+          <div class="title">Lines of Code</div>
+          <div class="value">293</div>
+        </div>
+        <div class="stat-box">
+          <div class="title">Dependencies</div>
+          <div class="value">5 Links</div>
+        </div>
+        <div class="stat-box">
+          <div class="title">Engine Mode</div>
+          <div class="value" style="font-size:0.95rem; color:var(--accent); font-weight:600; margin-top:8px;">Rule/AST Deep Knowledg...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🏛 Architecture Profile: Single Page Application (SPA) / Frontend Component Architecture</h2>
+        <p style="line-height:1.6; color:#d1d5db; margin-bottom:16px;">The project implements a modern client-side Single Page Application architecture. Components are organized hierarchically, allowing rapid declarative DOM updates via the Virtual DOM and encapsulated CSS styling.</p>
+        
+        <h3>Tech Stack Ecosystem Compatibility</h3>
+        <p style="line-height:1.6; color:#9ca3af;">**Multi-Language Ecosystem**: The codebase is composed of Dockerfile (1 files), Java (1 files), JavaScript (JSX/React) (1 files), Shell Script (1 files), Rust (1 files), Go (1 files), HTML (1 files), Python (1 files), CSS (1 files), TypeScript (1 files). The frontend leverages modern React declarative components for high-fidelity interactive state management. Styling is streamlined using atomic utility classes compiled ahead of time for minimal production bundle footprint. Environment parity is guaranteed through Docker containerization, ensuring deterministic deployment across local and cloud targets.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>📦 Detected Frameworks & Tooling</h2>
+          <div style="margin-top:12px;">
+            <div style="margin-bottom:12px;">
+              <strong style="color:var(--text-muted); font-size:0.8rem; display:block; margin-bottom:6px;">LANGUAGES:</strong>
+              <span class='pill'>Dockerfile (1 files)</span> <span class='pill'>Java (1 files)</span> <span class='pill'>JavaScript (JSX/React) (1 files)</span> <span class='pill'>Shell Script (1 files)</span> <span class='pill'>Rust (1 files)</span> <span class='pill'>Go (1 files)</span> <span class='pill'>HTML (1 files)</span> <span class='pill'>Python (1 files)</span> <span class='pill'>CSS (1 files)</span> <span class='pill'>TypeScript (1 files)</span>
+            </div>
+            <div style="margin-bottom:12px;">
+              <strong style="color:var(--text-muted); font-size:0.8rem; display:block; margin-bottom:6px;">FRAMEWORKS:</strong>
+              <span class='pill' style='border-color:var(--accent); color:var(--accent);'>CLI / Tooling Automation (python)</span> <span class='pill' style='border-color:var(--accent); color:var(--accent);'>Docker Engine Containerization</span> <span class='pill' style='border-color:var(--accent); color:var(--accent);'>Go Standard net/http</span> <span class='pill' style='border-color:var(--accent); color:var(--accent);'>Pydantic Data Validation</span> <span class='pill' style='border-color:var(--accent); color:var(--accent);'>React / Modern SPA Mount Point</span> <span class='pill' style='border-color:var(--accent); color:var(--accent);'>React.js</span> <span class='pill' style='border-color:var(--accent); color:var(--accent);'>Tailwind CSS Utilities</span>
+            </div>
+            <div>
+              <strong style="color:var(--text-muted); font-size:0.8rem; display:block; margin-bottom:6px;">BUILD TOOLS & RUNTIMES:</strong>
+              <span class='pill'>Docker Container Engine</span> <span class='pill'>OCI Containerized Sandbox</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📂 Subsystem & Folder Roles</h2>
+          <table class="data-table">
+            <thead><tr><th>Folder</th><th>Architectural Responsibility</th></tr></thead>
+            <tbody>
+              <tr><td><code>root/</code></td><td>Repository Scaffolding, Package Manifests & Environment Configs</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Visual Graph -->
+    <div id="tab-graph" class="tab-pane">
+      <div class="card" style="margin-bottom:16px;">
+        <h2>🌐 Cross-File Interactive Dependency Graph</h2>
+        <p style="color:var(--text-muted); font-size:0.85rem;">Click any node to inspect its incoming/outgoing dependencies, or double-click to open its deep breakdown.</p>
+      </div>
+      <div id="graph-container">
+        <div id="graph-canvas"></div>
+        <div class="graph-instructions">Click node to inspect | Scroll to zoom | Drag to pan</div>
+      </div>
+      <div id="graph-info" class="card" style="margin-top:16px; display:none;"></div>
+    </div>
+
+    <!-- Tab 3: File Deep Dive -->
+    <div id="tab-file-detail" class="tab-pane">
+      <div id="file-detail-content">
+        <div class="card" style="text-align:center; padding:50px;">
+          <h2 style="justify-content:center;">👈 Select a file from the left sidebar</h2>
+          <p style="color:var(--text-muted); margin-top:8px;">Choose any file to view all its tags, hooks, functions, CSS layouts, and architectural mechanics.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Interconnections Table -->
+    <div id="tab-interconnections" class="tab-pane">
+      <div class="card">
+        <h2>🔗 Cross-File Interconnections Ledger</h2>
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:16px;">Exhaustive mapping of how and why each module communicates with its neighbors.</p>
+        <table class="data-table">
+          <thead>
+            <tr><th>Source File</th><th>Target File</th><th>Relation Type</th><th>How & Why It Works</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class='tag-badge'>Dockerfile</span></td><td><span class='tag-badge' style='background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);'>server.py</span></td><td><span class='kind-badge'>docker_builds</span></td><td><strong>How:</strong> The Dockerfile copies `server.py` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.<br><br><strong>Why:</strong> Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies.</td></tr><tr><td><span class='tag-badge'>Dockerfile</span></td><td><span class='tag-badge' style='background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);'>deploy.sh</span></td><td><span class='kind-badge'>docker_builds</span></td><td><strong>How:</strong> The Dockerfile copies `deploy.sh` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.<br><br><strong>Why:</strong> Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies.</td></tr><tr><td><span class='tag-badge'>app.jsx</span></td><td><span class='tag-badge' style='background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);'>utils.ts</span></td><td><span class='kind-badge'>imports</span></td><td><strong>How:</strong> `app.jsx` imports symbols from `utils.ts` using module syntax `./utils.ts`. The bundler or module loader resolves the file export dictionary and binds exported components or functions into the caller's local scope.<br><br><strong>Why:</strong> Enforces clean separation of concerns: `utils.ts` encapsulates reusable UI or business logic, allowing `app.jsx` to compose it without code duplication.</td></tr><tr><td><span class='tag-badge'>index.html</span></td><td><span class='tag-badge' style='background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);'>style.css</span></td><td><span class='kind-badge'>styles</span></td><td><strong>How:</strong> The HTML document references `style.css` via `<link rel='stylesheet' href='style.css'>`. The browser engine dispatches an HTTP request, parses the CSS rules, and constructs the CSSOM (CSS Object Model).<br><br><strong>Why:</strong> Applies visual presentation, responsive layouts, color themes, and typography to the DOM nodes defined in `index.html`.</td></tr><tr><td><span class='tag-badge'>index.html</span></td><td><span class='tag-badge' style='background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);'>app.jsx</span></td><td><span class='kind-badge'>scripts</span></td><td><strong>How:</strong> The HTML file loads `app.jsx` via `<script src='app.jsx'>`. The browser script engine compiles and executes the bundle, attaching event listeners and mounting dynamic views into the DOM.<br><br><strong>Why:</strong> Transforms the static HTML scaffold into an interactive application, initializing state management and dynamic UI lifecycle.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const FILES = {"Dockerfile": {"file_path": "D:\\Explanier\\samples\\Dockerfile", "relative_path": "Dockerfile", "language": "Dockerfile", "line_count": 18, "file_size_bytes": 317, "summary": "Dockerfile defining container image build specifications. Uses a multi-stage build across 2 distinct stages to minimize image size. Base image: `python:3.12-slim AS builder`. Exposes network port(s): 8000. Injects 3 file/directory asset(s) from host context.", "role_in_codebase": "Containerization, Environment Isolation & Deployment Blueprint", "concepts_detected": ["Multi-Stage Build Pipeline (2 stages)", "Exposed Network Ports (8000)", "Filesystem Context Injection (3 COPY operations)"], "frameworks_detected": ["Docker Engine Containerization"], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "Directive: FROM", "kind": "directive", "line_number": 2, "snippet": "FROM python:3.12-slim AS builder...", "what_it_is": "Initializes a new build stage and sets the foundational base image for subsequent instructions.", "how_it_is_used": "Executed at line 2 with arguments: `python:3.12-slim AS builder`.", "where_it_is_used": "Instruction in build stage at line 2.", "why_it_works": "Docker downloads the base image layers from the container registry (e.g., Docker Hub), providing the kernel filesystem and OS libraries.", "best_practices": "Use minimal, pinned base images (e.g. `node:20-alpine` or `python:3.12-slim`) rather than generic `latest` tags."}, {"name": "Directive: WORKDIR", "kind": "directive", "line_number": 4, "snippet": "WORKDIR /app...", "what_it_is": "Sets the working directory for any following `RUN`, `CMD`, `ENTRYPOINT`, `COPY`, and `ADD` instructions.", "how_it_is_used": "Executed at line 4 with arguments: `/app`.", "where_it_is_used": "Instruction in build stage at line 4.", "why_it_works": "Creates the directory if it does not exist and ensures all relative file paths execute inside this safe container directory.", "best_practices": "Always set an absolute `WORKDIR` (e.g., `/app`) instead of relying on default container root directories."}, {"name": "Directive: COPY", "kind": "directive", "line_number": 5, "snippet": "COPY server.py ....", "what_it_is": "Copies files or directories from the local build context into the container filesystem.", "how_it_is_used": "Executed at line 5 with arguments: `server.py .`.", "where_it_is_used": "Instruction in build stage at line 5.", "why_it_works": "Each `COPY` creates an immutable image layer. Docker caches layers; if files have not changed, Docker reuses cached build layers.", "best_practices": "Copy package manifest files (`package.json`, `requirements.txt`) before copying source code to maximize Docker cache utilization."}, {"name": "Directive: RUN", "kind": "directive", "line_number": 7, "snippet": "RUN pip install --no-cache-dir pydantic...", "what_it_is": "Executes shell commands during container build time, committing the resulting filesystem changes into a new image layer.", "how_it_is_used": "Executed at line 7 with arguments: `pip install --no-cache-dir pydantic`.", "where_it_is_used": "Instruction in build stage at line 7.", "why_it_works": "Commonly used for installing packages, compiling code, or building production frontend assets.", "best_practices": "Chain related commands with `&&` and clean up package manager caches (`rm -rf /var/lib/apt/lists/*`) in the same layer to minimize image size."}, {"name": "Directive: EXPOSE", "kind": "directive", "line_number": 17, "snippet": "EXPOSE 8000...", "what_it_is": "Documentation directive informing Docker that the container listens on the specified network ports at runtime.", "how_it_is_used": "Executed at line 17 with arguments: `8000`.", "where_it_is_used": "Instruction in build stage at line 17.", "why_it_works": "Does not actually publish ports automatically; it serves as metadata for container runtimes and human operators.", "best_practices": "Always pair with `-p <host>:<container>` during `docker run` or port definitions in `docker-compose.yml`."}, {"name": "Directive: ENTRYPOINT", "kind": "directive", "line_number": 18, "snippet": "ENTRYPOINT [\"./deploy.sh\"]...", "what_it_is": "Configures a container that will run as an executable, defining the default executable process.", "how_it_is_used": "Executed at line 18 with arguments: `[\"./deploy.sh\"]`.", "where_it_is_used": "Instruction in build stage at line 18.", "why_it_works": "Unlike `CMD`, `ENTRYPOINT` is not easily overridden by CLI arguments; arguments passed to `docker run` are appended to the entrypoint.", "best_practices": "Use the exec JSON format (`ENTRYPOINT [\"python\", \"app.py\"]`) so Unix signals (SIGTERM) pass directly to the main process."}], "inbound": [], "outbound": [{"target": "server.py", "type": "docker_builds", "how": "The Dockerfile copies `server.py` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.", "why": "Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies."}, {"target": "deploy.sh", "type": "docker_builds", "how": "The Dockerfile copies `deploy.sh` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.", "why": "Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies."}]}, "Service.java": {"file_path": "D:\\Explanier\\samples\\Service.java", "relative_path": "Service.java", "language": "Java", "line_count": 19, "file_size_bytes": 449, "summary": "Java source file in package `com.cloudsphere.analytics` declaring 1 class(es), 0 interface(s), and using 2 imports. ", "role_in_codebase": "Java Enterprise Backend Service / JVM Component", "concepts_detected": ["Java Class OOP Structure (Service)"], "frameworks_detected": [], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "class Service", "kind": "class", "line_number": null, "snippet": "public class Service { ... }", "what_it_is": "Java class `Service` defined in package `com.cloudsphere.analytics`.", "how_it_is_used": "Forms a core object-oriented building block compiled to JVM bytecode.", "where_it_is_used": "Belongs to package `com.cloudsphere.analytics`.", "why_it_works": "Executed by the JVM with automatic garbage collection and runtime classloading.", "best_practices": "Maintain strong encapsulation with private fields and descriptive method contracts."}], "inbound": [], "outbound": []}, "app.jsx": {"file_path": "D:\\Explanier\\samples\\app.jsx", "relative_path": "app.jsx", "language": "JavaScript (JSX/React)", "line_count": 36, "file_size_bytes": 917, "summary": "JavaScript (JSX/React) module containing 2 external/internal import references and exporting 1 symbol(s) (Dashboard). Declares 1 UI component(s): Dashboard. Utilizes 2 React hook type(s): useState, useEffect. Features asynchronous promise and fetch workflows. ", "role_in_codebase": "React View Component & Interactive UI Controller", "concepts_detected": ["React State & Hooks Architecture (useState, useEffect)", "Modular React Component Hierarchy (Dashboard)", "Asynchronous Data Pipelines (Promises / async-await)"], "frameworks_detected": ["React.js"], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "Hook: useState()", "kind": "hook", "line_number": 5, "snippet": "const [...] = useState(...)", "what_it_is": "A React Hook declaring a state variable and an updater function that triggers component re-rendering when changed.", "how_it_is_used": "Invoked 2 time(s) to manage state or lifecycle.", "where_it_is_used": "First invoked around line 5.", "why_it_works": "React preserves state between renders by tracking hook call order within the component's internal fiber node. Updating state schedules a reconciliation pass.", "best_practices": "Never mutate state objects or arrays directly; always return new references (e.g. `[...items, newItem]`) to trigger accurate shallow equality checks."}, {"name": "Hook: useEffect()", "kind": "hook", "line_number": 8, "snippet": "const [...] = useEffect(...)", "what_it_is": "A React Hook synchronizing the component with external systems (APIs, DOM timers, WebSockets, event listeners).", "how_it_is_used": "Invoked 1 time(s) to manage state or lifecycle.", "where_it_is_used": "First invoked around line 8.", "why_it_works": "Runs asynchronously after DOM paint. React compares values in the dependency array: if any reference has changed, the previous cleanup function is executed, followed by the new effect.", "best_practices": "Always declare every reactive value used inside the effect in the dependency array, and return a cleanup function to prevent memory leaks."}, {"name": "Component: <Dashboard />", "kind": "component", "line_number": 4, "snippet": "function Dashboard(...) { ... return <...> }", "what_it_is": "Declarative React UI component `<Dashboard />` encapsulating presentation and interactive behavior.", "how_it_is_used": "Receives props, maintains local state, and returns a JSX Virtual DOM subtree.", "where_it_is_used": "Defined at line 4.", "why_it_works": "React instantiates a fiber node for this component, executing render and reconciliation algorithms whenever inputs change.", "best_practices": "Keep components focused on a single UI responsibility. Extract pure business logic into custom hooks or utility helpers."}, {"name": "Async / Await Flow", "kind": "concept", "line_number": null, "snippet": "async () => { const res = await fetch(...); }", "what_it_is": "Syntactic sugar built on top of JavaScript Promises for writing asynchronous code sequentially.", "how_it_is_used": "Pauses execution non-blockingly while network or async tasks resolve.", "where_it_is_used": "Found in data retrieval, effect handlers, or API endpoints.", "why_it_works": "The JavaScript engine pauses execution of the async generator function while awaiting the Promise, yielding execution back to the event loop so the UI doesn't freeze.", "best_practices": "Always wrap await calls in `try...catch` blocks or attach `.catch()` handlers to handle network failures cleanly."}], "inbound": [{"source": "index.html", "type": "scripts", "how": "The HTML file loads `app.jsx` via `<script src='app.jsx'>`. The browser script engine compiles and executes the bundle, attaching event listeners and mounting dynamic views into the DOM.", "why": "Transforms the static HTML scaffold into an interactive application, initializing state management and dynamic UI lifecycle."}], "outbound": [{"target": "utils.ts", "type": "imports", "how": "`app.jsx` imports symbols from `utils.ts` using module syntax `./utils.ts`. The bundler or module loader resolves the file export dictionary and binds exported components or functions into the caller's local scope.", "why": "Enforces clean separation of concerns: `utils.ts` encapsulates reusable UI or business logic, allowing `app.jsx` to compose it without code duplication."}]}, "deploy.sh": {"file_path": "D:\\Explanier\\samples\\deploy.sh", "relative_path": "deploy.sh", "language": "Shell Script", "line_count": 16, "file_size_bytes": 288, "summary": "Shell automation script containing 16 lines. Targets interpreter: `#!/usr/bin/env bash`. Enforces strict error trapping. Defines 2 modular shell routine(s): log_info, start_application. Orchestrates command-line tools: python. Sources 0 child configuration/script file(s).", "role_in_codebase": "Build, Automation, CI/CD or Deployment Task Runner", "concepts_detected": ["Interpreter Shebang (`#!/usr/bin/env bash`)", "Strict Shell Safety Mode (`set -e / pipefail`)", "Modular Shell Functions (log_info, start_application)", "Orchestrated External Tooling (python)"], "frameworks_detected": ["CLI / Tooling Automation (python)"], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "Shebang Interpreter", "kind": "directive", "line_number": 1, "snippet": "#!/usr/bin/env bash", "what_it_is": "The first line of an executable script starting with `#!` indicating the interpreter path.", "how_it_is_used": "Instructs the OS kernel which binary executes this script file.", "where_it_is_used": "First line of the script.", "why_it_works": "The operating system kernel examines the initial bytes (magic numbers 0x23 0x21) to invoke the specified binary (e.g. `/bin/bash` or `/usr/bin/env bash`).", "best_practices": "Use `#!/usr/bin/env bash` for maximum portability across Unix and Linux distributions."}, {"name": "Strict Mode Flag", "kind": "concept", "line_number": null, "snippet": "set -euo pipefail", "what_it_is": "Common shell safeguard flags: `set -euo pipefail`.", "how_it_is_used": "Configures bash runtime to fail fast on any error.", "where_it_is_used": "Initialization section of the script.", "why_it_works": "Enforces immediate script exit on command error (`-e`), treats unset variables as errors (`-u`), and fails pipelines if any stage fails (`-o pipefail`).", "best_practices": "Place `set -euo pipefail` at the start of every production shell script to prevent catastrophic partial script execution."}], "inbound": [{"source": "Dockerfile", "type": "docker_builds", "how": "The Dockerfile copies `deploy.sh` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.", "why": "Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies."}], "outbound": []}, "engine.rs": {"file_path": "D:\\Explanier\\samples\\engine.rs", "relative_path": "engine.rs", "language": "Rust", "line_count": 35, "file_size_bytes": 710, "summary": "Rust module declaring 1 struct(s), 1 enum(s), 1 trait(s), and 3 function(s). Uses 2 crate/module imports.", "role_in_codebase": "Rust Systems Service / High-Performance Core Engine", "concepts_detected": ["Data Structures (ClusterNode)", "Algebraic Data Types / Enums (HealthStatus)", "Trait Abstractions (NodeEvaluator)", "Async Tokio Runtime & Concurrency"], "frameworks_detected": [], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "struct ClusterNode", "kind": "struct", "line_number": null, "snippet": "struct ClusterNode { ... }", "what_it_is": "Rust custom data struct `ClusterNode` defining memory layout and fields.", "how_it_is_used": "Provides strict, type-safe data modeling with zero runtime overhead.", "where_it_is_used": "Declared in this module to represent core state or domain entities.", "why_it_works": "Rust guarantees memory safety without garbage collection via ownership rules and compile-time borrowing checks.", "best_practices": "Derive standard traits like `#[derive(Debug, Clone, PartialEq)]` where appropriate."}, {"name": "fn check_health()", "kind": "function", "line_number": null, "snippet": "fn check_health(...) { ... }", "what_it_is": "Rust function `check_health` implementing typed computation.", "how_it_is_used": "Performs modular operations according to Rust's strict ownership contracts.", "where_it_is_used": "Declared at the module or impl block level.", "why_it_works": "Compiled down to native machine code with LLVM optimizations and zero-cost abstractions.", "best_practices": "Return `Result<T, E>` for recoverable errors rather than panicking."}, {"name": "fn check_health()", "kind": "function", "line_number": null, "snippet": "fn check_health(...) { ... }", "what_it_is": "Rust function `check_health` implementing typed computation.", "how_it_is_used": "Performs modular operations according to Rust's strict ownership contracts.", "where_it_is_used": "Declared at the module or impl block level.", "why_it_works": "Compiled down to native machine code with LLVM optimizations and zero-cost abstractions.", "best_practices": "Return `Result<T, E>` for recoverable errors rather than panicking."}, {"name": "fn run_monitoring_engine()", "kind": "function", "line_number": null, "snippet": "fn run_monitoring_engine(...) { ... }", "what_it_is": "Rust function `run_monitoring_engine` implementing typed computation.", "how_it_is_used": "Performs modular operations according to Rust's strict ownership contracts.", "where_it_is_used": "Declared at the module or impl block level.", "why_it_works": "Compiled down to native machine code with LLVM optimizations and zero-cost abstractions.", "best_practices": "Return `Result<T, E>` for recoverable errors rather than panicking."}], "inbound": [], "outbound": []}, "handler.go": {"file_path": "D:\\Explanier\\samples\\handler.go", "relative_path": "handler.go", "language": "Go", "line_count": 34, "file_size_bytes": 586, "summary": "Go file in package `main` with 1 struct(s), 1 interface(s), and 1 function(s). Uses 3 package imports. Features lightweight goroutine concurrency. ", "role_in_codebase": "Go Cloud Microservice / High-Performance Backend Routine", "concepts_detected": ["Go Composite Structs (TelemetryPayload)", "Implicit Go Interfaces (TelemetryStore)", "CSP Concurrency (Goroutines & Channels)"], "frameworks_detected": ["Go Standard net/http"], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "type TelemetryPayload struct", "kind": "struct", "line_number": null, "snippet": "type TelemetryPayload struct { ... }", "what_it_is": "Go struct `TelemetryPayload` defining a typed data container.", "how_it_is_used": "Stores state and serves as receiver for associated Go methods.", "where_it_is_used": "Part of package `main`.", "why_it_works": "Allocated contiguously in memory for minimal cache misses and fast GC scanning.", "best_practices": "Use struct tags (`json:\"name\"`) to govern serialization."}, {"name": "func HandleMetrics()", "kind": "function", "line_number": null, "snippet": "func HandleMetrics(...) { ... }", "what_it_is": "Go function or method `HandleMetrics`.", "how_it_is_used": "Executes explicit, procedural logic with explicit error checking.", "where_it_is_used": "Defined in package `main`.", "why_it_works": "Compiled to statically-linked native binary with an embedded Go runtime.", "best_practices": "Always check returned `err` values immediately (`if err != nil`)."}], "inbound": [], "outbound": []}, "index.html": {"file_path": "D:\\Explanier\\samples\\index.html", "relative_path": "index.html", "language": "HTML", "line_count": 38, "file_size_bytes": 1201, "summary": "HTML document containing 25 elements across 18 distinct tag types. Serves as the visual entrypoint or template. Configured as a React/SPA application mount point. References 1 stylesheet(s) and 1 script bundle(s).", "role_in_codebase": "Application Presentation & DOM Root Entrypoint", "concepts_detected": ["External Stylesheets (1 referenced)", "External Script Bundles (1 referenced)", "Single Page Application (SPA) DOM Anchor"], "frameworks_detected": ["Tailwind CSS Utilities", "React / Modern SPA Mount Point"], "design_and_style_notes": "Links 1 external stylesheet(s). Utilizes Tailwind utility classes in markup. ", "animations_and_interactions": "", "elements": [{"name": "<html>", "kind": "tag", "line_number": 2, "snippet": "<html ...> (count: 1)", "what_it_is": "The root element of an HTML document representing the top-level container.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "The browser parser uses <html> to initialize the DOM (Document Object Model) tree. The 'lang' attribute specifies the human language for screen readers and search engines.", "best_practices": "Always specify a valid 'lang' attribute (e.g. lang='en') to ensure accessibility compliance and proper hyphenation/translation."}, {"name": "<head>", "kind": "tag", "line_number": 3, "snippet": "<head ...> (count: 1)", "what_it_is": "The container for document metadata that is not directly rendered on the page canvas.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "The browser reads <head> synchronously to load external stylesheets, fonts, set viewport rules, and parse meta tags before initial paint, preventing flash of unstyled content (FOUC).", "best_practices": "Place charset and viewport meta tags near the very top of <head> so the parser configures text encoding and mobile scaling immediately."}, {"name": "<meta>", "kind": "tag", "line_number": 4, "snippet": "<meta ...> (count: 3)", "what_it_is": "Provides structured document-level metadata not expressible by other head elements.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 3.", "where_it_is_used": "Used 3 time(s) across the document. ", "why_it_works": "Configures responsive viewport rendering (<meta name='viewport'>), character encoding (UTF-8), SEO descriptions, and OpenGraph social cards.", "best_practices": "Include <meta name='viewport' content='width=device-width, initial-scale=1.0'> on every responsive web page."}, {"name": "<title>", "kind": "tag", "line_number": 7, "snippet": "<title ...> (count: 1)", "what_it_is": "Standard HTML5 element `<title>` providing document structure or markup styling.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.", "best_practices": "Ensure proper closing tags and valid semantic hierarchy."}, {"name": "<link>", "kind": "tag", "line_number": 8, "snippet": "<link ...> (count: 2)", "what_it_is": "Specifies external resource relationships (stylesheets, preloaded fonts, favicons, canonical URLs).", "how_it_is_used": "Defined in the markup to structure content. Count in file: 2.", "where_it_is_used": "Used 2 time(s) across the document. Imports stylesheets/resources: style.css. ", "why_it_works": "Allows the browser engine to fetch critical external CSS and fonts. Rel='preload' instructs high-priority fetching ahead of DOM discovery.", "best_practices": "Use rel='preload' for critical hero fonts or LCP images, and rel='preconnect' for external asset domains."}, {"name": "<body>", "kind": "tag", "line_number": 11, "snippet": "<body ...> (count: 1)", "what_it_is": "The document's primary renderable canvas containing all visual content, widgets, and layout structures.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Parsing the <body> builds the visible DOM elements. As elements are parsed, the browser computes CSSOM attachments to generate the render tree.", "best_practices": "Keep the DOM tree reasonably flat; deep nesting (>32 levels) causes significant style recalculation and layout thrashing."}, {"name": "<header>", "kind": "tag", "line_number": 12, "snippet": "<header ...> (count: 1)", "what_it_is": "A semantic landmark element representing introductory content or a set of navigational links.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Screen readers expose <header> as an ARIA 'banner' landmark (when top-level), allowing assistive technology users to jump directly to primary site navigation.", "best_practices": "Use <header> at the page level or within <article>/<section> to group titles, logos, and search bars. Avoid nesting <header> inside <footer>."}, {"name": "<nav>", "kind": "tag", "line_number": 13, "snippet": "<nav ...> (count: 1)", "what_it_is": "A semantic landmark designating a section of major navigational links.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Assistive software maps <nav> to the 'navigation' landmark role, enabling keyboard shortcuts to skip repetitive content and reach links immediately.", "best_practices": "Reserve <nav> for primary navigation blocks (menus, paginations, breadcrumbs). Do not wrap all links in <nav>."}, {"name": "<div>", "kind": "tag", "line_number": 14, "snippet": "<div ...> (count: 2)", "what_it_is": "The generic block-level flow container with no inherent semantic meaning.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 2.", "where_it_is_used": "Used 2 time(s) across the document. Contains the primary React/SPA root mount point (`#root`). ", "why_it_works": "Provides a clean hook for CSS styling (Flexbox, CSS Grid, absolute positioning) and JavaScript manipulation without imposing accessibility semantics.", "best_practices": "Do not use <div> for interactive buttons or links; prefer native semantic elements (<button>, <a>) to retain keyboard focus and accessibility roles."}, {"name": "<ul>", "kind": "tag", "line_number": 15, "snippet": "<ul ...> (count: 1)", "what_it_is": "Standard HTML5 element `<ul>` providing document structure or markup styling.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.", "best_practices": "Ensure proper closing tags and valid semantic hierarchy."}, {"name": "<li>", "kind": "tag", "line_number": 16, "snippet": "<li ...> (count: 2)", "what_it_is": "Standard HTML5 element `<li>` providing document structure or markup styling.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 2.", "where_it_is_used": "Used 2 time(s) across the document. ", "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.", "best_practices": "Ensure proper closing tags and valid semantic hierarchy."}, {"name": "<a>", "kind": "tag", "line_number": 16, "snippet": "<a ...> (count: 2)", "what_it_is": "Standard HTML5 element `<a>` providing document structure or markup styling.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 2.", "where_it_is_used": "Used 2 time(s) across the document. ", "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.", "best_practices": "Ensure proper closing tags and valid semantic hierarchy."}, {"name": "<main>", "kind": "tag", "line_number": 22, "snippet": "<main ...> (count: 1)", "what_it_is": "The dominant, unique central content area of the document body.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Mapped to the ARIA 'main' landmark. There should only be one non-hidden <main> per document so users can skip repeated headers and sidebars.", "best_practices": "Never include repeated headers, copyright notices, search banners, or global sidebars directly in <main>."}, {"name": "<section>", "kind": "tag", "line_number": 23, "snippet": "<section ...> (count: 1)", "what_it_is": "A generic standalone thematic grouping of content, typically with an introductory heading.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Creates a distinct logical region in the document outline, assisting both search engine indexers and accessibility navigation.", "best_practices": "Always include a descriptive heading (<h2>-<h6>) within a <section> to identify its purpose."}, {"name": "<h1>", "kind": "tag", "line_number": 24, "snippet": "<h1 ...> (count: 1)", "what_it_is": "Standard HTML5 element `<h1>` providing document structure or markup styling.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.", "best_practices": "Ensure proper closing tags and valid semantic hierarchy."}, {"name": "<p>", "kind": "tag", "line_number": 25, "snippet": "<p ...> (count: 2)", "what_it_is": "Standard HTML5 element `<p>` providing document structure or markup styling.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 2.", "where_it_is_used": "Used 2 time(s) across the document. ", "why_it_works": "Parsed by the browser engine into DOM elements for styling, positioning, and script access.", "best_practices": "Ensure proper closing tags and valid semantic hierarchy."}, {"name": "<footer>", "kind": "tag", "line_number": 32, "snippet": "<footer ...> (count: 1)", "what_it_is": "A semantic container for concluding information about its nearest sectioning parent or the page.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. ", "why_it_works": "Mapped to 'contentinfo' landmark role at the document root, housing legal notices, copyright, sitemaps, and contact information.", "best_practices": "Ensure contrast ratios for footer links comply with WCAG AA even when subdued colors are used."}, {"name": "<script>", "kind": "tag", "line_number": 36, "snippet": "<script ...> (count: 1)", "what_it_is": "Embeds executable code or references an external JavaScript file.", "how_it_is_used": "Defined in the markup to structure content. Count in file: 1.", "where_it_is_used": "Used 1 time(s) across the document. Loads scripts: app.jsx. ", "why_it_works": "By default, scripts block DOM construction. Using 'defer' executes the script after DOM is ready without blocking, while 'async' executes as soon as downloaded.", "best_practices": "Always use 'defer' for client app bundles or 'type=module' which is deferred by default."}], "inbound": [], "outbound": [{"target": "style.css", "type": "styles", "how": "The HTML document references `style.css` via `<link rel='stylesheet' href='style.css'>`. The browser engine dispatches an HTTP request, parses the CSS rules, and constructs the CSSOM (CSS Object Model).", "why": "Applies visual presentation, responsive layouts, color themes, and typography to the DOM nodes defined in `index.html`."}, {"target": "app.jsx", "type": "scripts", "how": "The HTML file loads `app.jsx` via `<script src='app.jsx'>`. The browser script engine compiles and executes the bundle, attaching event listeners and mounting dynamic views into the DOM.", "why": "Transforms the static HTML scaffold into an interactive application, initializing state management and dynamic UI lifecycle."}]}, "server.py": {"file_path": "D:\\Explanier\\samples\\server.py", "relative_path": "server.py", "language": "Python", "line_count": 23, "file_size_bytes": 703, "summary": "Python module containing 3 imports, 2 class definition(s), and 3 function(s). Built with Pydantic Data Validation. Features asynchronous coroutines. ", "role_in_codebase": "Domain Model / Object-Oriented Core Service", "concepts_detected": ["Object-Oriented Architecture (2 classes)", "Functional / Modular Routines (3 functions)", "Asyncio Asynchronous Coroutines"], "frameworks_detected": ["Pydantic Data Validation"], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [{"name": "class MetricResponse", "kind": "class", "line_number": 5, "snippet": "class MetricResponse(BaseModel):", "what_it_is": "An object-oriented blueprint for creating user-defined data structures containing state (attributes) and behavior (methods).", "how_it_is_used": "Defined at line 5 inherits from `BaseModel`. ", "where_it_is_used": "Class blueprint declared at line 5.", "why_it_works": "Instantiating a class invokes `__new__` to allocate memory followed by `__init__` to initialize instance attributes.", "best_practices": "Prefer composition over deep inheritance hierarchies. Use `@dataclass` or Pydantic `BaseModel` for pure data structures."}, {"name": "class ClusterService", "kind": "class", "line_number": 10, "snippet": "class ClusterService():", "what_it_is": "An object-oriented blueprint for creating user-defined data structures containing state (attributes) and behavior (methods).", "how_it_is_used": "Defined at line 10 base class. ", "where_it_is_used": "Class blueprint declared at line 10.", "why_it_works": "Instantiating a class invokes `__new__` to allocate memory followed by `__init__` to initialize instance attributes.", "best_practices": "Prefer composition over deep inheritance hierarchies. Use `@dataclass` or Pydantic `BaseModel` for pure data structures."}, {"name": "async def handle_metrics_route()", "kind": "function", "line_number": 20, "snippet": "async def handle_metrics_route(...):", "what_it_is": "A modular, reusable block of code that accepts input parameters, executes statements, and returns a value.", "how_it_is_used": "Defined at line 20. ", "where_it_is_used": "Function declared at line 20.", "why_it_works": "Allocates a new stack frame in the Python execution environment for local variables. Supports first-class function passing and closures.", "best_practices": "Adhere to the Single Responsibility Principle: each function should do one thing well and be covered by unit tests."}, {"name": "def __init__()", "kind": "function", "line_number": 11, "snippet": "def __init__(...):", "what_it_is": "A modular, reusable block of code that accepts input parameters, executes statements, and returns a value.", "how_it_is_used": "Defined at line 11. ", "where_it_is_used": "Function declared at line 11.", "why_it_works": "Allocates a new stack frame in the Python execution environment for local variables. Supports first-class function passing and closures.", "best_practices": "Adhere to the Single Responsibility Principle: each function should do one thing well and be covered by unit tests."}, {"name": "async def get_system_telemetry()", "kind": "function", "line_number": 14, "snippet": "async def get_system_telemetry(...):", "what_it_is": "A modular, reusable block of code that accepts input parameters, executes statements, and returns a value.", "how_it_is_used": "Defined at line 14. ", "where_it_is_used": "Function declared at line 14.", "why_it_works": "Allocates a new stack frame in the Python execution environment for local variables. Supports first-class function passing and closures.", "best_practices": "Adhere to the Single Responsibility Principle: each function should do one thing well and be covered by unit tests."}], "inbound": [{"source": "Dockerfile", "type": "docker_builds", "how": "The Dockerfile copies `server.py` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.", "why": "Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies."}], "outbound": []}, "style.css": {"file_path": "D:\\Explanier\\samples\\style.css", "relative_path": "style.css", "language": "CSS", "line_count": 58, "file_size_bytes": 1110, "summary": "CSS stylesheet containing 5 class selectors, 5 ID selectors, and 1 responsive media query breakpoints. Employs modern Flexbox alignment. Features CSS Grid layout templates. Configures centralized CSS custom variables. Defines 1 GPU-accelerated keyframe animations. ", "role_in_codebase": "Application Styling, Design System Tokens & Responsive Theme Layer", "concepts_detected": ["Flexbox One-Dimensional Layout Engine", "CSS Grid Two-Dimensional Layout Engine", "CSS Custom Properties / Design Tokens", "Keyframe Animations (fadeIn)", "Responsive Breakpoints (1 queries)"], "frameworks_detected": [], "design_and_style_notes": "Selector count: 5 classes, 5 IDs. Layout architectures: Flexbox CSS Grid . Design tokens: Yes (CSS Custom Properties). Responsive adaptation: 1 breakpoints.", "animations_and_interactions": "Active motion design layer: 1 @keyframes sequences defined. 2 transition/transform rules for hover, focus, and state animations.", "elements": [{"name": "Flexbox (`display: flex`)", "kind": "layout", "line_number": null, "snippet": "display: flex; justify-content: ...; align-items: ...", "what_it_is": "A one-dimensional layout model providing space distribution and alignment along primary and cross axes.", "how_it_is_used": "Applied to parent containers to automatically align, distribute, and space child elements.", "where_it_is_used": "Found in container and layout rules across the stylesheet.", "why_it_works": "The flex container calculates available space along the main axis ('justify-content') and cross axis ('align-items'), dynamically shrinking or expanding children based on 'flex-grow' and 'flex-shrink'.", "best_practices": "Ideal for navigation bars, item lists, toolbars, and centered modal boxes. Use 'gap' instead of child margins."}, {"name": "CSS Grid (`display: grid`)", "kind": "layout", "line_number": null, "snippet": "display: grid; grid-template-columns: ...", "what_it_is": "A two-dimensional layout system managing both rows and columns simultaneously.", "how_it_is_used": "Establishes explicit rows and columns for structured card matrices and multi-panel dashboards.", "where_it_is_used": "Defines the overarching scaffolding and responsive layout grids.", "why_it_works": "Creates explicit tracks using 'grid-template-columns' and 'grid-template-rows'. Elements snap into grid lines or named template areas.", "best_practices": "Use CSS Grid for overall page scaffolding, complex dashboards, multi-column card galleries, and asymmetrical layouts."}, {"name": "CSS Variables (`--custom-properties`)", "kind": "concept", "line_number": null, "snippet": "--primary-color: #...; --bg-surface: ...;", "what_it_is": "CSS Custom Properties (e.g., --primary-color: #3b82f6) that store reusable values cascading throughout the DOM.", "how_it_is_used": "Centralizes color palettes, font stacks, and spacing tokens for dynamic theming (e.g. dark/light mode).", "where_it_is_used": "Declared in `:root` and consumed with `var(--...)` throughout declarations.", "why_it_works": "Unlike SASS variables, CSS variables are live in the browser runtime and inherit down the DOM tree, enabling instant theme switching (dark/light mode) without recompilation.", "best_practices": "Declare shared design tokens under the ':root' selector and override them inside '[data-theme=dark]' or '.dark' classes."}, {"name": "@keyframes (1 defined)", "kind": "animation", "line_number": null, "snippet": "@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }", "what_it_is": "Declarative animation sequences controlling intermediate steps in a CSS animation using percentage keyframes.", "how_it_is_used": "Declares discrete animation sequences: fadeIn.", "where_it_is_used": "Referenced by `animation:` properties on interactive or hero elements.", "why_it_works": "The browser's compositor thread handles GPU-accelerated properties ('transform' and 'opacity') at 60/120fps without triggering expensive CPU layout reflows.", "best_practices": "Stick to animating 'transform' and 'opacity' whenever possible. Use '@media (prefers-reduced-motion: reduce)' to disable motion for sensitive users."}, {"name": "@media Queries (1 rules)", "kind": "concept", "line_number": null, "snippet": "@media (max-width: 768px)...", "what_it_is": "Conditional CSS rules applying styles depending on device viewport dimensions, pixel density, orientation, or preferences.", "how_it_is_used": "Adapts layout rules dynamically when screen width changes between mobile, tablet, and desktop viewports.", "where_it_is_used": "Configured breakpoints: (max-width: 768px)...", "why_it_works": "Evaluated continuously by the browser. When the viewport crosses specified thresholds (e.g., min-width: 768px), the matching stylesheet branch overrides earlier styles.", "best_practices": "Follow a mobile-first design strategy using 'min-width' queries to ensure fast baseline rendering on smaller devices."}], "inbound": [{"source": "index.html", "type": "styles", "how": "The HTML document references `style.css` via `<link rel='stylesheet' href='style.css'>`. The browser engine dispatches an HTTP request, parses the CSS rules, and constructs the CSSOM (CSS Object Model).", "why": "Applies visual presentation, responsive layouts, color themes, and typography to the DOM nodes defined in `index.html`."}], "outbound": []}, "utils.ts": {"file_path": "D:\\Explanier\\samples\\utils.ts", "relative_path": "utils.ts", "language": "TypeScript", "line_count": 16, "file_size_bytes": 440, "summary": "TypeScript module containing 0 external/internal import references and exporting 3 symbol(s) (ClusterMetric, formatLatency, calculateUptime). ", "role_in_codebase": "JavaScript/TypeScript Logic & Module Utility", "concepts_detected": ["Static TypeScript Type Contracts"], "frameworks_detected": [], "design_and_style_notes": "", "animations_and_interactions": "", "elements": [], "inbound": [{"source": "app.jsx", "type": "imports", "how": "`app.jsx` imports symbols from `utils.ts` using module syntax `./utils.ts`. The bundler or module loader resolves the file export dictionary and binds exported components or functions into the caller's local scope.", "why": "Enforces clean separation of concerns: `utils.ts` encapsulates reusable UI or business logic, allowing `app.jsx` to compose it without code duplication."}], "outbound": []}};
+    const GRAPH_DATA = {"nodes": [{"id": "Dockerfile", "label": "Dockerfile", "path": "Dockerfile", "language": "Dockerfile", "lines": 18, "role": "Containerization, Environment Isolation & Deployment Blueprint"}, {"id": "Service.java", "label": "Service.java", "path": "Service.java", "language": "Java", "lines": 19, "role": "Java Enterprise Backend Service / JVM Component"}, {"id": "app.jsx", "label": "app.jsx", "path": "app.jsx", "language": "JavaScript (JSX/React)", "lines": 36, "role": "React View Component & Interactive UI Controller"}, {"id": "deploy.sh", "label": "deploy.sh", "path": "deploy.sh", "language": "Shell Script", "lines": 16, "role": "Build, Automation, CI/CD or Deployment Task Runner"}, {"id": "engine.rs", "label": "engine.rs", "path": "engine.rs", "language": "Rust", "lines": 35, "role": "Rust Systems Service / High-Performance Core Engine"}, {"id": "handler.go", "label": "handler.go", "path": "handler.go", "language": "Go", "lines": 34, "role": "Go Cloud Microservice / High-Performance Backend Routine"}, {"id": "index.html", "label": "index.html", "path": "index.html", "language": "HTML", "lines": 38, "role": "Application Presentation & DOM Root Entrypoint"}, {"id": "server.py", "label": "server.py", "path": "server.py", "language": "Python", "lines": 23, "role": "Domain Model / Object-Oriented Core Service"}, {"id": "style.css", "label": "style.css", "path": "style.css", "language": "CSS", "lines": 58, "role": "Application Styling, Design System Tokens & Responsive Theme Layer"}, {"id": "utils.ts", "label": "utils.ts", "path": "utils.ts", "language": "TypeScript", "lines": 16, "role": "JavaScript/TypeScript Logic & Module Utility"}], "edges": [{"from": "Dockerfile", "to": "server.py", "label": "docker_builds", "how": "The Dockerfile copies `server.py` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.", "why": "Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies.", "code": "server.py"}, {"from": "Dockerfile", "to": "deploy.sh", "label": "docker_builds", "how": "The Dockerfile copies `deploy.sh` into the container filesystem via `COPY` or `ADD`. Creates an immutable container layer containing the code needed for runtime execution.", "why": "Isolates the application runtime environment, ensuring identical deployment regardless of host OS dependencies.", "code": "deploy.sh"}, {"from": "app.jsx", "to": "utils.ts", "label": "imports", "how": "`app.jsx` imports symbols from `utils.ts` using module syntax `./utils.ts`. The bundler or module loader resolves the file export dictionary and binds exported components or functions into the caller's local scope.", "why": "Enforces clean separation of concerns: `utils.ts` encapsulates reusable UI or business logic, allowing `app.jsx` to compose it without code duplication.", "code": "./utils.ts"}, {"from": "index.html", "to": "style.css", "label": "styles", "how": "The HTML document references `style.css` via `<link rel='stylesheet' href='style.css'>`. The browser engine dispatches an HTTP request, parses the CSS rules, and constructs the CSSOM (CSS Object Model).", "why": "Applies visual presentation, responsive layouts, color themes, and typography to the DOM nodes defined in `index.html`.", "code": "style.css"}, {"from": "index.html", "to": "app.jsx", "label": "scripts", "how": "The HTML file loads `app.jsx` via `<script src='app.jsx'>`. The browser script engine compiles and executes the bundle, attaching event listeners and mounting dynamic views into the DOM.", "why": "Transforms the static HTML scaffold into an interactive application, initializing state management and dynamic UI lifecycle.", "code": "app.jsx"}]};
+    let activeFilePath = null;
+    let network = null;
+
+    function renderSidebar() {
+      const container = document.getElementById("fileTree");
+      container.innerHTML = "";
+      Object.keys(FILES).sort().forEach(relPath => {
+        const f = FILES[relPath];
+        const item = document.createElement("div");
+        item.className = "file-item" + (relPath === activeFilePath ? " active" : "");
+        item.id = "side-" + btoa(relPath).replace(/=/g, "");
+        item.onclick = () => selectFile(relPath);
+        item.innerHTML = `
+          <div>
+            <div class="file-name">${relPath}</div>
+            <div class="file-meta">${f.language}</div>
+          </div>
+          <span class="file-meta">${f.line_count}L</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function filterFiles() {
+      const query = document.getElementById("fileSearch").value.toLowerCase();
+      document.querySelectorAll(".file-item").forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(query) ? "flex" : "none";
+      });
+    }
+
+    function selectFile(relPath) {
+      activeFilePath = relPath;
+      document.querySelectorAll(".file-item").forEach(i => i.classList.remove("active"));
+      const activeEl = document.getElementById("side-" + btoa(relPath).replace(/=/g, ""));
+      if (activeEl) activeEl.classList.add("active");
+
+      renderFileDetail(relPath);
+      switchTab('file-detail');
+    }
+
+    function renderFileDetail(relPath) {
+      const f = FILES[relPath];
+      const container = document.getElementById("file-detail-content");
+
+      let elementsRows = "";
+      f.elements.forEach(el => {
+        elementsRows += `
+          <tr>
+            <td><strong style="color:var(--accent);">${escapeHtml(el.name)}</strong></td>
+            <td><span class="kind-badge">${el.kind}</span></td>
+            <td>${el.line_number || '-'}</td>
+            <td>
+              <strong>What:</strong> ${el.what_it_is}<br>
+              <strong style="margin-top:4px; display:inline-block;">How:</strong> ${el.how_it_is_used}
+            </td>
+            <td>${el.where_it_is_used}</td>
+            <td>
+              <strong>Why:</strong> ${el.why_it_works}<br>
+              ${el.best_practices ? '<strong style="color:var(--green); margin-top:4px; display:inline-block;">Best Practice:</strong> ' + el.best_practices : ''}
+            </td>
+          </tr>
+        `;
+      });
+
+      let inConn = f.inbound.map(c => `<li>⬅️ Referenced by <code>${c.source}</code> (${c.type})</li>`).join("");
+      let outConn = f.outbound.map(c => `<li>➡️ References <code>${c.target}</code> (${c.type})</li>`).join("");
+
+      container.innerHTML = `
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h2>📄 ${f.relative_path}</h2>
+            <span class="tag-badge">${f.language} | ${f.line_count} Lines | ${f.file_size_bytes} Bytes</span>
+          </div>
+          <p style="font-size:1.05rem; color:#f3f4f6; margin-bottom:8px;"><strong>Role:</strong> ${f.role_in_codebase}</p>
+          <p style="line-height:1.6; color:#9ca3af; margin-bottom:14px;">${f.summary}</p>
+
+          ${f.concepts_detected.length ? '<div style="margin-bottom:8px;"><strong style="font-size:0.8rem; color:var(--text-muted);">CONCEPTS:</strong> ' + f.concepts_detected.map(c => `<span class="pill">${c}</span>`).join('') + '</div>' : ''}
+          ${f.design_and_style_notes ? '<p style="color:var(--accent); font-size:0.85rem; margin-top:8px;">🎨 <strong>Design & Style:</strong> ' + f.design_and_style_notes + '</p>' : ''}
+          ${f.animations_and_interactions ? '<p style="color:var(--purple); font-size:0.85rem; margin-top:4px;">✨ <strong>Motion:</strong> ' + f.animations_and_interactions + '</p>' : ''}
+
+          ${(inConn || outConn) ? `
+            <div style="margin-top:16px; background:#162032; padding:12px 16px; border-radius:6px;">
+              <strong style="font-size:0.85rem; color:#fff;">File Interconnections:</strong>
+              <ul style="margin:6px 0 0 20px; font-size:0.85rem; color:#cbd5e1;">${outConn}${inConn}</ul>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="card">
+          <h2>🔍 Tag, Component & Function Explanations (${f.elements.length} Elements)</h2>
+          <table class="data-table">
+            <thead>
+              <tr><th>Element</th><th>Kind</th><th>Line</th><th>What & How It's Used</th><th>Where Used</th><th>Why It Works</th></tr>
+            </thead>
+            <tbody>
+              ${elementsRows || '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No granular elements extracted for this file type.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
+      
+      const targetBtn = Array.from(document.querySelectorAll(".tab-btn")).find(b => b.getAttribute("onclick").includes(tabId));
+      if (targetBtn) targetBtn.classList.add("active");
+      const targetPane = document.getElementById("tab-" + tabId);
+      if (targetPane) targetPane.classList.add("active");
+
+      if (tabId === "graph") {
+        setTimeout(initGraph, 100);
+      }
+    }
+
+    function initGraph() {
+      if (network) return;
+      const container = document.getElementById("graph-canvas");
+      const nodeItems = GRAPH_DATA.nodes.map(n => ({
+        id: n.id,
+        label: n.label,
+        shape: "box",
+        margin: 10,
+        color: {
+          background: "#162032",
+          border: "#38bdf8",
+          highlight: { background: "#38bdf8", border: "#fff" }
+        },
+        font: { color: "#f3f4f6", size: 13 }
+      }));
+
+      const edgeItems = GRAPH_DATA.edges.map(e => ({
+        from: e.from,
+        to: e.to,
+        label: e.label,
+        arrows: "to",
+        color: { color: "#475569", highlight: "#38bdf8" },
+        font: { color: "#94a3b8", size: 10, align: "middle" }
+      }));
+
+      const data = {
+        nodes: new vis.DataSet(nodeItems),
+        edges: new vis.DataSet(edgeItems)
+      };
+
+      const options = {
+        physics: {
+          solver: "forceAtlas2Based",
+          forceAtlas2Based: { gravitationalConstant: -50, centralGravity: 0.01, springLength: 100 }
+        }
+      };
+
+      network = new vis.Network(container, data, options);
+      network.on("click", params => {
+        if (params.nodes.length > 0) {
+          const nodeId = params.nodes[0];
+          showGraphInfo(nodeId);
+        }
+      });
+      network.on("doubleClick", params => {
+        if (params.nodes.length > 0) {
+          selectFile(params.nodes[0]);
+        }
+      });
+    }
+
+    function showGraphInfo(nodeId) {
+      const f = FILES[nodeId];
+      if (!f) return;
+      const box = document.getElementById("graph-info");
+      box.style.display = "block";
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3>📄 ${f.relative_path}</h3>
+          <button onclick="selectFile('${f.relative_path}')" class="tab-btn" style="padding:4px 10px; font-size:0.8rem; background:var(--accent); color:#000; border-radius:4px;">Open File Inspector ➔</button>
+        </div>
+        <p style="font-size:0.85rem; color:#cbd5e1; margin-top:6px;"><strong>Role:</strong> ${f.role_in_codebase}</p>
+        <p style="font-size:0.85rem; color:#9ca3af; margin-top:4px;">${f.summary}</p>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Auto-select first file on start
+    renderSidebar();
+    const firstKey = Object.keys(FILES)[0];
+    if (firstKey) renderFileDetail(firstKey);
+  </script>
+</body>
+</html>

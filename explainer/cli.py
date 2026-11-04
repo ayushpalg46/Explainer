@@ -1,10 +1,13 @@
 import os
 import sys
+import webbrowser
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict
 import click
 from rich.console import Console
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Prompt
+from rich.table import Table
+from rich.panel import Panel
 
 from .scanner.workspace_scanner import WorkspaceScanner
 from .scanner.tech_stack import TechStackAnalyzer
@@ -22,7 +25,7 @@ console = Console()
 @click.group(invoke_without_command=True)
 @click.pass_context
 def main(ctx):
-    """Dual-Engine Codebase & File Explainer Tool."""
+    """⚡ EXPL / Explainer: Deep Codebase & Per-File Architecture Intelligence Engine."""
     if ctx.invoked_subcommand is None:
         interactive_wizard()
 
@@ -30,23 +33,20 @@ def main(ctx):
 def interactive_wizard():
     console.print()
     console.print("[bold cyan]════════════════════════════════════════════════════════════════════[/bold cyan]")
-    console.print("[bold white] 🔍 Welcome to the Dual-Engine Codebase & File Explainer Tool[/bold white]")
+    console.print("[bold white] ⚡ EXPL - Codebase & File Architecture Explainer Engine[/bold white]")
     console.print("[dim]   Deep Code Architecture, Tech Stack & File-by-File Breakdown[/dim]")
     console.print("[bold cyan]════════════════════════════════════════════════════════════════════[/bold cyan]")
     console.print()
 
-    # 1. Target directory
-    default_dir = os.getcwd()
-    target_dir = Prompt.ask(
-        "[bold green]Enter codebase directory or file path[/bold green]",
-        default=default_dir
-    )
-
-    # 2. Engine Mode Choice
-    console.print("\n[bold yellow]Select Analysis Engine:[/bold yellow]")
-    console.print("  [cyan][1][/cyan] [bold]Pure Knowledge & AST Engine (Zero-AI)[/bold] - 100% Deterministic, Fast, Deep Grammar & Architecture Analysis")
-    console.print("  [cyan][2][/cyan] [bold]Local AI Model Engine[/bold] - Connects to local Ollama or LM Studio model")
-    mode_choice = Prompt.ask("Choose mode", choices=["1", "2"], default="1")
+    # Detect current working directory as the codebase folder
+    current_cwd = Path.cwd().resolve()
+    console.print(f"[bold]📁 Current Codebase:[/bold] [underline white]{current_cwd}[/underline white]")
+    
+    # 1. First Prompt: Choose between Without-AI and AI (Default: 1)
+    console.print("\n[bold yellow]Choose Explanation Mode:[/bold yellow]")
+    console.print("  [cyan][1][/cyan] [bold]Without-AI Explanation[/bold] (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [bold green][Default][/bold green]")
+    console.print("  [cyan][2][/cyan] [bold]AI Explanation[/bold] (Local Ollama / Qwen Model)")
+    mode_choice = Prompt.ask("Select mode", choices=["1", "2"], default="1")
 
     ai_provider = "ollama"
     ai_endpoint = "http://localhost:11434/api/generate"
@@ -54,140 +54,146 @@ def interactive_wizard():
 
     if mode_choice == "2":
         console.print("\n[bold yellow]Local AI Model Configuration:[/bold yellow]")
-        console.print("  [cyan][1][/cyan] Ollama (Default: http://localhost:11434)")
-        console.print("  [cyan][2][/cyan] LM Studio / Local OpenAI Compatible Server (Default: http://localhost:1234/v1)")
-        p_choice = Prompt.ask("Choose runner", choices=["1", "2"], default="1")
-        if p_choice == "1":
-            ai_provider = "ollama"
-            ai_endpoint = Prompt.ask("Ollama endpoint URL", default="http://localhost:11434/api/generate")
+        detected_models = AIExplainerEngine.list_installed_models()
+        if detected_models:
+            console.print(f"[bold green]✓ Discovered {len(detected_models)} installed Ollama model(s):[/bold green]")
+            model_choices = []
+            def_choice = "1"
+            for idx, m_name in enumerate(detected_models, 1):
+                is_coder = "coder" in m_name.lower()
+                badge = " [bold green]⭐ (Specialized Code Model)[/bold green]" if is_coder else ""
+                console.print(f"  [cyan][{idx}][/cyan] {m_name}{badge}")
+                model_choices.append(str(idx))
+                if is_coder:
+                    def_choice = str(idx)
 
-            # Auto-detect models from Ollama
-            detected_models = AIExplainerEngine.list_installed_models()
-            if detected_models:
-                console.print(f"\n[bold green]✓ Discovered {len(detected_models)} installed Ollama model(s):[/bold green]")
-                model_choices = []
-                for idx, m_name in enumerate(detected_models, 1):
-                    badge = " [bold green]⭐ (Specialized Code Model)[/bold green]" if "coder" in m_name.lower() else ""
-                    console.print(f"  [cyan][{idx}][/cyan] {m_name}{badge}")
-                    model_choices.append(str(idx))
+            console.print(f"  [cyan][{len(detected_models) + 1}][/cyan] Enter another model name manually")
+            model_choices.append(str(len(detected_models) + 1))
 
-                console.print(f"  [cyan][{len(detected_models) + 1}][/cyan] Enter another model name manually")
-                model_choices.append(str(len(detected_models) + 1))
-
-                # Default to coder model if present
-                def_choice = "1"
-                for idx, m_name in enumerate(detected_models, 1):
-                    if "coder" in m_name.lower():
-                        def_choice = str(idx)
-                        break
-
-                m_select = Prompt.ask("Select model", choices=model_choices, default=def_choice)
-                if int(m_select) <= len(detected_models):
-                    ai_model = detected_models[int(m_select) - 1]
-                else:
-                    ai_model = Prompt.ask("Enter model identifier")
+            m_select = Prompt.ask("Select model", choices=model_choices, default=def_choice)
+            if int(m_select) <= len(detected_models):
+                ai_model = detected_models[int(m_select) - 1]
             else:
-                ai_model = Prompt.ask(
-                    "Model identifier",
-                    default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
-                )
+                ai_model = Prompt.ask("Enter model identifier")
         else:
-            ai_provider = "openai_compatible"
-            ai_endpoint = Prompt.ask("Server endpoint URL", default="http://localhost:1234/v1")
-            ai_model = Prompt.ask("Model name or path", default="local-model")
+            ai_model = Prompt.ask(
+                "Enter Ollama model name",
+                default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
+            )
 
-    # 3. Output Format Choice
-    console.print("\n[bold yellow]Select Output Format:[/bold yellow]")
-    console.print("  [cyan][1][/cyan] Terminal Interactive UI Only")
-    console.print("  [cyan][2][/cyan] Markdown Report (`EXPLAINER_REPORT.md`)")
-    console.print("  [cyan][3][/cyan] Interactive HTML Visual Dashboard (`explainer_dashboard.html`)")
-    console.print("  [cyan][4][/cyan] [bold green]All Formats (Terminal + Markdown + HTML Dashboard)[/bold green] [Recommended]")
-    format_choice = Prompt.ask("Choose format", choices=["1", "2", "3", "4"], default="4")
+    # Automatically derive the folder name: (<Codebase folder-name>-EXPL)
+    codebase_folder_name = current_cwd.name or "Codebase"
+    expl_folder_name = f"{codebase_folder_name}-EXPL"
+    expl_output_dir = current_cwd / expl_folder_name
 
-    run_pipeline(
-        target_path=target_dir,
+    # 2. Run the analysis engine
+    codebase_analysis = run_core_analysis(
+        target_path=str(current_cwd),
         mode="ai" if mode_choice == "2" else "static",
-        fmt="all" if format_choice == "4" else {"1": "terminal", "2": "markdown", "3": "html"}[format_choice],
         ai_provider=ai_provider,
         ai_endpoint=ai_endpoint,
         ai_model=ai_model
     )
 
+    # 3. Generate the (<Codebase folder-name>-EXPL) folder structure
+    with console.status("[bold green]Writing individual file explanations to folder...[/bold green]"):
+        md_renderer = MarkdownRenderer()
+        generated_files = md_renderer.render_multi_file_dossier(codebase_analysis, str(expl_output_dir))
 
-@main.command(name="analyze")
-@click.argument("path", default=".", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
-@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default=None, help="AI model identifier (defaults to detected local Qwen/Coder model).")
-@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
-@click.option("--output-dir", default=".", help="Directory to save generated markdown and HTML reports.")
-def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
-    """Analyze a repository or individual file from CLI flags."""
-    run_pipeline(
-        target_path=path,
-        mode=mode,
-        fmt=fmt,
-        ai_provider=ai_provider,
-        ai_endpoint=ai_endpoint,
-        ai_model=ai_model,
-        inspect_file=inspect,
-        output_dir=output_dir
-    )
+        # Generate HTML Dashboard inside the folder
+        html_renderer = HtmlDashboardRenderer()
+        html_path = expl_output_dir / "dashboard.html"
+        html_renderer.render(codebase_analysis, str(html_path))
 
+    # 4. Notify user work has been done
+    file_count = len(codebase_analysis.files)
+    console.print()
+    console.print("[bold green]════════════════════════════════════════════════════════════════════[/bold green]")
+    console.print(f"[bold white] ✔ Work has been done successfully![/bold white]")
+    console.print(f"[bold cyan] 📁 Created Folder:[/bold cyan] [bold white]{expl_folder_name}[/bold white]")
+    console.print(f"[dim]    • Generated separate detailed explanations for each of the {file_count} files in:[/dim] [white]{expl_folder_name}/files/[/white]")
+    console.print(f"[dim]    • Generated Master Architecture Index in:[/dim] [white]{expl_folder_name}/INDEX.md[/white]")
+    console.print(f"[dim]    • Generated Interactive Visual Web GUI in:[/dim] [white]{expl_folder_name}/dashboard.html[/white]")
+    console.print("[bold green]════════════════════════════════════════════════════════════════════[/bold green]")
+    console.print()
 
-@main.command(name="scan")
-@click.argument("path", default=".", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
-@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default=None, help="AI model identifier (defaults to detected local Qwen/Coder model).")
-@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
-@click.option("--output-dir", default=".", help="Directory to save generated markdown and HTML reports.")
-def scan_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
-    """Scan and explain a codebase (alias for analyze)."""
-    run_pipeline(
-        target_path=path,
-        mode=mode,
-        fmt=fmt,
-        ai_provider=ai_provider,
-        ai_endpoint=ai_endpoint,
-        ai_model=ai_model,
-        inspect_file=inspect,
-        output_dir=output_dir
-    )
+    # 5. Second Prompt: Choose how to view (Default: 1)
+    console.print("[bold yellow]How would you like to view the explanation?[/bold yellow]")
+    console.print("  [cyan][1][/cyan] [bold]Want To See In Codebase Files Explanation In CLI[/bold] [bold green][Default][/bold green]")
+    console.print("  [cyan][2][/cyan] [bold]Want To See In Codebase Files Explanation In Webpage (GUI)[/bold]")
+    view_choice = Prompt.ask("Choose view format", choices=["1", "2"], default="1")
+
+    if view_choice == "1":
+        # Interactive CLI Viewer
+        terminal_renderer = RichTerminalRenderer()
+        terminal_renderer.render(codebase_analysis, inspect_file=None)
+        run_cli_file_inspector(codebase_analysis)
+    else:
+        # Open in Web Browser
+        console.print(f"\n[bold green]🌐 Opening Webpage GUI in your default browser...[/bold green]")
+        webbrowser.open(f"file://{html_path.resolve()}")
 
 
+def run_cli_file_inspector(codebase_analysis):
+    """Allows user to interactively inspect any file explanation in terminal."""
+    file_keys = sorted(list(codebase_analysis.files.keys()))
+    if not file_keys:
+        return
 
-def run_pipeline(
+    terminal_renderer = RichTerminalRenderer()
+
+    while True:
+        console.print("\n[bold cyan]🔎 Inspect Individual File Breakdown in CLI:[/bold cyan]")
+        console.print("Enter file number, file path, 'all', or 'q' to quit:")
+        for idx, f_path in enumerate(file_keys, 1):
+            fa = codebase_analysis.files[f_path]
+            console.print(f"  [cyan][{idx}][/cyan] {f_path} [dim]({fa.language} • {fa.line_count} LOC)[/dim]")
+
+        user_input = Prompt.ask("\nSelect file to inspect", default="q")
+        if user_input.strip().lower() in ("q", "quit", "exit"):
+            console.print("[dim]Exiting CLI Inspector. All files remain saved in your `-EXPL` folder.[/dim]\n")
+            break
+        elif user_input.strip().lower() == "all":
+            for f_path in file_keys:
+                terminal_renderer.render(codebase_analysis, inspect_file=f_path)
+            break
+        elif user_input.isdigit() and 1 <= int(user_input) <= len(file_keys):
+            selected_path = file_keys[int(user_input) - 1]
+            terminal_renderer.render(codebase_analysis, inspect_file=selected_path)
+        elif user_input in codebase_analysis.files:
+            terminal_renderer.render(codebase_analysis, inspect_file=user_input)
+        else:
+            console.print("[red]Invalid selection. Please choose a valid file number or 'q'.[/red]")
+
+
+def run_core_analysis(
     target_path: str,
     mode: str = "static",
-    fmt: str = "all",
     ai_provider: str = "ollama",
     ai_endpoint: str = "http://localhost:11434/api/generate",
-    ai_model: str = "llama3",
-    inspect_file: Optional[str] = None,
-    output_dir: str = "."
+    ai_model: Optional[str] = None
 ):
+    """Core analysis orchestrator returning a CodebaseAnalysis object."""
     target_p = Path(target_path).resolve()
-    with console.status("[bold green]Scanning workspace and source files...[/bold green]"):
+    with console.status("[bold green]Scanning codebase source files...[/bold green]"):
         scanner = WorkspaceScanner(str(target_p))
         scanned_files = scanner.scan()
 
     if not scanned_files:
-        console.print("[bold red]❌ No readable source files detected at specified path.[/bold red]")
+        console.print("[bold red]❌ No readable source files detected in codebase directory.[/bold red]")
         sys.exit(1)
 
-    console.print(f"[bold cyan]✓[/bold cyan] Discovered [bold]{len(scanned_files)}[/bold] source files to analyze.")
+    console.print(f"[bold cyan]✓[/bold cyan] Discovered [bold]{len(scanned_files)}[/bold] files to analyze.")
 
     # Parse all files
     registry = ParserRegistry()
     analyzed_files = {}
 
-    with console.status("[bold green]Extracting AST, tags, components, and concepts...[/bold green]"):
+    with console.status("[bold green]Extracting AST, tags, components, and concepts across all files...[/bold green]"):
         for fpath, rel_path in scanned_files:
+            # Skip previously generated EXPL folders
+            if "-EXPL" in rel_path:
+                continue
             try:
                 content = fpath.read_text(encoding="utf-8", errors="replace")
                 parser = registry.get_parser_for_path(fpath)
@@ -226,25 +232,63 @@ def run_pipeline(
             interconnections=interconnections
         )
 
-    out_dir = Path(output_dir).resolve()
-    out_dir.mkdir(parents=True, exist_ok=True)
+    return codebase_analysis
 
-    # Render Outputs
+
+def run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
+    """Executes analysis and writes out the (<Codebase folder-name>-EXPL) multi-file dossier."""
+    target_p = Path(path).resolve()
+    codebase_name = target_p.name or "Codebase"
+    out_dir = Path(output_dir) if output_dir else (target_p / f"{codebase_name}-EXPL")
+
+    analysis = run_core_analysis(
+        target_path=str(target_p),
+        mode=mode,
+        ai_provider=ai_provider,
+        ai_endpoint=ai_endpoint,
+        ai_model=ai_model
+    )
+
+    md_renderer = MarkdownRenderer()
+    md_renderer.render_multi_file_dossier(analysis, str(out_dir))
+
+    html_renderer = HtmlDashboardRenderer()
+    html_renderer.render(analysis, str(out_dir / "dashboard.html"))
+
     if fmt in ("terminal", "all"):
         terminal_renderer = RichTerminalRenderer()
-        terminal_renderer.render(codebase_analysis, inspect_file=inspect_file)
+        terminal_renderer.render(analysis, inspect_file=inspect)
 
-    if fmt in ("markdown", "all"):
-        md_path = out_dir / "EXPLAINER_REPORT.md"
-        md_renderer = MarkdownRenderer()
-        written_md = md_renderer.render(codebase_analysis, str(md_path))
-        console.print(f"[bold green]✓ Markdown Report generated:[/bold green] [underline cyan]{written_md}[/underline cyan]")
+    console.print(f"[bold green]✔ Complete multi-file dossier generated in:[/bold green] [underline white]{out_dir}[/underline white]")
+    return analysis, out_dir
 
-    if fmt in ("html", "all"):
-        html_path = out_dir / "explainer_dashboard.html"
-        html_renderer = HtmlDashboardRenderer()
-        written_html = html_renderer.render(codebase_analysis, str(html_path))
-        console.print(f"[bold green]✓ Interactive Visual Dashboard generated:[/bold green] [underline cyan]{written_html}[/underline cyan]")
+
+@main.command(name="analyze")
+@click.argument("path", default=".", type=click.Path(exists=True))
+@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
+@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
+@click.option("--output-dir", default=None, help="Directory to save generated markdown and HTML reports.")
+def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
+    """Analyze a repository or individual file from CLI flags."""
+    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
+
+
+@main.command(name="scan")
+@click.argument("path", default=".", type=click.Path(exists=True))
+@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "html", "all"]), default="all", help="Output format.")
+@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
+@click.option("--output-dir", default=None, help="Directory to save generated markdown and HTML reports.")
+def scan_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
+    """Scan and explain a codebase (alias for analyze)."""
+    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
 
 
 if __name__ == "__main__":

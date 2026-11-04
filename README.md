@@ -71,19 +71,46 @@ pip install -e .
 
 ## 🖥 Usage
 
-### 1. Interactive Wizard Mode (Recommended)
-Simply run without arguments to launch the step-by-step interactive configuration prompt:
+### 1. Interactive Workflow with `expl` Command (Recommended)
 
-```bash
-python -m explainer.cli
-# or if installed via pip:
-explainer
-```
+1. Open **CMD** or **PowerShell** inside any codebase folder:
+   ```bash
+   cd path/to/your/codebase
+   ```
+2. Type and run:
+   ```bash
+   expl
+   ```
+   *(or `EXPL` / `explainer`)*
 
-The wizard will guide you to:
-1. Enter your target codebase directory or file path.
-2. Select your engine: **[1] Pure Knowledge/AST Engine (Zero-AI)** or **[2] Local AI Model**.
-3. Choose your output format: **Terminal**, **Markdown**, **HTML Dashboard**, or **All**.
+3. **Step 1: Choose Mode** (Default: `[1]`):
+   ```text
+   Choose Explanation Mode:
+     [1] Without-AI Explanation (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [Default]
+     [2] AI Explanation (Local Ollama / Qwen Model)
+   Select mode [1]:
+   ```
+4. **Step 2: Automatic Multi-File Folder Generation**:
+   The tool analyzes all files and creates a dedicated folder named:
+   `📁 <Codebase_Folder_Name>-EXPL/`
+   Containing:
+   * `files/<filename>.md`: **Individual, exhaustive explanation document for each file in the codebase** (tags, symbols, functions, hooks, and how/why connections).
+   * `INDEX.md`: Master architecture index, tech stack compatibility, directory roles, and Mermaid dependency graph.
+   * `dashboard.html`: Interactive visual web GUI with draggable network graph.
+   * `FULL_REPORT.md`: Consolidated single-file dossier.
+
+5. **Step 3: Choose How to View** (Default: `[1]`):
+   ```text
+   ✔ Work has been done successfully!
+   📁 Created Folder: <Codebase_Folder_Name>-EXPL
+
+   How would you like to view the explanation?
+     [1] Want To See In Codebase Files Explanation In CLI [Default]
+     [2] Want To See In Codebase Files Explanation In Webpage (GUI)
+   Choose view format [1]:
+   ```
+   * **Option 1 (CLI)**: Displays the project overview and an interactive file selector to inspect any file's deep tags and symbols directly in your terminal.
+   * **Option 2 (Webpage GUI)**: Automatically launches `dashboard.html` in your default web browser!
 
 ---
 

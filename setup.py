@@ -17,6 +17,8 @@ setup(
     entry_points={
         "console_scripts": [
             "explainer=explainer.cli:main",
+            "expl=explainer.cli:main",
+            "EXPL=explainer.cli:main",
         ],
     },
     python_requires=">=3.9",
