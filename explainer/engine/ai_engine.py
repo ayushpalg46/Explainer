@@ -166,7 +166,8 @@ class AIExplainerEngine:
         self,
         fa: FileAnalysis,
         codebase: CodebaseAnalysis,
-        root_path: str
+        root_path: str,
+        stream_callback: Optional[Callable[[str], None]] = None
     ) -> Optional[str]:
         """Queries the local AI model for a deep, line-by-line file explanation for beginners."""
         content_snippet = ""
@@ -212,29 +213,50 @@ class AIExplainerEngine:
             f"──────\n"
         )
 
-        return self._send_prompt(prompt, max_tokens=850, temperature=0.3)
+        return self._send_prompt(prompt, max_tokens=850, temperature=0.3, stream_callback=stream_callback)
 
-    def _send_prompt(self, prompt: str, max_tokens: int = 650, temperature: float = 0.3) -> Optional[str]:
-        """Sends a prompt to the local AI endpoint with robust timeout and error reporting."""
+    def _send_prompt(
+        self,
+        prompt: str,
+        max_tokens: int = 650,
+        temperature: float = 0.3,
+        stream_callback: Optional[Callable[[str], None]] = None
+    ) -> Optional[str]:
+        """Sends a prompt to the local AI endpoint with robust timeout and optional token streaming."""
         try:
             if self.provider == "ollama":
                 payload = {
                     "model": self.model_name,
                     "prompt": prompt,
-                    "stream": False,
+                    "stream": bool(stream_callback),
                     "options": {
                         "num_predict": max_tokens,
                         "temperature": temperature
                     }
                 }
-                res = requests.post(self.endpoint_url, json=payload, timeout=120)
-                if res.status_code == 200:
-                    data = res.json()
-                    response_text = data.get("response", "").strip()
-                    if response_text:
-                        return response_text
+                if stream_callback:
+                    res = requests.post(self.endpoint_url, json=payload, timeout=180, stream=True)
+                    if res.status_code == 200:
+                        full_tokens = []
+                        for line in res.iter_lines():
+                            if line:
+                                chunk = json.loads(line.decode("utf-8"))
+                                tok = chunk.get("response", "")
+                                if tok:
+                                    full_tokens.append(tok)
+                                    stream_callback(tok)
+                        return "".join(full_tokens).strip()
+                    else:
+                        return f"*AI Generation Notice*: Ollama returned HTTP {res.status_code}: {res.text[:100]}"
                 else:
-                    return f"*AI Generation Notice*: Ollama returned HTTP {res.status_code}: {res.text[:100]}"
+                    res = requests.post(self.endpoint_url, json=payload, timeout=120)
+                    if res.status_code == 200:
+                        data = res.json()
+                        response_text = data.get("response", "").strip()
+                        if response_text:
+                            return response_text
+                    else:
+                        return f"*AI Generation Notice*: Ollama returned HTTP {res.status_code}: {res.text[:100]}"
 
             elif self.provider == "openai_compatible":
                 url = self.endpoint_url
@@ -247,16 +269,40 @@ class AIExplainerEngine:
                         {"role": "user", "content": prompt}
                     ],
                     "temperature": temperature,
-                    "max_tokens": max_tokens
+                    "max_tokens": max_tokens,
+                    "stream": bool(stream_callback)
                 }
-                res = requests.post(url, json=payload, timeout=180)
-                if res.status_code == 200:
-                    data = res.json()
-                    choices = data.get("choices", [])
-                    if choices:
-                        return choices[0].get("message", {}).get("content", "").strip()
+                if stream_callback:
+                    res = requests.post(url, json=payload, timeout=180, stream=True)
+                    if res.status_code == 200:
+                        full_tokens = []
+                        for line in res.iter_lines():
+                            if line:
+                                dec = line.decode("utf-8")
+                                if dec.startswith("data: "):
+                                    d_str = dec[6:].strip()
+                                    if d_str == "[DONE]":
+                                        break
+                                    try:
+                                        chunk = json.loads(d_str)
+                                        tok = chunk["choices"][0].get("delta", {}).get("content", "")
+                                        if tok:
+                                            full_tokens.append(tok)
+                                            stream_callback(tok)
+                                    except Exception:
+                                        pass
+                        return "".join(full_tokens).strip()
+                    else:
+                        return f"*AI Generation Notice*: Local AI server returned HTTP {res.status_code}: {res.text[:100]}"
                 else:
-                    return f"*AI Generation Notice*: Local AI server returned HTTP {res.status_code}: {res.text[:100]}"
+                    res = requests.post(url, json=payload, timeout=180)
+                    if res.status_code == 200:
+                        data = res.json()
+                        choices = data.get("choices", [])
+                        if choices:
+                            return choices[0].get("message", {}).get("content", "").strip()
+                    else:
+                        return f"*AI Generation Notice*: Local AI server returned HTTP {res.status_code}: {res.text[:100]}"
 
         except requests.exceptions.Timeout:
             return "*AI Generation Notice*: Local model request timed out (>180s)."

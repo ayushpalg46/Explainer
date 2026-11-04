@@ -8,6 +8,8 @@ from explainer.parsers.java_parser import JavaParser
 from explainer.parsers.go_parser import GoParser
 from explainer.parsers.docker_parser import DockerParser
 from explainer.parsers.shell_parser import ShellParser
+from explainer.parsers.sql_parser import SqlParser
+from explainer.parsers.conf_parser import ConfParser
 from explainer.parsers.generic_parser import GenericParser
 
 
@@ -225,6 +227,54 @@ class TestFileParsers(unittest.TestCase):
         self.assertTrue(el.words_breakdown)
         self.assertTrue(el.simple_analogy)
 
+
+    def test_sql_parser(self):
+        content = """
+        CREATE TABLE users (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE orders (
+            id INT PRIMARY KEY,
+            user_id INT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+        """
+        parser = SqlParser()
+        analysis = parser.parse("schema.sql", content, "schema.sql")
+        self.assertEqual(analysis.language, "SQL Database Script")
+        self.assertIn("users", analysis.raw_imports)
+        tbl_names = [e.name for e in analysis.elements]
+        self.assertTrue(any("users" in n for n in tbl_names))
+        self.assertTrue(len(analysis.elements) > 0)
+        first_el = analysis.elements[0]
+        self.assertTrue(first_el.simple_analogy)
+        self.assertTrue(first_el.words_breakdown)
+
+    def test_conf_parser(self):
+        content = """
+        server {
+            listen 80;
+            server_name example.com;
+            location /api/ {
+                proxy_pass http://localhost:8000;
+            }
+            location / {
+                root /var/www/html;
+                index index.html;
+            }
+        }
+        """
+        parser = ConfParser()
+        analysis = parser.parse("nginx.conf", content, "nginx.conf")
+        self.assertIn("http://localhost:8000", analysis.raw_imports)
+        names = [e.name for e in analysis.elements]
+        self.assertTrue(any("server" in n for n in names))
+        self.assertTrue(any("proxy_pass" in n for n in names))
+        first_el = analysis.elements[0]
+        self.assertTrue(first_el.simple_analogy)
+        self.assertTrue(first_el.words_breakdown)
 
     def test_user_exact_toy_box_example(self):
         content = """<div id="root" class="container">

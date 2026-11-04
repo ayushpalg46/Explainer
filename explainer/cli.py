@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 import click
 from rich.console import Console
 from rich.prompt import Prompt
@@ -17,11 +17,28 @@ from .engine.rule_engine import RuleExplainerEngine
 from .engine.ai_engine import AIExplainerEngine
 from .renderers.rich_terminal import RichTerminalRenderer
 from .renderers.markdown_renderer import MarkdownRenderer
+from .diff.git_diff_explainer import GitDiffExplainer, DiffAnalysis
+from .models import CodebaseAnalysis, TechStackInfo
 
 console = Console()
 
 
-@click.group(invoke_without_command=True)
+class ExplGroup(click.Group):
+    """Custom Click Group that dynamically routes file arguments directly to `explain_file`."""
+    def resolve_command(self, ctx, args):
+        if not args:
+            return super().resolve_command(ctx, args)
+        cmd_name = args[0]
+        cmd = self.get_command(ctx, cmd_name)
+        if cmd is not None:
+            return cmd_name, cmd, args[1:]
+        # If the argument is an existing file, route to explain_file
+        if Path(cmd_name).is_file():
+            return "explain_file", self.get_command(ctx, "explain_file"), args
+        return super().resolve_command(ctx, args)
+
+
+@click.group(cls=ExplGroup, invoke_without_command=True)
 @click.pass_context
 def main(ctx):
     """⚡ EXPL / Explainer: Deep Codebase & Per-File Architecture Intelligence Engine."""
@@ -29,43 +46,25 @@ def main(ctx):
         interactive_wizard()
 
 
-def interactive_wizard():
-    console.print()
-    console.print("[bold cyan]════════════════════════════════════════════════════════════════════[/bold cyan]")
-    console.print("[bold white] ⚡ EXPL - Codebase & File Architecture Explainer Engine[/bold white]")
-    console.print("[dim]   Deep Code Architecture, Tech Stack & File-by-File Breakdown[/dim]")
-    console.print("[bold cyan]════════════════════════════════════════════════════════════════════[/bold cyan]")
-    console.print()
-
-    # Detect current working directory as the codebase folder
-    current_cwd = Path.cwd().resolve()
-    console.print(f"[bold]📁 Current Codebase:[/bold] [underline white]{current_cwd}[/underline white]")
-    
-    # 1. First Prompt: Choose between Without-AI and AI (Default: 1) with "GO BACK" support
-    mode_choice = "1"
-    ai_provider = "ollama"
-    ai_endpoint = "http://localhost:11434/api/generate"
-    ai_model = None
-
+def select_mode_interactive() -> Tuple[str, Optional[str]]:
+    """Prompt user to choose between Without-AI and AI mode, returning (mode, ai_model)."""
     while True:
         console.print("\n[bold yellow]Choose Explanation Mode:[/bold yellow]")
         console.print("  [cyan][1][/cyan] [bold]Without-AI Explanation[/bold] (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [bold green][Default][/bold green]")
-        console.print("  [cyan][2][/cyan] [bold]AI Explanation[/bold] (Local Ollama / Qwen Model)")
+        console.print("  [cyan][2][/cyan] [bold]AI Explanation[/bold] (Local Ollama / Qwen Model with Live Streaming)")
         mode_choice = Prompt.ask("Select mode", choices=["1", "2"], default="1")
 
         if mode_choice == "1":
-            # Proceed directly with Without-AI mode
-            break
-
+            return "static", None
         elif mode_choice == "2":
             console.print("\n[bold yellow]Select Local AI Model:[/bold yellow]")
             detected_models = AIExplainerEngine.list_installed_models()
-            
+
             if detected_models:
                 console.print(f"[bold green]✓ Discovered {len(detected_models)} installed Ollama model(s):[/bold green]")
                 model_choices = []
                 def_choice = "1"
-                
+
                 for idx, m_name in enumerate(detected_models, 1):
                     is_coder = "coder" in m_name.lower()
                     badge = " [bold green]⭐ (Specialized Code Model)[/bold green]" if is_coder else ""
@@ -84,38 +83,53 @@ def interactive_wizard():
                 model_choices.append(back_idx)
 
                 m_select = Prompt.ask("Choose option", choices=model_choices, default=def_choice)
-                
+
                 if m_select == back_idx:
                     console.print("[dim]Returning to main menu...[/dim]")
-                    continue  # Loops back to Choose Explanation Mode
+                    continue
                 elif m_select == manual_idx:
                     ai_model = Prompt.ask("Enter model identifier")
-                    break
+                    return "ai", ai_model
                 else:
                     ai_model = detected_models[int(m_select) - 1]
-                    break
+                    return "ai", ai_model
             else:
                 console.print("[yellow]No local Ollama models detected automatically.[/yellow]")
                 console.print("  [cyan][1][/cyan] Enter Ollama model name manually")
                 console.print("  [cyan][2][/cyan] [bold yellow]↩ GO BACK[/bold yellow] (Return to Main Menu)")
                 m_select = Prompt.ask("Choose option", choices=["1", "2"], default="1")
-                
+
                 if m_select == "2":
                     console.print("[dim]Returning to main menu...[/dim]")
-                    continue  # Loops back to Choose Explanation Mode
+                    continue
                 else:
                     ai_model = Prompt.ask(
                         "Enter Ollama model name",
                         default="hf.co/BlossomsAI/Qwen2.5-Coder-7B-Instruct-Uncensored-GGUF:Q6_K"
                     )
-                    break
+                    return "ai", ai_model
 
-    # Automatically derive the folder name: (<Codebase folder-name>-EXPL)
+
+def interactive_wizard():
+    console.print()
+    console.print("[bold cyan]════════════════════════════════════════════════════════════════════[/bold cyan]")
+    console.print("[bold white] ⚡ EXPL - Codebase & File Architecture Explainer Engine[/bold white]")
+    console.print("[dim]   Deep Code Architecture, Tech Stack & File-by-File Breakdown[/dim]")
+    console.print("[bold cyan]════════════════════════════════════════════════════════════════════[/bold cyan]")
+    console.print()
+
+    current_cwd = Path.cwd().resolve()
+    console.print(f"[bold]📁 Current Codebase:[/bold] [underline white]{current_cwd}[/underline white]")
+
+    # Select Mode
+    mode, ai_model = select_mode_interactive()
+    ai_provider = "ollama"
+    ai_endpoint = "http://localhost:11434/api/generate"
+
     codebase_folder_name = current_cwd.name or "Codebase"
     expl_folder_name = f"{codebase_folder_name}-EXPL"
     expl_output_dir = current_cwd / expl_folder_name
 
-    # If the folder already exists, ask the user whether to update or create a new one
     if expl_output_dir.exists():
         console.print()
         console.print(f"[bold yellow]📁 Existing explanation folder '[white]{expl_folder_name}[/white]' already exists.[/bold yellow]")
@@ -130,21 +144,18 @@ def interactive_wizard():
         else:
             console.print(f"[bold green]🔄 Will update existing folder:[/bold green] [bold white]{expl_folder_name}[/bold white]")
 
-    # 2. Run the analysis engine
     codebase_analysis = run_core_analysis(
         target_path=str(current_cwd),
-        mode="ai" if mode_choice == "2" else "static",
+        mode=mode,
         ai_provider=ai_provider,
         ai_endpoint=ai_endpoint,
         ai_model=ai_model
     )
 
-    # 3. Generate the (<Codebase folder-name>-EXPL) folder structure
     with console.status("[bold green]Writing individual file explanations to folder...[/bold green]"):
         md_renderer = MarkdownRenderer()
-        generated_files = md_renderer.render_multi_file_dossier(codebase_analysis, str(expl_output_dir))
+        md_renderer.render_multi_file_dossier(codebase_analysis, str(expl_output_dir))
 
-    # 4. Notify user work has been done
     file_count = len(codebase_analysis.files)
     console.print()
     console.print("[bold green]════════════════════════════════════════════════════════════════════[/bold green]")
@@ -155,7 +166,6 @@ def interactive_wizard():
     console.print("[bold green]════════════════════════════════════════════════════════════════════[/bold green]")
     console.print()
 
-    # 5. Launch CLI Viewer directly
     console.print("[bold cyan]🔍 Opening Codebase Explanation in CLI Interface...[/bold cyan]\n")
     terminal_renderer = RichTerminalRenderer()
     terminal_renderer.render(codebase_analysis, inspect_file=None)
@@ -213,13 +223,11 @@ def run_core_analysis(
 
     console.print(f"[bold cyan]✓[/bold cyan] Discovered [bold]{len(scanned_files)}[/bold] files to analyze.")
 
-    # Parse all files
     registry = ParserRegistry()
     analyzed_files = {}
 
     with console.status("[bold green]Extracting AST, tags, components, and concepts across all files...[/bold green]"):
         for fpath, rel_path in scanned_files:
-            # Skip previously generated EXPL folders
             if "-EXPL" in rel_path:
                 continue
             try:
@@ -230,17 +238,14 @@ def run_core_analysis(
             except Exception as e:
                 console.print(f"[dim yellow]Warning: Failed to parse {rel_path}: {e}[/dim yellow]")
 
-    # Build Dependency & Interconnection Graph
     with console.status("[bold green]Resolving cross-file dependency graph and mechanics...[/bold green]"):
         dep_builder = DependencyGraphBuilder(analyzed_files)
         interconnections = dep_builder.build_interconnections()
 
-    # Analyze Tech Stack
     with console.status("[bold green]Analyzing technology stack & ecosystem compatibility...[/bold green]"):
         ts_analyzer = TechStackAnalyzer(str(target_p if target_p.is_dir() else target_p.parent))
         tech_stack = ts_analyzer.analyze(analyzed_files)
 
-    # Execute Explainer Engine
     if mode == "ai":
         engine = AIExplainerEngine(
             endpoint_url=ai_endpoint,
@@ -275,6 +280,183 @@ def run_core_analysis(
     return codebase_analysis
 
 
+def run_single_file_cli(
+    filepath: str,
+    mode: Optional[str] = None,
+    ai_provider: str = "ollama",
+    ai_endpoint: str = "http://localhost:11434/api/generate",
+    ai_model: Optional[str] = None,
+    stream: bool = True
+):
+    """Direct single-file explainer with live streaming and line-by-line breakdown."""
+    file_path = Path(filepath).resolve()
+    if not file_path.exists() or not file_path.is_file():
+        console.print(f"[bold red]❌ Error: File '{filepath}' does not exist or is not a valid file.[/bold red]")
+        sys.exit(1)
+
+    registry = ParserRegistry()
+    parser = registry.get_parser_for_path(file_path)
+    content = file_path.read_text(encoding="utf-8", errors="replace")
+    fa = parser.parse(str(file_path), content, file_path.name)
+
+    # Prompt for mode if not provided via flags
+    if not mode:
+        console.print(f"\n[bold cyan]📄 Direct File Explainer:[/bold cyan] [bold white]{file_path.name}[/bold white] [dim]({fa.language} • {fa.line_count} LOC)[/dim]")
+        mode, ai_model = select_mode_interactive()
+
+    terminal_renderer = RichTerminalRenderer()
+
+    if mode == "ai":
+        engine = AIExplainerEngine(
+            endpoint_url=ai_endpoint,
+            model_name=ai_model,
+            provider=ai_provider
+        )
+        engine.ensure_ollama_running()
+
+        console.print(f"\n[bold magenta]🧠 Querying Local AI Model: [bold white]{engine.model_name}[/bold white][/bold magenta]")
+        console.print("[dim]Streaming live token-by-token line walkthrough...[/dim]\n")
+
+        # Create dummy codebase wrapper for prompt context
+        dummy_codebase = CodebaseAnalysis(
+            root_path=str(file_path.parent),
+            project_name=file_path.parent.name or "Project",
+            total_files=1,
+            total_lines=fa.line_count,
+            tech_stack=TechStackInfo(languages={fa.language: 1}),
+            files={fa.relative_path: fa},
+            architecture_style="Modular File Component",
+            architecture_summary=f"Single source file ({fa.language}) within {file_path.parent.name}."
+        )
+
+        def stream_tok(tok: str):
+            console.print(tok, end="")
+
+        ai_out = engine._query_file_analysis(
+            fa=fa,
+            codebase=dummy_codebase,
+            root_path=str(file_path.parent),
+            stream_callback=stream_tok if stream else None
+        )
+        console.print("\n")
+        fa.ai_insights = ai_out
+        fa.ai_model_used = engine.model_name
+
+        # Also render standard AST elements if present
+        if not stream:
+            terminal_renderer.render_single_file(fa, project_name=file_path.parent.name)
+    else:
+        # Deterministic Without-AI mode
+        terminal_renderer.render_single_file(fa, project_name=file_path.parent.name)
+
+
+def run_git_diff_cli(
+    ref: Optional[str] = None,
+    mode: Optional[str] = None,
+    staged: bool = False,
+    ai_provider: str = "ollama",
+    ai_endpoint: str = "http://localhost:11434/api/generate",
+    ai_model: Optional[str] = None,
+    stream: bool = True
+):
+    """Executes git diff analysis line-by-line & word-by-word."""
+    explainer = GitDiffExplainer()
+    raw_diff, ref_label = explainer.get_git_diff(ref=ref, staged=staged)
+
+    if not raw_diff.strip():
+        console.print(f"[bold green]✓ No code changes detected in Git diff ({ref_label}). Working tree clean![/bold green]")
+        return
+
+    diff_files = explainer.parse_diff(raw_diff)
+    if not diff_files:
+        console.print("[bold yellow]No source file changes detected in diff.[/bold yellow]")
+        return
+
+    total_added = sum(len(f.added_lines) for f in diff_files)
+    console.print(f"\n[bold cyan]🔍 Git Diff Detected:[/bold cyan] [bold white]{len(diff_files)} file(s) changed[/bold white], [bold green]+{total_added} added lines[/bold green] [dim]({ref_label})[/dim]")
+
+    if not mode:
+        mode, ai_model = select_mode_interactive()
+
+    ai_engine = None
+    if mode == "ai":
+        ai_engine = AIExplainerEngine(
+            endpoint_url=ai_endpoint,
+            model_name=ai_model,
+            provider=ai_provider
+        )
+        ai_engine.ensure_ollama_running()
+        console.print(f"\n[bold magenta]🧠 Streaming Git Diff AI Walkthrough with: [bold white]{ai_engine.model_name}[/bold white][/bold magenta]\n")
+
+    def stream_tok(tok: str):
+        console.print(tok, end="")
+
+    analysis = explainer.analyze_diff(
+        files=diff_files,
+        ref_label=ref_label,
+        mode=mode or "static",
+        ai_engine=ai_engine,
+        stream_callback=stream_tok if stream else None
+    )
+
+    console.print()
+    terminal_renderer = RichTerminalRenderer()
+    terminal_renderer.render_diff(analysis)
+
+
+@main.command(name="explain_file")
+@click.argument("filepath", type=click.Path(exists=True))
+@click.option("--mode", type=click.Choice(["static", "ai"]), default=None, help="Explanation mode: 'static' (Without-AI) or 'ai' (Local LLM).")
+@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--stream/--no-stream", default=True, help="Enable live token streaming for AI mode.")
+def explain_file_cmd(filepath, mode, ai_provider, ai_endpoint, ai_model, stream):
+    """Direct line-by-line & word-by-word explanation of an individual file."""
+    run_single_file_cli(filepath, mode, ai_provider, ai_endpoint, ai_model, stream)
+
+
+@main.command(name="diff")
+@click.argument("ref", required=False, default=None)
+@click.option("--mode", type=click.Choice(["static", "ai"]), default=None, help="Explanation mode: 'static' or 'ai'.")
+@click.option("--staged", is_flag=True, help="Explain staged git changes.")
+@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--stream/--no-stream", default=True, help="Enable live token streaming for AI mode.")
+def diff_cmd(ref, mode, staged, ai_provider, ai_endpoint, ai_model, stream):
+    """Explain Git diff changes line-by-line & word-by-word for modified/added lines."""
+    run_git_diff_cli(ref, mode, staged, ai_provider, ai_endpoint, ai_model, stream)
+
+
+@main.command(name="analyze")
+@click.argument("path", default=".", type=click.Path(exists=True))
+@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
+@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
+@click.option("--output-dir", default=None, help="Directory to save generated markdown files.")
+def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
+    """Analyze a repository or folder from CLI flags."""
+    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
+
+
+@main.command(name="scan")
+@click.argument("path", default=".", type=click.Path(exists=True))
+@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
+@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
+@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
+@click.option("--ai-model", default=None, help="AI model identifier.")
+@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
+@click.option("--output-dir", default=None, help="Directory to save generated markdown files.")
+def scan_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
+    """Scan and explain a codebase (alias for analyze)."""
+    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
+
+
 def run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
     """Executes analysis and writes out the (<Codebase folder-name>-EXPL) multi-file dossier."""
     target_p = Path(path).resolve()
@@ -298,34 +480,6 @@ def run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, o
 
     console.print(f"[bold green]✔ Complete multi-file dossier generated in:[/bold green] [underline white]{out_dir}[/underline white]")
     return analysis, out_dir
-
-
-@main.command(name="analyze")
-@click.argument("path", default=".", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
-@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default=None, help="AI model identifier.")
-@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
-@click.option("--output-dir", default=None, help="Directory to save generated markdown files.")
-def analyze_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
-    """Analyze a repository or individual file from CLI flags."""
-    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
-
-
-@main.command(name="scan")
-@click.argument("path", default=".", type=click.Path(exists=True))
-@click.option("--mode", type=click.Choice(["static", "ai"]), default="static", help="Engine mode: 'static' (Zero-AI) or 'ai' (Local LLM).")
-@click.option("--format", "fmt", type=click.Choice(["terminal", "markdown", "all"]), default="all", help="Output format.")
-@click.option("--ai-provider", type=click.Choice(["ollama", "openai_compatible"]), default="ollama", help="Local AI provider.")
-@click.option("--ai-endpoint", default="http://localhost:11434/api/generate", help="Local AI endpoint URL.")
-@click.option("--ai-model", default=None, help="AI model identifier.")
-@click.option("--inspect", default=None, help="Specific relative file to inspect deeply in terminal.")
-@click.option("--output-dir", default=None, help="Directory to save generated markdown and HTML reports.")
-def scan_cmd(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir):
-    """Scan and explain a codebase (alias for analyze)."""
-    run_cli_scan(path, mode, fmt, ai_provider, ai_endpoint, ai_model, inspect, output_dir)
 
 
 if __name__ == "__main__":

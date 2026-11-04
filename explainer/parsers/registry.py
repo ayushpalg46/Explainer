@@ -10,6 +10,8 @@ from .java_parser import JavaParser
 from .go_parser import GoParser
 from .docker_parser import DockerParser
 from .shell_parser import ShellParser
+from .sql_parser import SqlParser
+from .conf_parser import ConfParser
 from .generic_parser import GenericParser
 
 
@@ -34,6 +36,11 @@ class ParserRegistry:
             ".sh": ShellParser(),
             ".bash": ShellParser(),
             ".zsh": ShellParser(),
+            ".sql": SqlParser(),
+            ".conf": ConfParser(),
+            ".nginx": ConfParser(),
+            ".cfg": ConfParser(),
+            ".ini": ConfParser(),
             ".json": GenericParser("JSON Data"),
             ".yaml": GenericParser("YAML Configuration"),
             ".yml": GenericParser("YAML Configuration"),

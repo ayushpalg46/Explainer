@@ -5,15 +5,43 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://python.org)
-[![Tests: 19 Passed](https://img.shields.io/badge/Tests-19%20Passed-success.svg)](tests/)
+[![Tests: 27 Passed](https://img.shields.io/badge/Tests-27%20Passed-success.svg)](tests/)
 
 ---
 
 ## 🌟 What is CodeExplainer?
 
-**CodeExplainer** is a developer tool and learning engine that breaks down any software codebase into plain, beginner-friendly explanations. Whether you are an absolute beginner who has never touched code or a developer trying to understand a massive unfamiliar project, CodeExplainer reads every single file in your repository and explains what is written **line-by-line, word-by-word, and tag-by-tag**.
+**CodeExplainer** is a developer tool and learning engine that breaks down any software codebase, single file, or Git diff into plain, beginner-friendly explanations. Whether you are an absolute beginner who has never touched code or a senior developer reviewing unfamiliar code, CodeExplainer reads what is written **line-by-line, word-by-word, and tag-by-tag** with **blue highlighted code lines**.
 
 It operates under the persona of a **World-Class Senior Developer & Master System Architect** who translates complex software concepts into fun, vivid real-world analogies (toys, Lego blocks, kitchen blenders, doorbell buttons, and helpful robot assistants).
+
+---
+
+## ⚡ Key Capabilities
+
+1. **📁 Full Codebase Analysis (`expl`)**:
+   - Recursively scans your workspace, detects languages, frameworks, build tools, package managers, and runtimes.
+   - Generates an isolated `<Codebase>-EXPL` dossier containing individual markdown breakdowns for each file and a master `INDEX.md`.
+   - Opens an interactive terminal inspector where you can browse any file's breakdown directly in your CLI.
+
+2. **📄 Direct Single-File Explainer (`expl <file_path>`)**:
+   - Pass any file path directly (e.g. `expl server.py`, `expl schema.sql`, `expl nginx.conf`).
+   - Bypasses workspace scan and immediately outputs the Big Picture Story and the full Line-by-Line & Word-by-Word breakdown into your terminal.
+
+3. **🔍 Git Diff Line-by-Line Explainer (`expl diff [ref]`)**:
+   - Inspects modified and added lines in your Git working tree or commits (e.g. `expl diff`, `expl diff HEAD~1`, `expl diff --staged`).
+   - Walks through every added or modified line with 4-year-old analogies, screen/system outcomes, cross-file ripple effects, and failure risks.
+
+4. **🧠 Live Token Streaming for Local AI Mode**:
+   - Connects to your local Ollama models (e.g. `Qwen2.5-Coder-7B` or `Qwen3.5`).
+   - Streams neural tokens word-by-word live into your terminal in real time.
+
+5. **🗄️ First-Class SQL & Configuration Support (`.sql`, `.conf`, `.nginx`, `.cfg`, `.ini`)**:
+   - Deep structural AST & semantic analysis for SQL tables, primary keys, foreign keys, constraints, and queries (`SELECT`, `JOIN`, `WHERE`).
+   - Deep structural analysis for web servers (Nginx reverse proxies, `listen` ports, `server_name`, `location`, `proxy_pass`) and INI settings.
+
+6. **🖥️ 100% Pure CLI Experience**:
+   - Fully optimized for terminals, PowerShell, and command prompts. No distracting browser popups or web server overhead.
 
 ---
 
@@ -26,16 +54,16 @@ CodeExplainer offers two distinct execution engines that produce the **exact sam
    - 🎯 **AST Grammar & Semantic Catalog**: Extracts exact code lines, attributes, properties, functions, and cross-file dependencies with mathematical precision.
    - 🧸 **Deep Pedagogical Catalog**: Powered by an extensive semantic dictionary containing 4-year-old analogies, screen outcomes, and failure consequences.
 
-2. **Option 2: Local AI Explanation (Local Ollama / Qwen2.5-Coder Model)**
+2. **Option 2: Local AI Explanation (Local Ollama / Qwen2.5-Coder Model with Live Streaming)**
    - 🧠 **Authentic Neural Intelligence**: Auto-detects and connects to your local Ollama models (e.g. `Qwen2.5-Coder-7B` or `Qwen3.5`).
-   - 🎓 **Senior Developer (ELI4) Prompt**: Instructed to analyze every file line-by-line and word-by-word using the exact standardized template.
+   - 🌊 **Live Token Streaming**: Outputs tokens word-by-word directly to the console as the model thinks.
    - 🛡️ **Zero Cloud Dependency**: Runs entirely on your local machine with full data privacy.
 
 ---
 
 ## 📖 The Standard Output Format
 
-Every single file in your codebase receives an explanation structured in this exact standard template:
+Every file and code diff receives an explanation structured in this exact standard template:
 
 ```markdown
 #### 🧸 1. The Big Picture Story (What is this code?)
@@ -112,9 +140,7 @@ Every single file in your codebase receives an explanation structured in this ex
 
 ---
 
-## 🛠️ Supported Languages & Manifests
-
-CodeExplainer extracts exact code lines and builds word-by-word dictionaries across all major development stacks:
+## 🛠️ Supported Languages & File Types
 
 | Language / Filetype | What Gets Explained Line-by-Line |
 | :--- | :--- |
@@ -122,12 +148,14 @@ CodeExplainer extracts exact code lines and builds word-by-word dictionaries acr
 | **CSS (`.css`, `.scss`)** | Selectors (`.class`, `#id`, `:root`, `element`), properties (`display: flex`, `grid`, `background`, `padding`, `margin`, `border-radius`, custom `--variables`), `@keyframes` animations, `@media` queries. |
 | **JavaScript / TypeScript / React (`.js`, `.jsx`, `.ts`, `.tsx`)** | ES module imports/exports, components, JSX tags, React hooks (`useState`, `useEffect`), event handlers (`onClick`), functions, async/await flows. |
 | **Python (`.py`)** | Imports, classes, `@dataclass`, functions, parameters, return types, main execution guards (`if __name__ == '__main__':`). |
+| **SQL Database Scripts (`.sql`)** | Table definitions (`CREATE TABLE`), column types (`INT`, `VARCHAR`, `TIMESTAMP`), constraints (`PRIMARY KEY`, `AUTO_INCREMENT`, `NOT NULL`, `UNIQUE`), foreign keys (`REFERENCES ... ON DELETE CASCADE`), queries (`SELECT`, `JOIN`, `WHERE`). |
+| **Server & INI Configurations (`.conf`, `.nginx`, `.cfg`, `.ini`)** | Server blocks, listen ports (`listen 80`), hostnames (`server_name`), document roots (`root /var/www/html`), URL locations (`location /api`), reverse proxies (`proxy_pass http://localhost:8000`), key-value configs. |
 | **Go (`.go`)** | Package clauses, imports, composite structs, interfaces, methods, functions, goroutines (`go ...`), channels (`chan`). |
 | **Rust (`.rs`)** | `use` declarations, modules, structs, enums, traits, functions, ownership/borrowing mechanics, Tokio async tasks. |
 | **Java (`.java`)** | Package namespaces, imports, annotations (`@SpringBootApplication`, `@Service`, `@RestController`), classes, methods. |
 | **Dockerfile & Docker Compose** | Build directives (`FROM`, `WORKDIR`, `COPY`, `RUN`, `EXPOSE`, `CMD`, `ENTRYPOINT`), microservice definitions, ports, volumes, environment links. |
 | **Shell Scripts (`.sh`, `.bash`, `.zsh`)** | Shebang lines (`#!/usr/bin/env bash`), strict safety flags (`set -euo pipefail`), sourced scripts, functions, CLI tools (`docker`, `python`, `npm`, `curl`, `mkdir`). |
-| **Manifests & Config (`package.json`, `requirements.txt`, `.env`)** | npm scripts, production & dev dependencies, pinned Python libraries, environment secrets, YAML/TOML settings, Markdown headers. |
+| **Manifests & Config (`package.json`, `requirements.txt`, `.env`)** | npm scripts, production & dev dependencies, pinned Python libraries, environment secrets, YAML/TOML settings. |
 
 ---
 
@@ -135,7 +163,7 @@ CodeExplainer extracts exact code lines and builds word-by-word dictionaries acr
 
 ### Installation
 
-Clone the repository and install dependencies:
+Clone the repository and install in editable mode:
 
 ```bash
 git clone https://github.com/ayushpalg46/Explainer.git
@@ -143,92 +171,80 @@ cd Explainer
 pip install -e .
 ```
 
-This registers the global CLI command `expl` in your PATH.
+This registers the global CLI command `expl` in your environment.
 
 ---
 
 ## 🖥 How to Use It
 
-### The Interactive CLI (`expl`)
+### 1. Direct Single-File Explainer
+Explain any single file directly in your terminal:
 
-1. Open **CMD** or **PowerShell** and navigate to your codebase directory:
-   ```bash
-   cd D:\my-awesome-project
-   ```
+```bash
+# Direct execution (prompts for mode: Without-AI [Default] or AI)
+expl server.py
 
-2. Run the command:
-   ```bash
-   expl
-   ```
+# Without-AI mode explicitly
+expl samples/schema.sql --mode static
 
-3. **Step 1: Choose Explanation Mode** (Default: `[1]`):
-   ```text
-   Choose Explanation Mode:
-     [1] Without-AI Explanation (Deterministic Pure AST & Knowledge Engine - 100% Offline & Precise) [Default]
-     [2] AI Explanation (Local Ollama / Qwen Model)
-   Select mode [1]:
-   ```
-   - Press **Enter** to run in instant, zero-latency Without-AI mode.
-   - Or press **2** to select from your installed local Ollama models (with an option `[4] ↩ GO BACK` to return to the menu).
+# Configuration file
+expl samples/nginx.conf --mode static
 
-4. **Step 2: Existing Folder Handling (Safe & Clean Updates)**:
-   If `<Codebase>-EXPL` already exists from a previous run, the tool prompts you:
-   ```text
-   Folder 'my-awesome-project-EXPL' already exists! Choose an action:
-     [1] Update & refresh existing folder (Default / Clean update)
-     [2] Create a new timestamped folder (Keep both)
-   Select option [1]:
-   ```
-   - **Option 1**: Cleans any deleted files and refreshes the dossier in-place.
-   - **Option 2**: Preserves your existing folder and creates a timestamped archive (e.g. `my-awesome-project-EXPL_20261104_120000`).
+# Local AI with live streaming
+expl server.py --mode ai --ai-model qwen2.5-coder:7b
+```
 
-5. **Step 3: Dedicated Multi-File Output Generation**:
-   The tool analyzes the codebase and generates:
+### 2. Git Diff Line-by-Line Explainer
+Explain what changed in your working tree or commits:
+
+```bash
+# Explain working tree diff line-by-line
+expl diff
+
+# Explain staged changes
+expl diff --staged
+
+# Explain changes compared to previous commit
+expl diff HEAD~1
+
+# Run diff in AI mode with live streaming
+expl diff --mode ai
+```
+
+### 3. Full Codebase Interactive Wizard
+Run `expl` in any directory to explain the whole project:
+
+```bash
+cd D:\my-project
+expl
+```
+
+1. **Choose Explanation Mode**: Select `[1]` (Without-AI [Default]) or `[2]` (Local AI with model selection and `↩ GO BACK`).
+2. **Existing Folder Handling**: Updates existing `<Codebase>-EXPL` cleanly or generates a timestamped archive.
+3. **Dedicated Output Dossier**:
    ```text
    📁 <Codebase_Name>-EXPL/
    ├── 📁 files/
-   │   ├── index.html.md    <-- Dedicated line-by-line breakdown of index.html
-   │   ├── style.css.md     <-- Dedicated line-by-line breakdown of style.css
-   │   ├── app.jsx.md       <-- Dedicated line-by-line breakdown of app.jsx
-   │   ├── server.py.md     <-- Dedicated line-by-line breakdown of server.py
-   │   └── Dockerfile.md    <-- Dedicated line-by-line breakdown of Dockerfile
-   ├── INDEX.md             <-- Architecture summary & file catalog with links
-   └── FULL_REPORT.md       <-- Consolidated comprehensive dossier
+   │   ├── index.html.md
+   │   ├── style.css.md
+   │   ├── schema.sql.md
+   │   └── server.py.md
+   ├── INDEX.md
+   └── FULL_REPORT.md
    ```
-
-6. **Step 4: Interactive CLI File Inspector**:
-   The tool immediately opens the rich terminal interface:
-   - Displays project architecture cards, tech stack compatibility, and cross-file links.
-   - Launches an interactive terminal menu where you can type any file number to deeply inspect its lines, word-by-word dictionaries, 4-year-old analogies, and failure consequences right in your terminal (or press `q` to exit).
-
----
-
-## 💻 CLI Flags (Non-Interactive / Scripting Mode)
-
-You can also run CodeExplainer via direct command-line flags:
-
-```bash
-# Run Without-AI analysis and generate markdown and terminal output
-python -m explainer.cli analyze ./my-project --mode static --format all
-
-# Run with Local AI (Ollama)
-python -m explainer.cli analyze ./my-project --mode ai --ai-model qwen2.5-coder:7b --format all
-
-# Inspect a single file directly in terminal
-python -m explainer.cli analyze ./my-project --inspect index.html --format terminal
-```
+4. **Interactive CLI Inspector**: Type any file number to deeply inspect its line-by-line walkthrough in your terminal, or `q` to exit.
 
 ---
 
 ## 🧪 Running Automated Tests
 
-Run the full automated test suite (19 unit & integration tests):
+Run the full automated test suite (27 unit & integration tests):
 
 ```bash
 pytest tests/ -v
 ```
 
-All 19 tests pass in under 1 second.
+All 27 tests pass in ~1.3 seconds.
 
 ---
 
